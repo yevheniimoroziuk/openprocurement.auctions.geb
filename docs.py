@@ -7,17 +7,13 @@ from datetime import timedelta, datetime
 from openprocurement.auctions.core.utils import get_now
 from openprocurement.auctions.core.tests.base import PrefixedRequestClass
 import openprocurement.auctions.landlease.tests.base as base_test
-from openprocurement.auctions.landlease.constants import DEFAULT_PROCUREMENT_METHOD_TYPE_FINANCIAL
-from openprocurement.auctions.landlease.tests.base import test_auction_data as base_test_auction_data, test_bids, test_financial_bids
+from openprocurement.auctions.landlease.tests.base import test_auction_data as base_test_auction_data, test_bids
 from openprocurement.auctions.landlease.tests.base import test_auction_maximum_data
 from openprocurement.auctions.landlease.tests.tender import BaseAuctionWebTest
 from webtest import TestApp
 
 now = datetime.now()
-
 test_auction_data = base_test_auction_data.copy()
-test_financial_auction_data = test_auction_data.copy()
-test_financial_auction_data["procurementMethodType"] = DEFAULT_PROCUREMENT_METHOD_TYPE_FINANCIAL
 
 bid = {
     "data": {
@@ -123,12 +119,11 @@ cancellation = {
 }
 
 test_complaint_data = {'data':
-        {
-            'title': 'complaint title',
-            'description': 'complaint description',
-            'author': bid["data"]["tenderers"][0]
-        }
-    }
+                       {
+                           'title': 'complaint title',
+                           'description': 'complaint description',
+                           'author': bid["data"]["tenderers"][0]
+                       }}
 
 
 class DumpsTestAppwebtest(TestApp):
@@ -140,17 +135,26 @@ class DumpsTestAppwebtest(TestApp):
             if req.body:
                 try:
                     self.file_obj.write(
-                        '\n' + json.dumps(json.loads(req.body), indent=2, ensure_ascii=False).encode('utf8'))
+                        '\n' +
+                        json.dumps(
+                            json.loads(
+                                req.body),
+                            indent=2,
+                            ensure_ascii=False).encode('utf8'))
                     self.file_obj.write("\n")
-                except:
+                except Exception:
                     pass
             self.file_obj.write("\n")
-        resp = super(DumpsTestAppwebtest, self).do_request(req, status=status, expect_errors=expect_errors)
+        resp = super(
+            DumpsTestAppwebtest,
+            self).do_request(
+            req,
+            status=status,
+            expect_errors=expect_errors)
         if hasattr(self, 'file_obj') and not self.file_obj.closed:
-            headers = [(n.title(), v)
-                       for n, v in resp.headerlist
-                       if n.lower() != 'content-length']
-            headers.sort()
+            headers = sorted([(n.title(), v)
+                              for n, v in resp.headerlist
+                              if n.lower() != 'content-length'])
             self.file_obj.write(str('\n%s\n%s\n') % (
                 resp.status,
                 str('\n').join([str('%s: %s') % (n, v) for n, v in headers]),
@@ -158,8 +162,14 @@ class DumpsTestAppwebtest(TestApp):
 
             if resp.testbody:
                 try:
-                    self.file_obj.write('\n' + json.dumps(json.loads(resp.testbody), indent=2, ensure_ascii=False).encode('utf8'))
-                except:
+                    self.file_obj.write(
+                        '\n' +
+                        json.dumps(
+                            json.loads(
+                                resp.testbody),
+                            indent=2,
+                            ensure_ascii=False).encode('utf8'))
+                except Exception:
                     pass
             self.file_obj.write("\n\n")
         return resp
@@ -172,7 +182,9 @@ class AuctionResourceTest(BaseAuctionWebTest):
 
     def setUp(self):
         self.app = DumpsTestAppwebtest(
-            "config:tests.ini", relative_to=os.path.dirname(base_test.__file__))
+            "config:tests.ini",
+            relative_to=os.path.dirname(
+                base_test.__file__))
         self.app.RequestClass = PrefixedRequestClass
         self.app.authorization = ('Basic', ('broker', ''))
         self.couchdb_server = self.app.app.registry.couchdb_server
@@ -182,7 +194,8 @@ class AuctionResourceTest(BaseAuctionWebTest):
             self.app.app.registry.docservice_url = 'http://public.docs-sandbox.ea.openprocurement.org'
 
     def generate_docservice_url(self):
-        return super(AuctionResourceTest, self).generate_docservice_url().replace('/localhost/', '/public.docs-sandbox.ea.openprocurement.org/')
+        return super(AuctionResourceTest, self).generate_docservice_url().replace(
+            '/localhost/', '/public.docs-sandbox.ea.openprocurement.org/')
 
     def test_docs_acceleration(self):
         # SANDBOX_MODE=TRUE
@@ -199,7 +212,6 @@ class AuctionResourceTest(BaseAuctionWebTest):
             self.assertEqual(response.status, '201 Created')
         auction = response.json['data']
         self.auction_id = auction['id']
-        owner_token = response.json['access']['token']
 
     def test_docs_2pc(self):
         # Creating auction in draft status
@@ -219,8 +231,11 @@ class AuctionResourceTest(BaseAuctionWebTest):
         # switch to 'active.tendering'
 
         with open('docs/source/tutorial/auction-patch-2pc.http', 'w') as self.app.file_obj:
-            response = self.app.patch_json('/auctions/{}?acc_token={}'.format(auction['id'], owner_token),
-                                           {'data': {"status": 'active.tendering'}})
+            response = self.app.patch_json(
+                '/auctions/{}?acc_token={}'.format(
+                    auction['id'], owner_token), {
+                    'data': {
+                        "status": 'active.tendering'}})
             self.assertEqual(response.status, '200 OK')
 
     def test_docs_tutorial(self):
@@ -244,7 +259,10 @@ class AuctionResourceTest(BaseAuctionWebTest):
         with open('docs/source/tutorial/auction-post-attempt-json.http', 'w') as self.app.file_obj:
             self.app.authorization = ('Basic', ('broker', ''))
             response = self.app.post(
-                request_path, 'data', content_type='application/json', status=422)
+                request_path,
+                'data',
+                content_type='application/json',
+                status=422)
             self.assertEqual(response.status, '422 Unprocessable Entity')
 
         # Creating auction
@@ -263,7 +281,8 @@ class AuctionResourceTest(BaseAuctionWebTest):
             "startDate": (now + timedelta(days=6)).isoformat()
         }
         with open('docs/source/tutorial/tenderperiod-validation-error.http', 'w') as self.app.file_obj:
-            response = self.app.post_json('/auctions?opt_pretty=1', {"data": data}, status=422)
+            response = self.app.post_json(
+                '/auctions?opt_pretty=1', {"data": data}, status=422)
             self.assertEqual(response.status, '422 Unprocessable Entity')
 
         with open('docs/source/tutorial/blank-auction-view.http', 'w') as self.app.file_obj:
@@ -280,7 +299,8 @@ class AuctionResourceTest(BaseAuctionWebTest):
                 '/auctions?opt_pretty=1', {"data": test_auction_maximum_data})
             self.assertEqual(response.status, '201 Created')
 
-        response = self.app.post_json('/auctions?opt_pretty=1', {"data": test_auction_data})
+        response = self.app.post_json(
+            '/auctions?opt_pretty=1', {"data": test_auction_data})
         self.assertEqual(response.status, '201 Created')
 
         with open('docs/source/tutorial/auction-listing-after-procuringEntity.http', 'w') as self.app.file_obj:
@@ -294,13 +314,12 @@ class AuctionResourceTest(BaseAuctionWebTest):
 
         tenderPeriod_endDate = get_now() + timedelta(days=15, seconds=10)
         with open('docs/source/tutorial/patch-items-value-periods.http', 'w') as self.app.file_obj:
-            response = self.app.patch_json('/auctions/{}?acc_token={}'.format(auction['id'], owner_token), {'data':
-                {
-                    "tenderPeriod": {
-                        "endDate": tenderPeriod_endDate.isoformat()
-                    }
-                }
-            })
+            response = self.app.patch_json(
+                '/auctions/{}?acc_token={}'.format(
+                    auction['id'], owner_token), {
+                    'data': {
+                        "tenderPeriod": {
+                            "endDate": tenderPeriod_endDate.isoformat()}}})
 
         self.app.get(request_path)
         with open('docs/source/tutorial/auction-listing-after-patch.http', 'w') as self.app.file_obj:
@@ -313,23 +332,29 @@ class AuctionResourceTest(BaseAuctionWebTest):
         self.go_to_rectificationPeriod_end()
         data = test_auction_data.copy()
         with open('docs/source/tutorial/out-of-rectification-period-editing-denied.http', 'w') as self.app.file_obj:
-            response = self.app.patch_json('/auctions/{}?acc_token={}'.format(auction['id'], owner_token),
-            {"data": data}, status=403)
+            response = self.app.patch_json(
+                '/auctions/{}?acc_token={}'.format(
+                    auction['id'], owner_token), {
+                    "data": data}, status=403)
             self.assertEqual(response.status, '403 Forbidden')
 
         # Uploading documentation
         #
 
         with open('docs/source/tutorial/upload-auction-notice.http', 'w') as self.app.file_obj:
-            response = self.app.post_json('/auctions/{}/documents?acc_token={}'.format(self.auction_id, owner_token),
-                {'data': {
-                    'title': u'Notice.pdf',
-                    'url': self.generate_docservice_url(),
-                    'hash': 'md5:' + '0' * 32,
-                    'format': 'application/pdf',
-                    "documentType": "technicalSpecifications",
-                    "description": "document description",
-                }})
+            response = self.app.post_json(
+                '/auctions/{}/documents?acc_token={}'.format(
+                    self.auction_id,
+                    owner_token),
+                {
+                    'data': {
+                        'title': u'Notice.pdf',
+                        'url': self.generate_docservice_url(),
+                        'hash': 'md5:' + '0' * 32,
+                        'format': 'application/pdf',
+                        "documentType": "technicalSpecifications",
+                        "description": "document description",
+                    }})
             self.assertEqual(response.status, '201 Created')
 
         doc_id = response.json["data"]["id"]
@@ -339,13 +364,17 @@ class AuctionResourceTest(BaseAuctionWebTest):
             self.assertEqual(response.status, '200 OK')
 
         with open('docs/source/tutorial/upload-award-criteria.http', 'w') as self.app.file_obj:
-            response = self.app.post_json('/auctions/{}/documents?acc_token={}'.format(self.auction_id, owner_token),
-                {'data': {
-                    'title': u'AwardCriteria.pdf',
-                    'url': self.generate_docservice_url(),
-                    'hash': 'md5:' + '0' * 32,
-                    'format': 'application/pdf',
-                }})
+            response = self.app.post_json(
+                '/auctions/{}/documents?acc_token={}'.format(
+                    self.auction_id,
+                    owner_token),
+                {
+                    'data': {
+                        'title': u'AwardCriteria.pdf',
+                        'url': self.generate_docservice_url(),
+                        'hash': 'md5:' + '0' * 32,
+                        'format': 'application/pdf',
+                    }})
             self.assertEqual(response.status, '201 Created')
 
         doc_id = response.json["data"]["id"]
@@ -356,13 +385,18 @@ class AuctionResourceTest(BaseAuctionWebTest):
             self.assertEqual(response.status, '200 OK')
 
         with open('docs/source/tutorial/update-award-criteria.http', 'w') as self.app.file_obj:
-            response = self.app.put_json('/auctions/{}/documents/{}?acc_token={}'.format(self.auction_id, doc_id, owner_token),
-                {'data': {
-                    'title': u'AwardCriteria-2.pdf',
-                    'url': self.generate_docservice_url(),
-                    'hash': 'md5:' + '0' * 32,
-                    'format': 'application/pdf',
-                }})
+            response = self.app.put_json(
+                '/auctions/{}/documents/{}?acc_token={}'.format(
+                    self.auction_id,
+                    doc_id,
+                    owner_token),
+                {
+                    'data': {
+                        'title': u'AwardCriteria-2.pdf',
+                        'url': self.generate_docservice_url(),
+                        'hash': 'md5:' + '0' * 32,
+                        'format': 'application/pdf',
+                    }})
             self.assertEqual(response.status, '200 OK')
 
         with open('docs/source/tutorial/auction-documents-3.http', 'w') as self.app.file_obj:
@@ -371,16 +405,19 @@ class AuctionResourceTest(BaseAuctionWebTest):
             self.assertEqual(response.status, '200 OK')
 
         with open('docs/source/tutorial/upload-first-auction-illustration.http', 'w') as self.app.file_obj:
-            response = self.app.post_json('/auctions/{}/documents?acc_token={}'.format(self.auction_id, owner_token),
-                {'data': {
-                    'title': u'first_illustration.jpeg',
-                    'url': self.generate_docservice_url(),
-                    'hash': 'md5:' + '0' * 32,
-                    'format': 'image/jpeg',
-                    "documentType": "illustration",
-                    "description": "First illustration description",
-                    "index": 1
-                }})
+            response = self.app.post_json(
+                '/auctions/{}/documents?acc_token={}'.format(
+                    self.auction_id,
+                    owner_token),
+                {
+                    'data': {
+                        'title': u'first_illustration.jpeg',
+                        'url': self.generate_docservice_url(),
+                        'hash': 'md5:' + '0' * 32,
+                        'format': 'image/jpeg',
+                        "documentType": "illustration",
+                        "description": "First illustration description",
+                        "index": 1}})
             self.assertEqual(response.status, '201 Created')
 
         with open('docs/source/tutorial/auction-documents-4.http', 'w') as self.app.file_obj:
@@ -389,29 +426,35 @@ class AuctionResourceTest(BaseAuctionWebTest):
             self.assertEqual(response.status, '200 OK')
 
         with open('docs/source/tutorial/upload-second-auction-illustration.http', 'w') as self.app.file_obj:
-            response = self.app.post_json('/auctions/{}/documents?acc_token={}'.format(self.auction_id, owner_token),
-                {'data': {
-                    'title': u'second_illustration.jpeg',
-                    'url': self.generate_docservice_url(),
-                    'hash': 'md5:' + '0' * 32,
-                    'format': 'image/jpeg',
-                    "documentType": "illustration",
-                    "description": "Second illustration description",
-                    "index": 2
-                }})
+            response = self.app.post_json(
+                '/auctions/{}/documents?acc_token={}'.format(
+                    self.auction_id,
+                    owner_token),
+                {
+                    'data': {
+                        'title': u'second_illustration.jpeg',
+                        'url': self.generate_docservice_url(),
+                        'hash': 'md5:' + '0' * 32,
+                        'format': 'image/jpeg',
+                        "documentType": "illustration",
+                        "description": "Second illustration description",
+                        "index": 2}})
             self.assertEqual(response.status, '201 Created')
 
         with open('docs/source/tutorial/upload-third-auction-illustration.http', 'w') as self.app.file_obj:
-            response = self.app.post_json('/auctions/{}/documents?acc_token={}'.format(self.auction_id, owner_token),
-                {'data': {
-                    'title': u'third_illustration.jpeg',
-                    'url': self.generate_docservice_url(),
-                    'hash': 'md5:' + '0' * 32,
-                    'format': 'image/jpeg',
-                    "documentType": "illustration",
-                    "description": "Third illustration description",
-                    "index": 2
-                }})
+            response = self.app.post_json(
+                '/auctions/{}/documents?acc_token={}'.format(
+                    self.auction_id,
+                    owner_token),
+                {
+                    'data': {
+                        'title': u'third_illustration.jpeg',
+                        'url': self.generate_docservice_url(),
+                        'hash': 'md5:' + '0' * 32,
+                        'format': 'image/jpeg',
+                        "documentType": "illustration",
+                        "description": "Third illustration description",
+                        "index": 2}})
             self.assertEqual(response.status, '201 Created')
 
         with open('docs/source/tutorial/auction-documents-5.http', 'w') as self.app.file_obj:
@@ -420,12 +463,16 @@ class AuctionResourceTest(BaseAuctionWebTest):
             self.assertEqual(response.status, '200 OK')
 
         with open('docs/source/tutorial/add-asset-familiarization-document.http', 'w') as self.app.file_obj:
-            response = self.app.post_json('/auctions/{}/documents?acc_token={}'.format(self.auction_id, owner_token),
-                {'data': {
-                    'title': u'Familiarization with bank asset',
-                    "documentType": "x_dgfAssetFamiliarization",
-                    'accessDetails': "Familiar with asset: days, time, address",
-                }})
+            response = self.app.post_json(
+                '/auctions/{}/documents?acc_token={}'.format(
+                    self.auction_id,
+                    owner_token),
+                {
+                    'data': {
+                        'title': u'Familiarization with bank asset',
+                        "documentType": "x_dgfAssetFamiliarization",
+                        'accessDetails': "Familiar with asset: days, time, address",
+                    }})
             self.assertEqual(response.status, '201 Created')
 
         with open('docs/source/tutorial/auction-documents-6.http', 'w') as self.app.file_obj:
@@ -443,8 +490,9 @@ class AuctionResourceTest(BaseAuctionWebTest):
             self.assertEqual(response.status, '201 Created')
 
         with open('docs/source/tutorial/answer-question.http', 'w') as self.app.file_obj:
-            response = self.app.patch_json('/auctions/{}/questions/{}?acc_token={}'.format(
-                self.auction_id, question_id, owner_token), answer, status=200)
+            response = self.app.patch_json(
+                '/auctions/{}/questions/{}?acc_token={}'.format(
+                    self.auction_id, question_id, owner_token), answer, status=200)
             self.assertEqual(response.status, '200 OK')
 
         with open('docs/source/tutorial/list-question.http', 'w') as self.app.file_obj:
@@ -470,26 +518,35 @@ class AuctionResourceTest(BaseAuctionWebTest):
             self.assertEqual(response.status, '201 Created')
 
         with open('docs/source/tutorial/activate-bidder.http', 'w') as self.app.file_obj:
-            response = self.app.patch_json('/auctions/{}/bids/{}?acc_token={}'.format(
-                self.auction_id, bid1_id, bids_access[bid1_id]), {"data": {"status": "active"}})
+            response = self.app.patch_json(
+                '/auctions/{}/bids/{}?acc_token={}'.format(
+                    self.auction_id, bid1_id, bids_access[bid1_id]), {
+                    "data": {
+                        "status": "active"}})
             self.assertEqual(response.status, '200 OK')
 
         # Proposal Uploading
         #
 
         with open('docs/source/tutorial/upload-bid-proposal.http', 'w') as self.app.file_obj:
-            response = self.app.post_json('/auctions/{}/bids/{}/documents?acc_token={}'.format(self.auction_id, bid1_id, bids_access[bid1_id]),
-                {'data': {
-                    'title': u'Proposal.pdf',
-                    'url': self.generate_docservice_url(),
-                    'hash': 'md5:' + '0' * 32,
-                    'format': 'application/pdf',
-                }})
+            response = self.app.post_json(
+                '/auctions/{}/bids/{}/documents?acc_token={}'.format(
+                    self.auction_id,
+                    bid1_id,
+                    bids_access[bid1_id]),
+                {
+                    'data': {
+                        'title': u'Proposal.pdf',
+                        'url': self.generate_docservice_url(),
+                        'hash': 'md5:' + '0' * 32,
+                        'format': 'application/pdf',
+                    }})
             self.assertEqual(response.status, '201 Created')
 
         with open('docs/source/tutorial/bidder-documents.http', 'w') as self.app.file_obj:
-            response = self.app.get('/auctions/{}/bids/{}/documents?acc_token={}'.format(
-                self.auction_id, bid1_id, bids_access[bid1_id]))
+            response = self.app.get(
+                '/auctions/{}/bids/{}/documents?acc_token={}'.format(
+                    self.auction_id, bid1_id, bids_access[bid1_id]))
             self.assertEqual(response.status, '200 OK')
 
         # Second bidder registration
@@ -520,8 +577,10 @@ class AuctionResourceTest(BaseAuctionWebTest):
                 }
             ]
         }
-        response = self.app.patch_json('/auctions/{}/auction?acc_token={}'.format(self.auction_id, owner_token),
-                                       {'data': patch_data})
+        response = self.app.patch_json(
+            '/auctions/{}/auction?acc_token={}'.format(
+                self.auction_id, owner_token), {
+                'data': patch_data})
         self.assertEqual(response.status, '200 OK')
 
         self.app.authorization = ('Basic', ('broker', ''))
@@ -532,12 +591,14 @@ class AuctionResourceTest(BaseAuctionWebTest):
 
         with open('docs/source/tutorial/bidder-participation-url.http', 'w') as self.app.file_obj:
             response = self.app.get(
-                '/auctions/{}/bids/{}?acc_token={}'.format(self.auction_id, bid1_id, bids_access[bid1_id]))
+                '/auctions/{}/bids/{}?acc_token={}'.format(
+                    self.auction_id, bid1_id, bids_access[bid1_id]))
             self.assertEqual(response.status, '200 OK')
 
         with open('docs/source/tutorial/bidder2-participation-url.http', 'w') as self.app.file_obj:
             response = self.app.get(
-                '/auctions/{}/bids/{}?acc_token={}'.format(self.auction_id, bid2_id, bids_access[bid2_id]))
+                '/auctions/{}/bids/{}?acc_token={}'.format(
+                    self.auction_id, bid2_id, bids_access[bid2_id]))
             self.assertEqual(response.status, '200 OK')
 
         # Confirming qualification
@@ -553,12 +614,14 @@ class AuctionResourceTest(BaseAuctionWebTest):
 
         response = self.app.get('/auctions/{}/awards'.format(self.auction_id))
         with open('docs/source/tutorial/get-awards.http', 'w') as self.app.file_obj:
-            response = self.app.get('/auctions/{}/awards'.format(self.auction_id))
+            response = self.app.get(
+                '/auctions/{}/awards'.format(self.auction_id))
             self.assertEqual(response.status, '200 OK')
             self.assertEqual(len(response.json['data']), 2)
 
         # get waiting award
-        award = [i for i in response.json['data'] if i['status'] == 'pending.waiting'][0]
+        award = [i for i in response.json['data']
+                 if i['status'] == 'pending.waiting'][0]
         award_id = award['id']
 
         with open('docs/source/qualification/award-waiting-cancel.http', 'w') as self.app.file_obj:
@@ -568,67 +631,98 @@ class AuctionResourceTest(BaseAuctionWebTest):
 
         # get pending award
         response = self.app.get('/auctions/{}/awards'.format(self.auction_id))
-        award_id = [i['id'] for i in response.json['data'] if i['status'] == 'pending.verification'][0]
+        award_id = [i['id'] for i in response.json['data']
+                    if i['status'] == 'pending.verification'][0]
 
         with open('docs/source/tutorial/bidder-auction-protocol.http', 'w') as self.app.file_obj:
-            response = self.app.post_json('/auctions/{}/awards/{}/documents?acc_token={}'.format(self.auction_id, award_id, bids_access[bid2_id]),
-                {'data': {
-                    'title': u'SignedAuctionProtocol.pdf',
-                    'url': self.generate_docservice_url(),
-                    'hash': 'md5:' + '0' * 32,
-                    'format': 'application/pdf',
-                    "documentType": "auctionProtocol",
-                }})
+            response = self.app.post_json(
+                '/auctions/{}/awards/{}/documents?acc_token={}'.format(
+                    self.auction_id,
+                    award_id,
+                    bids_access[bid2_id]),
+                {
+                    'data': {
+                        'title': u'SignedAuctionProtocol.pdf',
+                        'url': self.generate_docservice_url(),
+                        'hash': 'md5:' + '0' * 32,
+                        'format': 'application/pdf',
+                        "documentType": "auctionProtocol",
+                    }})
             self.assertEqual(response.status, '201 Created')
 
         with open('docs/source/tutorial/owner-auction-protocol.http', 'w') as self.app.file_obj:
-            response = self.app.post_json('/auctions/{}/awards/{}/documents?acc_token={}'.format(self.auction_id, award_id, owner_token),
-                {'data': {
-                    'title': u'SignedAuctionProtocol.pdf',
-                    'url': self.generate_docservice_url(),
-                    'hash': 'md5:' + '0' * 32,
-                    'format': 'application/pdf',
-                    "documentType": "auctionProtocol",
-                }})
+            response = self.app.post_json(
+                '/auctions/{}/awards/{}/documents?acc_token={}'.format(
+                    self.auction_id,
+                    award_id,
+                    owner_token),
+                {
+                    'data': {
+                        'title': u'SignedAuctionProtocol.pdf',
+                        'url': self.generate_docservice_url(),
+                        'hash': 'md5:' + '0' * 32,
+                        'format': 'application/pdf',
+                        "documentType": "auctionProtocol",
+                    }})
             self.assertEqual(response.status, '201 Created')
 
         with open('docs/source/tutorial/verify-protocol.http', 'w') as self.app.file_obj:
-            response = self.app.patch_json('/auctions/{}/awards/{}?acc_token={}'.format(self.auction_id, award_id, owner_token), {"data": {"status": "pending.payment"}})
+            response = self.app.patch_json(
+                '/auctions/{}/awards/{}?acc_token={}'.format(
+                    self.auction_id, award_id, owner_token), {
+                    "data": {
+                        "status": "pending.payment"}})
             self.assertEqual(response.status, '200 OK')
 
         with open('docs/source/tutorial/confirm-qualification.http', 'w') as self.app.file_obj:
-            response = self.app.patch_json('/auctions/{}/awards/{}?acc_token={}'.format(self.auction_id, award_id, owner_token), {"data": {"status": "active"}})
+            response = self.app.patch_json('/auctions/{}/awards/{}?acc_token={}'.format(
+                self.auction_id, award_id, owner_token), {"data": {"status": "active"}})
             self.assertEqual(response.status, '200 OK')
 
-        response = self.app.get('/auctions/{}/contracts'.format(self.auction_id))
+        response = self.app.get(
+            '/auctions/{}/contracts'.format(self.auction_id))
         self.contract_id = response.json['data'][0]['id']
 
-        ####  Set contract value
+        # Set contract value
 
         auction = self.db.get(self.auction_id)
         for i in auction.get('awards', []):
             i['complaintPeriod']['endDate'] = i['complaintPeriod']['startDate']
         self.db.save(auction)
 
-        #### Setting contract period
+        # Setting contract period
 
-        period_dates = {"period": {"startDate": (now).isoformat(), "endDate": (now + timedelta(days=365)).isoformat()}}
+        period_dates = {
+            "period": {
+                "startDate": (now).isoformat(),
+                "endDate": (
+                    now +
+                    timedelta(
+                        days=365)).isoformat()}}
         with open('docs/source/tutorial/auction-contract-period.http', 'w') as self.app.file_obj:
-            response = self.app.patch_json('/auctions/{}/contracts/{}?acc_token={}'.format(
-            self.auction_id, self.contract_id, owner_token), {'data': {'period': period_dates["period"]}})
+            response = self.app.patch_json(
+                '/auctions/{}/contracts/{}?acc_token={}'.format(
+                    self.auction_id, self.contract_id, owner_token), {
+                    'data': {
+                        'period': period_dates["period"]}})
         self.assertEqual(response.status, '200 OK')
 
-        #### Uploading contract documentation
+        # Uploading contract documentation
         #
 
         with open('docs/source/tutorial/auction-contract-upload-document.http', 'w') as self.app.file_obj:
-            response = self.app.post_json('/auctions/{}/contracts/{}/documents?acc_token={}'.format(self.auction_id, self.contract_id, owner_token),
-                {'data': {
-                    'title': u'contract_first_document.doc',
-                    'url': self.generate_docservice_url(),
-                    'hash': 'md5:' + '0' * 32,
-                    'format': 'application/msword',
-                }})
+            response = self.app.post_json(
+                '/auctions/{}/contracts/{}/documents?acc_token={}'.format(
+                    self.auction_id,
+                    self.contract_id,
+                    owner_token),
+                {
+                    'data': {
+                        'title': u'contract_first_document.doc',
+                        'url': self.generate_docservice_url(),
+                        'hash': 'md5:' + '0' * 32,
+                        'format': 'application/msword',
+                    }})
             self.assertEqual(response.status, '201 Created')
 
         with open('docs/source/tutorial/auction-contract-get-documents.http', 'w') as self.app.file_obj:
@@ -637,13 +731,18 @@ class AuctionResourceTest(BaseAuctionWebTest):
         self.assertEqual(response.status, '200 OK')
 
         with open('docs/source/tutorial/auction-contract-upload-second-document.http', 'w') as self.app.file_obj:
-            response = self.app.post_json('/auctions/{}/contracts/{}/documents?acc_token={}'.format(self.auction_id, self.contract_id, owner_token),
-                {'data': {
-                    'title': u'contract_second_document.doc',
-                    'url': self.generate_docservice_url(),
-                    'hash': 'md5:' + '0' * 32,
-                    'format': 'application/msword',
-                }})
+            response = self.app.post_json(
+                '/auctions/{}/contracts/{}/documents?acc_token={}'.format(
+                    self.auction_id,
+                    self.contract_id,
+                    owner_token),
+                {
+                    'data': {
+                        'title': u'contract_second_document.doc',
+                        'url': self.generate_docservice_url(),
+                        'hash': 'md5:' + '0' * 32,
+                        'format': 'application/msword',
+                    }})
             self.assertEqual(response.status, '201 Created')
 
         with open('docs/source/tutorial/auction-contract-get-documents-again.http', 'w') as self.app.file_obj:
@@ -651,7 +750,7 @@ class AuctionResourceTest(BaseAuctionWebTest):
                 self.auction_id, self.contract_id))
         self.assertEqual(response.status, '200 OK')
 
-        #### Setting contract signature date and Contract signing
+        # Setting contract signature date and Contract signing
         #
 
         auction = self.db.get(self.auction_id)
@@ -660,18 +759,21 @@ class AuctionResourceTest(BaseAuctionWebTest):
         self.db.save(auction)
 
         with open('docs/source/tutorial/auction-contract-sign.http', 'w') as self.app.file_obj:
-            response = self.app.patch_json('/auctions/{}/contracts/{}?acc_token={}'.format(
-                    self.auction_id, self.contract_id, owner_token), {'data': {'status': 'active', "dateSigned": get_now().isoformat()}})
+            response = self.app.patch_json(
+                '/auctions/{}/contracts/{}?acc_token={}'.format(
+                    self.auction_id, self.contract_id, owner_token), {
+                    'data': {
+                        'status': 'active', "dateSigned": get_now().isoformat()}})
             self.assertEqual(response.status, '200 OK')
-
 
         # Preparing the cancellation request
         #
 
         self.set_status('active.awarded')
         with open('docs/source/tutorial/prepare-cancellation.http', 'w') as self.app.file_obj:
-            response = self.app.post_json('/auctions/{}/cancellations?acc_token={}'.format(
-                self.auction_id, owner_token), cancellation)
+            response = self.app.post_json(
+                '/auctions/{}/cancellations?acc_token={}'.format(
+                    self.auction_id, owner_token), cancellation)
             self.assertEqual(response.status, '201 Created')
 
         cancellation_id = response.json['data']['id']
@@ -680,37 +782,54 @@ class AuctionResourceTest(BaseAuctionWebTest):
         #
 
         with open('docs/source/tutorial/upload-cancellation-doc.http', 'w') as self.app.file_obj:
-            response = self.app.post_json('/auctions/{}/cancellations/{}/documents?acc_token={}'.format(self.auction_id, cancellation_id, owner_token),
-                {'data': {
-                    'title': u'Notice.pdf',
-                    'url': self.generate_docservice_url(),
-                    'hash': 'md5:' + '0' * 32,
-                    'format': 'application/pdf',
-                }})
+            response = self.app.post_json(
+                '/auctions/{}/cancellations/{}/documents?acc_token={}'.format(
+                    self.auction_id,
+                    cancellation_id,
+                    owner_token),
+                {
+                    'data': {
+                        'title': u'Notice.pdf',
+                        'url': self.generate_docservice_url(),
+                        'hash': 'md5:' + '0' * 32,
+                        'format': 'application/pdf',
+                    }})
             cancellation_doc_id = response.json['data']['id']
             self.assertEqual(response.status, '201 Created')
 
         with open('docs/source/tutorial/patch-cancellation.http', 'w') as self.app.file_obj:
-            response = self.app.patch_json('/auctions/{}/cancellations/{}/documents/{}?acc_token={}'.format(
-                self.auction_id, cancellation_id, cancellation_doc_id, owner_token), {'data': {"description": 'Changed description'}})
+            response = self.app.patch_json(
+                '/auctions/{}/cancellations/{}/documents/{}?acc_token={}'.format(
+                    self.auction_id, cancellation_id, cancellation_doc_id, owner_token), {
+                    'data': {
+                        "description": 'Changed description'}})
             self.assertEqual(response.status, '200 OK')
 
         with open('docs/source/tutorial/update-cancellation-doc.http', 'w') as self.app.file_obj:
-            response = self.app.put_json('/auctions/{}/cancellations/{}/documents/{}?acc_token={}'.format(self.auction_id, cancellation_id, cancellation_doc_id, owner_token),
-                {'data': {
-                    'title': u'Notice-2.pdf',
-                    'url': self.generate_docservice_url(),
-                    'hash': 'md5:' + '0' * 32,
-                    'format': 'application/pdf',
-                }})
+            response = self.app.put_json(
+                '/auctions/{}/cancellations/{}/documents/{}?acc_token={}'.format(
+                    self.auction_id,
+                    cancellation_id,
+                    cancellation_doc_id,
+                    owner_token),
+                {
+                    'data': {
+                        'title': u'Notice-2.pdf',
+                        'url': self.generate_docservice_url(),
+                        'hash': 'md5:' + '0' * 32,
+                        'format': 'application/pdf',
+                    }})
             self.assertEqual(response.status, '200 OK')
 
         # Activating the request and cancelling auction
         #
 
         with open('docs/source/tutorial/active-cancellation.http', 'w') as self.app.file_obj:
-            response = self.app.patch_json('/auctions/{}/cancellations/{}?acc_token={}'.format(
-                self.auction_id, cancellation_id, owner_token), {"data": {"status": "active"}})
+            response = self.app.patch_json(
+                '/auctions/{}/cancellations/{}?acc_token={}'.format(
+                    self.auction_id, cancellation_id, owner_token), {
+                    "data": {
+                        "status": "active"}})
             self.assertEqual(response.status, '200 OK')
 
     def test_docs_disqualification(self):
@@ -720,13 +839,25 @@ class AuctionResourceTest(BaseAuctionWebTest):
         # create bids
         self.set_status('active.tendering')
         self.app.authorization = ('Basic', ('broker', ''))
-        response = self.app.post_json('/auctions/{}/bids'.format(self.auction_id),
-                                      {'data': {"qualified": True, 'tenderers': [bid["data"]["tenderers"][0]], "value": {"amount": 450}}})
-        self.initial_bids_tokens[response.json['data']['id']] = response.json['access']['token']
+        response = self.app.post_json(
+            '/auctions/{}/bids'.format(
+                self.auction_id), {
+                'data': {
+                    "qualified": True, 'tenderers': [
+                        bid["data"]["tenderers"][0]], "value": {
+                        "amount": 450}}})
+        self.initial_bids_tokens[response.json['data']
+                                 ['id']] = response.json['access']['token']
         self.app.authorization = ('Basic', ('broker', ''))
-        response = self.app.post_json('/auctions/{}/bids'.format(self.auction_id),
-                                      {'data': {"qualified": True, 'tenderers': [bid["data"]["tenderers"][0]], "value": {"amount": 475}}})
-        self.initial_bids_tokens[response.json['data']['id']] = response.json['access']['token']
+        response = self.app.post_json(
+            '/auctions/{}/bids'.format(
+                self.auction_id), {
+                'data': {
+                    "qualified": True, 'tenderers': [
+                        bid["data"]["tenderers"][0]], "value": {
+                        "amount": 475}}})
+        self.initial_bids_tokens[response.json['data']
+                                 ['id']] = response.json['access']['token']
         # get auction info
         self.set_status('active.auction')
         self.app.authorization = ('Basic', ('auction', ''))
@@ -756,7 +887,8 @@ class AuctionResourceTest(BaseAuctionWebTest):
         response = self.app.get('/auctions/{}/awards'.format(self.auction_id))
         self.assertEqual(response.status, '200 OK')
 
-        award = [i for i in response.json['data'] if i['status'] == 'pending.verification'][0]
+        award = [i for i in response.json['data']
+                 if i['status'] == 'pending.verification'][0]
         award_id = award['id']
         bid_token = self.initial_bids_tokens[award['bid_id']]
 
@@ -781,12 +913,16 @@ class AuctionResourceTest(BaseAuctionWebTest):
             }})
         self.assertEqual(response.status, '201 Created')
 
-        response = self.app.patch_json('/auctions/{}/awards/{}?acc_token={}'.format(
-            self.auction_id, award_id, self.auction_token), {"data": {"status": "unsuccessful"}})
+        response = self.app.patch_json(
+            '/auctions/{}/awards/{}?acc_token={}'.format(
+                self.auction_id, award_id, self.auction_token), {
+                "data": {
+                    "status": "unsuccessful"}})
         self.assertEqual(response.status, '200 OK')
 
         response = self.app.get('/auctions/{}/awards'.format(self.auction_id))
-        award = [i for i in response.json['data'] if i['status'] == 'pending.verification'][0]
+        award = [i for i in response.json['data']
+                 if i['status'] == 'pending.verification'][0]
         award_id2 = award['id']
         bid_token = self.initial_bids_tokens[award['bid_id']]
 
@@ -814,15 +950,23 @@ class AuctionResourceTest(BaseAuctionWebTest):
             self.assertEqual(response.status, '201 Created')
 
         with open('docs/source/qualification/award-active-disqualify.http', 'w') as self.app.file_obj:
-            response = self.app.patch_json('/auctions/{}/awards/{}?acc_token={}'.format(
-                self.auction_id, award_id2, self.auction_token), {"data": {"status": "unsuccessful", "title": "Disqualified", "description": "Candidate didn’t sign the auction protocol in 3 business days"}})
+            response = self.app.patch_json(
+                '/auctions/{}/awards/{}?acc_token={}'.format(
+                    self.auction_id,
+                    award_id2,
+                    self.auction_token),
+                {
+                    "data": {
+                        "status": "unsuccessful",
+                        "title": "Disqualified",
+                        "description": "Candidate didn’t sign the auction protocol in 3 business days"}})
             self.assertEqual(response.status, '200 OK')
 
     def _test_docs_complaints(self):
 
-        ###################### Tender Conditions Claims/Complaints ##################
+        # ##################### Tender Conditions Claims/Complaints ############
         #
-        #### Claim Submission (with documents)
+        # Claim Submission (with documents)
         #
 
         self.create_auction()
@@ -837,7 +981,7 @@ class AuctionResourceTest(BaseAuctionWebTest):
 
         with open('docs/source/complaints/complaint-submission-upload.http', 'w') as self.app.file_obj:
             response = self.app.post_json('/auctions/{}/complaints/{}/documents?acc_token={}'.format(
-                    self.auction_id, complaint1_id, complaint1_token), {'data': {
+                self.auction_id, complaint1_id, complaint1_token), {'data': {
                     'title': u'Complaint_Attachement.pdf',
                     'url': self.generate_docservice_url(),
                     'hash': 'md5:' + '0' * 32,
@@ -846,11 +990,14 @@ class AuctionResourceTest(BaseAuctionWebTest):
             self.assertEqual(response.status, '201 Created')
 
         with open('docs/source/complaints/complaint-claim.http', 'w') as self.app.file_obj:
-            response = self.app.patch_json('/auctions/{}/complaints/{}?acc_token={}'.format(
-                    self.auction_id, complaint1_id, complaint1_token), {"data":{"status":"claim"}})
+            response = self.app.patch_json(
+                '/auctions/{}/complaints/{}?acc_token={}'.format(
+                    self.auction_id, complaint1_id, complaint1_token), {
+                    "data": {
+                        "status": "claim"}})
             self.assertEqual(response.status, '200 OK')
 
-        #### Claim Submission (without documents)
+        # Claim Submission (without documents)
         #
 
         test_complaint_data['data']['status'] = 'claim'
@@ -863,83 +1010,111 @@ class AuctionResourceTest(BaseAuctionWebTest):
         complaint2_id = response.json['data']['id']
         complaint2_token = response.json['access']['token']
 
-        #### Tender Conditions Claim/Complaint Retrieval
+        # Tender Conditions Claim/Complaint Retrieval
         #
 
         with open('docs/source/complaints/complaints-list.http', 'w') as self.app.file_obj:
             self.app.authorization = None
-            response = self.app.get('/auctions/{}/complaints'.format(self.auction_id))
+            response = self.app.get(
+                '/auctions/{}/complaints'.format(self.auction_id))
             self.assertEqual(response.status, '200 OK')
 
         with open('docs/source/complaints/complaint.http', 'w') as self.app.file_obj:
-            response = self.app.get('/auctions/{}/complaints/{}'.format(self.auction_id, complaint1_id))
+            response = self.app.get(
+                '/auctions/{}/complaints/{}'.format(self.auction_id, complaint1_id))
             self.assertEqual(response.status, '200 OK')
 
         self.app.authorization = ('Basic', ('broker', ''))
 
-        #### Claim's Answer
+        # Claim's Answer
         #
 
         with open('docs/source/complaints/complaint-answer.http', 'w') as self.app.file_obj:
-            response = self.app.patch_json('/auctions/{}/complaints/{}?acc_token={}'.format(self.auction_id, complaint1_id, self.auction_token),
+            response = self.app.patch_json(
+                '/auctions/{}/complaints/{}?acc_token={}'.format(
+                    self.auction_id,
+                    complaint1_id,
+                    self.auction_token),
                 {
                     "data": {
                         "status": "answered",
                         "resolutionType": "resolved",
                         "tendererAction": "Виправлено неконкурентні умови",
-                        "resolution": "Виправлено неконкурентні умови"
-                    }
-                }
-            )
+                        "resolution": "Виправлено неконкурентні умови"}})
             self.assertEqual(response.status, '200 OK')
 
-
-        #### Satisfied Claim
+        # Satisfied Claim
         #
 
         with open('docs/source/complaints/complaint-satisfy.http', 'w') as self.app.file_obj:
-            response = self.app.patch_json('/auctions/{}/complaints/{}?acc_token={}'.format(
-                    self.auction_id, complaint1_id, complaint1_token), {"data":{"status":"resolved","satisfied":True}})
+            response = self.app.patch_json(
+                '/auctions/{}/complaints/{}?acc_token={}'.format(
+                    self.auction_id, complaint1_id, complaint1_token), {
+                    "data": {
+                        "status": "resolved", "satisfied": True}})
             self.assertEqual(response.status, '200 OK')
 
-        #### Satisfied Claim
+        # Satisfied Claim
         #
 
-
-        response = self.app.patch_json('/auctions/{}/complaints/{}?acc_token={}'.format(
-                self.auction_id, complaint2_id, self.auction_token), {"data":{"status":"answered","resolutionType":"resolved","resolution":"Виправлено неконкурентні умови"}})
+        response = self.app.patch_json(
+            '/auctions/{}/complaints/{}?acc_token={}'.format(
+                self.auction_id,
+                complaint2_id,
+                self.auction_token),
+            {
+                "data": {
+                    "status": "answered",
+                    "resolutionType": "resolved",
+                    "resolution": "Виправлено неконкурентні умови"}})
         self.assertEqual(response.status, '200 OK')
 
         with open('docs/source/complaints/complaint-escalate.http', 'w') as self.app.file_obj:
-            response = self.app.patch_json('/auctions/{}/complaints/{}?acc_token={}'.format(
-                    self.auction_id, complaint2_id, complaint2_token), {"data":{"status":"pending","satisfied":False}})
+            response = self.app.patch_json(
+                '/auctions/{}/complaints/{}?acc_token={}'.format(
+                    self.auction_id, complaint2_id, complaint2_token), {
+                    "data": {
+                        "status": "pending", "satisfied": False}})
             self.assertEqual(response.status, '200 OK')
 
-        #### Rejecting Tender Conditions Complaint
+        # Rejecting Tender Conditions Complaint
         #
 
         self.app.authorization = ('Basic', ('reviewer', ''))
 
         with open('docs/source/complaints/complaint-reject.http', 'w') as self.app.file_obj:
-            response = self.app.patch_json('/auctions/{}/complaints/{}'.format(
-                    self.auction_id, complaint2_id), {"data":{"status":"invalid"}})
+            response = self.app.patch_json(
+                '/auctions/{}/complaints/{}'.format(
+                    self.auction_id, complaint2_id), {
+                    "data": {
+                        "status": "invalid"}})
             self.assertEqual(response.status, '200 OK')
 
-        #### Submitting Tender Conditions Complaint Resolution
+        # Submitting Tender Conditions Complaint Resolution
         #
 
         self.app.authorization = ('Basic', ('broker', ''))
-
 
         response = self.app.post_json('/auctions/{}/complaints'.format(
             self.auction_id), test_complaint_data)
         self.assertEqual(response.status, '201 Created')
         complaint3_id = response.json['data']['id']
         complaint3_token = response.json['access']['token']
-        self.app.patch_json('/auctions/{}/complaints/{}?acc_token={}'.format(
-                self.auction_id, complaint3_id, self.auction_token), {"data":{"status":"answered","resolutionType":"resolved","resolution":"Виправлено неконкурентні умови"}})
-        self.app.patch_json('/auctions/{}/complaints/{}?acc_token={}'.format(
-                self.auction_id, complaint3_id, complaint3_token), {"data":{"status":"pending","satisfied":False}})
+        self.app.patch_json(
+            '/auctions/{}/complaints/{}?acc_token={}'.format(
+                self.auction_id,
+                complaint3_id,
+                self.auction_token),
+            {
+                "data": {
+                    "status": "answered",
+                    "resolutionType": "resolved",
+                    "resolution": "Виправлено неконкурентні умови"}})
+        self.app.patch_json(
+            '/auctions/{}/complaints/{}?acc_token={}'.format(
+                self.auction_id, complaint3_id, complaint3_token), {
+                "data": {
+                    "status": "pending", "satisfied": False}})
 
         response = self.app.post_json('/auctions/{}/complaints'.format(
             self.auction_id), test_complaint_data)
@@ -947,17 +1122,27 @@ class AuctionResourceTest(BaseAuctionWebTest):
         del test_complaint_data['data']['status']
         complaint4_id = response.json['data']['id']
         complaint4_token = response.json['access']['token']
-        self.app.patch_json('/auctions/{}/complaints/{}?acc_token={}'.format(
-                self.auction_id, complaint4_id, self.auction_token), {"data":{"status":"answered","resolutionType":"resolved","resolution":"Виправлено неконкурентні умови"}})
-        self.app.patch_json('/auctions/{}/complaints/{}?acc_token={}'.format(
-                self.auction_id, complaint4_id, complaint4_token), {"data":{"status":"pending","satisfied":False}})
-
+        self.app.patch_json(
+            '/auctions/{}/complaints/{}?acc_token={}'.format(
+                self.auction_id,
+                complaint4_id,
+                self.auction_token),
+            {
+                "data": {
+                    "status": "answered",
+                    "resolutionType": "resolved",
+                    "resolution": "Виправлено неконкурентні умови"}})
+        self.app.patch_json(
+            '/auctions/{}/complaints/{}?acc_token={}'.format(
+                self.auction_id, complaint4_id, complaint4_token), {
+                "data": {
+                    "status": "pending", "satisfied": False}})
 
         self.app.authorization = ('Basic', ('reviewer', ''))
 
         with open('docs/source/complaints/complaint-resolution-upload.http', 'w') as self.app.file_obj:
             response = self.app.post_json('/auctions/{}/complaints/{}/documents'.format(
-                    self.auction_id, complaint3_id), {'data': {
+                self.auction_id, complaint3_id), {'data': {
                     'title': u'ComplaintResolution.pdf',
                     'url': self.generate_docservice_url(),
                     'hash': 'md5:' + '0' * 32,
@@ -966,25 +1151,40 @@ class AuctionResourceTest(BaseAuctionWebTest):
             self.assertEqual(response.status, '201 Created')
 
         with open('docs/source/complaints/complaint-resolve.http', 'w') as self.app.file_obj:
-            response = self.app.patch_json('/auctions/{}/complaints/{}'.format(
-                    self.auction_id, complaint3_id), {"data":{"status":"resolved"}})
+            response = self.app.patch_json(
+                '/auctions/{}/complaints/{}'.format(
+                    self.auction_id, complaint3_id), {
+                    "data": {
+                        "status": "resolved"}})
             self.assertEqual(response.status, '200 OK')
 
         with open('docs/source/complaints/complaint-decline.http', 'w') as self.app.file_obj:
-            response = self.app.patch_json('/auctions/{}/complaints/{}'.format(
-                    self.auction_id, complaint4_id), {"data":{"status":"declined"}})
+            response = self.app.patch_json(
+                '/auctions/{}/complaints/{}'.format(
+                    self.auction_id, complaint4_id), {
+                    "data": {
+                        "status": "declined"}})
             self.assertEqual(response.status, '200 OK')
 
         # create bids
         self.set_status('active.tendering')
         self.app.authorization = ('Basic', ('broker', ''))
-        response = self.app.post_json('/auctions/{}/bids'.format(self.auction_id),
-                                      {'data': {"qualified": True, 'tenderers': [bid["data"]["tenderers"][0]], "value": {"amount": 450}}})
-        bid_id = response.json['data']['id']
+        response = self.app.post_json(
+            '/auctions/{}/bids'.format(
+                self.auction_id), {
+                'data': {
+                    "qualified": True, 'tenderers': [
+                        bid["data"]["tenderers"][0]], "value": {
+                        "amount": 450}}})
         bid_token = response.json['access']['token']
         self.app.authorization = ('Basic', ('broker', ''))
-        response = self.app.post_json('/auctions/{}/bids'.format(self.auction_id),
-                                      {'data': {"qualified": True, 'tenderers': [bid["data"]["tenderers"][0]], "value": {"amount": 475}}})
+        response = self.app.post_json(
+            '/auctions/{}/bids'.format(
+                self.auction_id), {
+                'data': {
+                    "qualified": True, 'tenderers': [
+                        bid["data"]["tenderers"][0]], "value": {
+                        "amount": 475}}})
         # get auction info
         self.set_status('active.auction')
         self.app.authorization = ('Basic', ('auction', ''))
@@ -1012,10 +1212,12 @@ class AuctionResourceTest(BaseAuctionWebTest):
         self.app.authorization = ('Basic', ('broker', ''))
 
         with open('docs/source/qualification/awards-get.http', 'w') as self.app.file_obj:
-            response = self.app.get('/auctions/{}/awards'.format(self.auction_id))
+            response = self.app.get(
+                '/auctions/{}/awards'.format(self.auction_id))
             self.assertEqual(response.status, '200 OK')
 
-        award_id = [i['id'] for i in response.json['data'] if i['status'] == 'pending'][0]
+        award_id = [i['id']
+                    for i in response.json['data'] if i['status'] == 'pending'][0]
 
         with open('docs/source/qualification/award-pending-upload.http', 'w') as self.app.file_obj:
             response = self.app.post_json('/auctions/{}/awards/{}/documents?acc_token={}'.format(
@@ -1028,16 +1230,23 @@ class AuctionResourceTest(BaseAuctionWebTest):
             self.assertEqual(response.status, '201 Created')
 
         with open('docs/source/qualification/award-pending-unsuccessful.http', 'w') as self.app.file_obj:
-            response = self.app.patch_json('/auctions/{}/awards/{}?acc_token={}'.format(
-                self.auction_id, award_id, self.auction_token), {"data":{"status":"unsuccessful"}})
+            response = self.app.patch_json(
+                '/auctions/{}/awards/{}?acc_token={}'.format(
+                    self.auction_id, award_id, self.auction_token), {
+                    "data": {
+                        "status": "unsuccessful"}})
             self.assertEqual(response.status, '200 OK')
 
         response = self.app.get('/auctions/{}/awards'.format(self.auction_id))
-        award_id2 = [i['id'] for i in response.json['data'] if i['status'] == 'pending'][0]
+        award_id2 = [i['id']
+                     for i in response.json['data'] if i['status'] == 'pending'][0]
 
         with open('docs/source/qualification/award-pending-active.http', 'w') as self.app.file_obj:
-            response = self.app.patch_json('/auctions/{}/awards/{}?acc_token={}'.format(
-                self.auction_id, award_id2, self.auction_token), {"data":{"status":"active"}})
+            response = self.app.patch_json(
+                '/auctions/{}/awards/{}?acc_token={}'.format(
+                    self.auction_id, award_id2, self.auction_token), {
+                    "data": {
+                        "status": "active"}})
             self.assertEqual(response.status, '200 OK')
 
         with open('docs/source/qualification/award-active-get.http', 'w') as self.app.file_obj:
@@ -1046,12 +1255,17 @@ class AuctionResourceTest(BaseAuctionWebTest):
             self.assertEqual(response.status, '200 OK')
 
         with open('docs/source/qualification/award-active-cancel.http', 'w') as self.app.file_obj:
-            response = self.app.patch_json('/auctions/{}/awards/{}?acc_token={}'.format(
-                self.auction_id, award_id2, self.auction_token), {"data":{"status":"cancelled"}})
+            response = self.app.patch_json(
+                '/auctions/{}/awards/{}?acc_token={}'.format(
+                    self.auction_id, award_id2, self.auction_token), {
+                    "data": {
+                        "status": "cancelled"}})
             self.assertEqual(response.status, '200 OK')
 
-        response = self.app.get('/auctions/{}/awards?acc_token={}'.format(self.auction_id, self.auction_token))
-        award_id3 = [i['id'] for i in response.json['data'] if i['status'] == 'pending'][0]
+        response = self.app.get(
+            '/auctions/{}/awards?acc_token={}'.format(self.auction_id, self.auction_token))
+        award_id3 = [i['id']
+                     for i in response.json['data'] if i['status'] == 'pending'][0]
 
         with open('docs/source/qualification/award-active-cancel-upload.http', 'w') as self.app.file_obj:
             response = self.app.post_json('/auctions/{}/awards/{}/documents?acc_token={}'.format(
@@ -1066,143 +1280,205 @@ class AuctionResourceTest(BaseAuctionWebTest):
             self.assertEqual(response.status, '201 Created')
 
         with open('docs/source/qualification/award-active-cancel-disqualify.http', 'w') as self.app.file_obj:
-            response = self.app.patch_json('/auctions/{}/awards/{}?acc_token={}'.format(
-                self.auction_id, award_id3, self.auction_token), {"data":{"status":"unsuccessful", "title": "Disqualified", "description": "Candidate didn’t sign the auction protocol in 3 business days"}})
+            response = self.app.patch_json(
+                '/auctions/{}/awards/{}?acc_token={}'.format(
+                    self.auction_id,
+                    award_id3,
+                    self.auction_token),
+                {
+                    "data": {
+                        "status": "unsuccessful",
+                        "title": "Disqualified",
+                        "description": "Candidate didn’t sign the auction protocol in 3 business days"}})
             self.assertEqual(response.status, '200 OK')
 
-        ###################### Tender Award Claims/Complaints ##################
+        # ##################### Tender Award Claims/Complaints #################
         #
 
-        #### Tender Award Claim Submission (with documents)
+        # Tender Award Claim Submission (with documents)
         #
 
         with open('docs/source/complaints/award-complaint-submission.http', 'w') as self.app.file_obj:
-            response = self.app.post_json('/auctions/{}/awards/{}/complaints?acc_token={}'.format(
-                self.auction_id, award_id, bid_token), test_complaint_data)
+            response = self.app.post_json(
+                '/auctions/{}/awards/{}/complaints?acc_token={}'.format(
+                    self.auction_id, award_id, bid_token), test_complaint_data)
             self.assertEqual(response.status, '201 Created')
 
         complaint1_id = response.json['data']['id']
         complaint1_token = response.json['access']['token']
 
         with open('docs/source/complaints/award-complaint-submission-upload.http', 'w') as self.app.file_obj:
-            response = self.app.post_json('/auctions/{}/awards/{}/complaints/{}/documents?acc_token={}'.format(
-                    self.auction_id, award_id, complaint1_id, complaint1_token), {'data': {
-                    'title': u'Complaint_Attachement.pdf',
-                    'url': self.generate_docservice_url(),
-                    'hash': 'md5:' + '0' * 32,
-                    'format': 'application/pdf',
-                }})
+            response = self.app.post_json(
+                '/auctions/{}/awards/{}/complaints/{}/documents?acc_token={}'.format(
+                    self.auction_id,
+                    award_id,
+                    complaint1_id,
+                    complaint1_token),
+                {
+                    'data': {
+                        'title': u'Complaint_Attachement.pdf',
+                        'url': self.generate_docservice_url(),
+                        'hash': 'md5:' + '0' * 32,
+                        'format': 'application/pdf',
+                    }})
             self.assertEqual(response.status, '201 Created')
 
         with open('docs/source/complaints/award-complaint-claim.http', 'w') as self.app.file_obj:
-            response = self.app.patch_json('/auctions/{}/awards/{}/complaints/{}?acc_token={}'.format(
-                    self.auction_id, award_id, complaint1_id, complaint1_token), {"data":{"status":"claim"}})
+            response = self.app.patch_json(
+                '/auctions/{}/awards/{}/complaints/{}?acc_token={}'.format(
+                    self.auction_id, award_id, complaint1_id, complaint1_token), {
+                    "data": {
+                        "status": "claim"}})
             self.assertEqual(response.status, '200 OK')
 
-        #### Tender Award Claim Submission (without documents)
+        # Tender Award Claim Submission (without documents)
         #
 
         test_complaint_data['data']['status'] = 'claim'
 
         with open('docs/source/complaints/award-complaint-submission-claim.http', 'w') as self.app.file_obj:
-            response = self.app.post_json('/auctions/{}/awards/{}/complaints?acc_token={}'.format(
-                self.auction_id, award_id, bid_token), test_complaint_data)
+            response = self.app.post_json(
+                '/auctions/{}/awards/{}/complaints?acc_token={}'.format(
+                    self.auction_id, award_id, bid_token), test_complaint_data)
             self.assertEqual(response.status, '201 Created')
 
         complaint2_id = response.json['data']['id']
         complaint2_token = response.json['access']['token']
 
-        #### Tender Award Claim/Complaint Retrieval
+        # Tender Award Claim/Complaint Retrieval
         #
 
         with open('docs/source/complaints/award-complaints-list.http', 'w') as self.app.file_obj:
             self.app.authorization = None
-            response = self.app.get('/auctions/{}/awards/{}/complaints'.format(self.auction_id, award_id,))
+            response = self.app.get(
+                '/auctions/{}/awards/{}/complaints'.format(self.auction_id, award_id,))
             self.assertEqual(response.status, '200 OK')
 
         with open('docs/source/complaints/award-complaint.http', 'w') as self.app.file_obj:
-            response = self.app.get('/auctions/{}/awards/{}/complaints/{}'.format(self.auction_id, award_id, complaint1_id))
+            response = self.app.get(
+                '/auctions/{}/awards/{}/complaints/{}'.format(self.auction_id, award_id, complaint1_id))
             self.assertEqual(response.status, '200 OK')
 
         self.app.authorization = ('Basic', ('broker', ''))
 
-        #### Claim's Answer
+        # Claim's Answer
         #
 
         with open('docs/source/complaints/award-complaint-answer.http', 'w') as self.app.file_obj:
-            response = self.app.patch_json('/auctions/{}/awards/{}/complaints/{}?acc_token={}'.format(self.auction_id, award_id, complaint1_id, self.auction_token),
+            response = self.app.patch_json(
+                '/auctions/{}/awards/{}/complaints/{}?acc_token={}'.format(
+                    self.auction_id,
+                    award_id,
+                    complaint1_id,
+                    self.auction_token),
                 {
                     "data": {
                         "status": "answered",
                         "resolutionType": "resolved",
                         "tendererAction": "Виправлено неконкурентні умови",
-                        "resolution": "Виправлено неконкурентні умови"
-                    }
-                }
-            )
+                        "resolution": "Виправлено неконкурентні умови"}})
             self.assertEqual(response.status, '200 OK')
 
-
-        #### Satisfied Claim
+        # Satisfied Claim
         #
 
         with open('docs/source/complaints/award-complaint-satisfy.http', 'w') as self.app.file_obj:
-            response = self.app.patch_json('/auctions/{}/awards/{}/complaints/{}?acc_token={}'.format(
-                    self.auction_id, award_id, complaint1_id, complaint1_token), {"data":{"status":"resolved","satisfied":True}})
+            response = self.app.patch_json(
+                '/auctions/{}/awards/{}/complaints/{}?acc_token={}'.format(
+                    self.auction_id, award_id, complaint1_id, complaint1_token), {
+                    "data": {
+                        "status": "resolved", "satisfied": True}})
             self.assertEqual(response.status, '200 OK')
 
-        #### Satisfied Claim
+        # Satisfied Claim
         #
-        response = self.app.patch_json('/auctions/{}/awards/{}/complaints/{}?acc_token={}'.format(
-                self.auction_id, award_id, complaint2_id, self.auction_token), {"data":{"status":"answered","resolutionType":"resolved","resolution":"Виправлено неконкурентні умови"}})
+        response = self.app.patch_json(
+            '/auctions/{}/awards/{}/complaints/{}?acc_token={}'.format(
+                self.auction_id,
+                award_id,
+                complaint2_id,
+                self.auction_token),
+            {
+                "data": {
+                    "status": "answered",
+                    "resolutionType": "resolved",
+                    "resolution": "Виправлено неконкурентні умови"}})
         self.assertEqual(response.status, '200 OK')
 
         with open('docs/source/complaints/award-complaint-escalate.http', 'w') as self.app.file_obj:
-            response = self.app.patch_json('/auctions/{}/awards/{}/complaints/{}?acc_token={}'.format(
-                    self.auction_id, award_id, complaint2_id, complaint2_token), {"data":{"status":"pending","satisfied":False}})
+            response = self.app.patch_json(
+                '/auctions/{}/awards/{}/complaints/{}?acc_token={}'.format(
+                    self.auction_id, award_id, complaint2_id, complaint2_token), {
+                    "data": {
+                        "status": "pending", "satisfied": False}})
             self.assertEqual(response.status, '200 OK')
 
-        #### Rejecting Tender Award Complaint
+        # Rejecting Tender Award Complaint
         #
 
         self.app.authorization = ('Basic', ('reviewer', ''))
 
         with open('docs/source/complaints/award-complaint-reject.http', 'w') as self.app.file_obj:
             response = self.app.patch_json('/auctions/{}/awards/{}/complaints/{}'.format(
-                    self.auction_id, award_id, complaint2_id), {"data":{"status":"invalid"}})
+                self.auction_id, award_id, complaint2_id), {"data": {"status": "invalid"}})
             self.assertEqual(response.status, '200 OK')
 
-        #### Submitting Tender Award Complaint Resolution
+        # Submitting Tender Award Complaint Resolution
         #
 
         self.app.authorization = ('Basic', ('broker', ''))
 
-        response = self.app.post_json('/auctions/{}/awards/{}/complaints?acc_token={}'.format(
-            self.auction_id, award_id, bid_token), test_complaint_data)
+        response = self.app.post_json(
+            '/auctions/{}/awards/{}/complaints?acc_token={}'.format(
+                self.auction_id, award_id, bid_token), test_complaint_data)
         self.assertEqual(response.status, '201 Created')
         complaint3_id = response.json['data']['id']
         complaint3_token = response.json['access']['token']
-        self.app.patch_json('/auctions/{}/awards/{}/complaints/{}?acc_token={}'.format(
-                self.auction_id, award_id, complaint3_id, self.auction_token), {"data":{"status":"answered","resolutionType":"resolved","resolution":"Виправлено неконкурентні умови"}})
-        self.app.patch_json('/auctions/{}/awards/{}/complaints/{}?acc_token={}'.format(
-                self.auction_id, award_id, complaint3_id, complaint3_token), {"data":{"status":"pending","satisfied":False}})
+        self.app.patch_json(
+            '/auctions/{}/awards/{}/complaints/{}?acc_token={}'.format(
+                self.auction_id,
+                award_id,
+                complaint3_id,
+                self.auction_token),
+            {
+                "data": {
+                    "status": "answered",
+                    "resolutionType": "resolved",
+                    "resolution": "Виправлено неконкурентні умови"}})
+        self.app.patch_json(
+            '/auctions/{}/awards/{}/complaints/{}?acc_token={}'.format(
+                self.auction_id, award_id, complaint3_id, complaint3_token), {
+                "data": {
+                    "status": "pending", "satisfied": False}})
 
-
-        response = self.app.post_json('/auctions/{}/awards/{}/complaints?acc_token={}'.format(
-            self.auction_id, award_id, bid_token), test_complaint_data)
+        response = self.app.post_json(
+            '/auctions/{}/awards/{}/complaints?acc_token={}'.format(
+                self.auction_id, award_id, bid_token), test_complaint_data)
         self.assertEqual(response.status, '201 Created')
         complaint4_id = response.json['data']['id']
         complaint4_token = response.json['access']['token']
-        self.app.patch_json('/auctions/{}/awards/{}/complaints/{}?acc_token={}'.format(
-                self.auction_id, award_id, complaint4_id, self.auction_token), {"data":{"status":"answered","resolutionType":"resolved","resolution":"Виправлено неконкурентні умови"}})
-        self.app.patch_json('/auctions/{}/awards/{}/complaints/{}?acc_token={}'.format(
-                self.auction_id, award_id, complaint4_id, complaint4_token), {"data":{"status":"pending","satisfied":False}})
+        self.app.patch_json(
+            '/auctions/{}/awards/{}/complaints/{}?acc_token={}'.format(
+                self.auction_id,
+                award_id,
+                complaint4_id,
+                self.auction_token),
+            {
+                "data": {
+                    "status": "answered",
+                    "resolutionType": "resolved",
+                    "resolution": "Виправлено неконкурентні умови"}})
+        self.app.patch_json(
+            '/auctions/{}/awards/{}/complaints/{}?acc_token={}'.format(
+                self.auction_id, award_id, complaint4_id, complaint4_token), {
+                "data": {
+                    "status": "pending", "satisfied": False}})
 
         self.app.authorization = ('Basic', ('reviewer', ''))
 
         with open('docs/source/complaints/award-complaint-resolution-upload.http', 'w') as self.app.file_obj:
             response = self.app.post_json('/auctions/{}/awards/{}/complaints/{}/documents'.format(
-                    self.auction_id, award_id, complaint3_id), {'data': {
+                self.auction_id, award_id, complaint3_id), {'data': {
                     'title': u'ComplaintResolution.pdf',
                     'url': self.generate_docservice_url(),
                     'hash': 'md5:' + '0' * 32,
@@ -1212,12 +1488,12 @@ class AuctionResourceTest(BaseAuctionWebTest):
 
         with open('docs/source/complaints/award-complaint-resolve.http', 'w') as self.app.file_obj:
             response = self.app.patch_json('/auctions/{}/awards/{}/complaints/{}'.format(
-                    self.auction_id, award_id, complaint3_id), {"data":{"status":"resolved"}})
+                self.auction_id, award_id, complaint3_id), {"data": {"status": "resolved"}})
             self.assertEqual(response.status, '200 OK')
 
         with open('docs/source/complaints/award-complaint-decline.http', 'w') as self.app.file_obj:
             response = self.app.patch_json('/auctions/{}/awards/{}/complaints/{}'.format(
-                    self.auction_id, award_id, complaint4_id), {"data":{"status":"declined"}})
+                self.auction_id, award_id, complaint4_id), {"data": {"status": "declined"}})
             self.assertEqual(response.status, '200 OK')
 
         self.app.authorization = ('Basic', ('broker', ''))
@@ -1228,145 +1504,14 @@ class AuctionResourceTest(BaseAuctionWebTest):
             self.assertEqual(response.status, '200 OK')
 
         with open('docs/source/qualification/award-unsuccessful-cancel.http', 'w') as self.app.file_obj:
-            response = self.app.patch_json('/auctions/{}/awards/{}?acc_token={}'.format(
-                self.auction_id, award_id, self.auction_token), {"data":{"status":"cancelled"}})
+            response = self.app.patch_json(
+                '/auctions/{}/awards/{}?acc_token={}'.format(
+                    self.auction_id, award_id, self.auction_token), {
+                    "data": {
+                        "status": "cancelled"}})
             self.assertEqual(response.status, '200 OK')
 
         with open('docs/source/qualification/awards-unsuccessful-get2.http', 'w') as self.app.file_obj:
             response = self.app.get('/auctions/{}/awards'.format(
                 self.auction_id, award_id))
             self.assertEqual(response.status, '200 OK')
-
-    def test_docs_fintutorial(self):
-        request_path = '/auctions?opt_pretty=1'
-
-        # Creating auction
-        #
-
-        with open('docs/source/tutorial/finauction-post-attempt-json-data.http', 'w') as self.app.file_obj:
-            response = self.app.post_json(
-                '/auctions?opt_pretty=1', {"data": test_financial_auction_data})
-            self.assertEqual(response.status, '201 Created')
-
-        auction = response.json['data']
-        owner_token = response.json['access']['token']
-
-        with open('docs/source/tutorial/blank-finauction-view.http', 'w') as self.app.file_obj:
-            response = self.app.get('/auctions/{}'.format(auction['id']))
-            self.assertEqual(response.status, '200 OK')
-
-        self.app.get('/auctions')
-        with open('docs/source/tutorial/initial-finauction-listing.http', 'w') as self.app.file_obj:
-            response = self.app.get('/auctions')
-            self.assertEqual(response.status, '200 OK')
-
-        self.app.authorization = ('Basic', ('broker', ''))
-        self.auction_id = auction['id']
-
-        # Uploading documentation
-        #
-
-        with open('docs/source/tutorial/upload-finauction-notice.http', 'w') as self.app.file_obj:
-            response = self.app.post_json('/auctions/{}/documents?acc_token={}'.format(self.auction_id, owner_token),
-                {'data': {
-                    'title': u'Notice.pdf',
-                    'url': self.generate_docservice_url(),
-                    'hash': 'md5:' + '0' * 32,
-                    'format': 'application/pdf',
-                    "documentType": "technicalSpecifications",
-                    "description": "technical specification"
-                }})
-            self.assertEqual(response.status, '201 Created')
-
-        doc_id = response.json["data"]["id"]
-        with open('docs/source/tutorial/finauction-documents.http', 'w') as self.app.file_obj:
-            response = self.app.get('/auctions/{}/documents/{}'.format(
-                self.auction_id, doc_id))
-            self.assertEqual(response.status, '200 OK')
-
-        with open('docs/source/tutorial/finauction-upload-award-criteria.http', 'w') as self.app.file_obj:
-            response = self.app.post_json('/auctions/{}/documents?acc_token={}'.format(self.auction_id, owner_token),
-                {'data': {
-                    'title': u'AwardCriteria.pdf',
-                    'url': self.generate_docservice_url(),
-                    'hash': 'md5:' + '0' * 32,
-                    'format': 'application/pdf',
-                }})
-            self.assertEqual(response.status, '201 Created')
-
-        doc_id = response.json["data"]["id"]
-
-        with open('docs/source/tutorial/finauction-documents-2.http', 'w') as self.app.file_obj:
-            response = self.app.get('/auctions/{}/documents'.format(
-                self.auction_id))
-            self.assertEqual(response.status, '200 OK')
-
-        with open('docs/source/tutorial/finauction-update-award-criteria.http', 'w') as self.app.file_obj:
-            response = self.app.put_json('/auctions/{}/documents/{}?acc_token={}'.format(self.auction_id, doc_id, owner_token),
-                {'data': {
-                    'title': u'AwardCriteria-2.pdf',
-                    'url': self.generate_docservice_url(),
-                    'hash': 'md5:' + '0' * 32,
-                    'format': 'application/pdf',
-                }})
-            self.assertEqual(response.status, '200 OK')
-
-        with open('docs/source/tutorial/finauction-documents-3.http', 'w') as self.app.file_obj:
-            response = self.app.get('/auctions/{}/documents'.format(
-                self.auction_id))
-            self.assertEqual(response.status, '200 OK')
-
-        with open('docs/source/tutorial/finauction-adding-vdr.http', 'w') as self.app.file_obj:
-            response = self.app.post_json('/auctions/{}/documents?acc_token={}'.format(self.auction_id, owner_token),
-                {'data': {
-                    'title': u'VDR for auction lot',
-                    'url': 'http://virtial-data-room.com/id_of_room',
-                    'documentType': 'virtualDataRoom',
-                }})
-            self.assertEqual(response.status, '201 Created')
-
-        # Registering bid
-        #
-
-        self.app.authorization = ('Basic', ('broker', ''))
-        bids_access = {}
-        with open('docs/source/tutorial/register-finbidder.http', 'w') as self.app.file_obj:
-            response = self.app.post_json('/auctions/{}/bids'.format(
-                self.auction_id), {'data': test_financial_bids[0]})
-            bid1_id = response.json['data']['id']
-            bids_access[bid1_id] = response.json['access']['token']
-            self.assertEqual(response.status, '201 Created')
-
-        with open('docs/source/tutorial/activate-finbidder.http', 'w') as self.app.file_obj:
-            response = self.app.patch_json('/auctions/{}/bids/{}?acc_token={}'.format(
-                self.auction_id, bid1_id, bids_access[bid1_id]), {"data": {"status": "active"}})
-            self.assertEqual(response.status, '200 OK')
-
-        # Proposal Uploading
-        #
-
-        with open('docs/source/tutorial/upload-finbid-financial-license.http', 'w') as self.app.file_obj:
-            response = self.app.post_json('/auctions/{}/bids/{}/documents?acc_token={}'.format(self.auction_id, bid1_id, bids_access[bid1_id]),
-                {'data': {
-                    'title': u'FinancialLicense.pdf',
-                    'url': self.generate_docservice_url(),
-                    'hash': 'md5:' + '0' * 32,
-                    'format': 'application/pdf',
-                    "documentType": "financialLicense",
-                }})
-            self.assertEqual(response.status, '201 Created')
-
-        with open('docs/source/tutorial/finbidder-documents.http', 'w') as self.app.file_obj:
-            response = self.app.get('/auctions/{}/bids/{}/documents?acc_token={}'.format(
-                self.auction_id, bid1_id, bids_access[bid1_id]))
-            self.assertEqual(response.status, '200 OK')
-
-        # Second bidder registration
-        #
-
-        with open('docs/source/tutorial/register-2nd-finbidder.http', 'w') as self.app.file_obj:
-            response = self.app.post_json('/auctions/{}/bids'.format(
-                self.auction_id), {'data': test_financial_bids[1]})
-            bid2_id = response.json['data']['id']
-            bids_access[bid2_id] = response.json['access']['token']
-            self.assertEqual(response.status, '201 Created')

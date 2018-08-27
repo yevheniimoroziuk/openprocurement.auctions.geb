@@ -5,12 +5,10 @@ version = '1.2.1'
 
 entry_points = {
     'openprocurement.auctions.core.plugins': [
-        'auctions.landlease.other = openprocurement.auctions.landlease.includeme:includeme_other',
-        'auctions.landlease.financial = openprocurement.auctions.landlease.includeme:includeme_financial'
+        'auctions.landlease = openprocurement.auctions.landlease.includeme:includeme',
     ],
     'openprocurement.auctions.landlease.plugins': [
-        'landlease.other.migration = openprocurement.auctions.landlease.migration:migrate_data',
-        'landlease.financial.migration = openprocurement.auctions.landlease.migration:migrate_data'
+        'landlease.migration = openprocurement.auctions.landlease.migration:migrate_data',
     ]
 }
 
@@ -29,8 +27,7 @@ docs_requires = requires + [
 setup(name='openprocurement.auctions.landlease',
       version=version,
       description="",
-      long_description=open("README.rst").read() + "\n" +
-                       open(os.path.join("docs", "HISTORY.txt")).read(),
+      long_description=open("README.rst").read() + "\n" + open(os.path.join("docs", "HISTORY.txt")).read(),
       # Get more strings from
       # http://pypi.python.org/pypi?:action=list_classifiers
       classifiers=[
