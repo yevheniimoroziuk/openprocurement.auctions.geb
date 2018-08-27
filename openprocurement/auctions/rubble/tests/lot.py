@@ -18,8 +18,8 @@ from openprocurement.auctions.core.tests.blanks.lot_blanks import (
 )
 from openprocurement.auctions.core.tests.base import snitch
 
-from openprocurement.auctions.rubble.tests.base import BaseWebTest, BaseAuctionWebTest, test_auction_data, test_lots, test_financial_auction_data, test_financial_bids, test_financial_organization
-from openprocurement.auctions.rubble.tests.blanks.lot_blanks import (
+from openprocurement.auctions.landlease.tests.base import BaseWebTest, BaseAuctionWebTest, test_auction_data, test_lots, test_financial_auction_data, test_financial_bids, test_financial_organization
+from openprocurement.auctions.landlease.tests.blanks.lot_blanks import (
     patch_auction_currency
 )
 

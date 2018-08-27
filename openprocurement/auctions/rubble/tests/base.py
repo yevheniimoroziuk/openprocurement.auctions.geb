@@ -15,13 +15,13 @@ from openprocurement.auctions.core.utils import (
     apply_data_patch, get_now, SANDBOX_MODE
 )
 
-from openprocurement.auctions.rubble.constants import (
+from openprocurement.auctions.landlease.constants import (
     DEFAULT_PROCUREMENT_METHOD_TYPE_FINANCIAL,
     DEFAULT_PROCUREMENT_METHOD_TYPE_OTHER
 )
 
 
-from openprocurement.auctions.rubble.tests.fixtures import PARTIAL_MOCK_CONFIG
+from openprocurement.auctions.landlease.tests.fixtures import PARTIAL_MOCK_CONFIG
 
 from openprocurement.auctions.core.tests.base import MOCK_CONFIG as BASE_MOCK_CONFIG
 from openprocurement.auctions.core.utils import connection_mock_config
@@ -208,7 +208,7 @@ MOCK_CONFIG = connection_mock_config(PARTIAL_MOCK_CONFIG,
 
 class BaseWebTest(CoreBaseWebTest):
 
-    """Base Web Test to test openprocurement.auctions.rubble.
+    """Base Web Test to test openprocurement.auctions.landlease.
 
     It setups the database before each test and delete it after.
     """

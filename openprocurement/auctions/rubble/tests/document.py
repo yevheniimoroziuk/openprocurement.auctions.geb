@@ -17,8 +17,8 @@ from openprocurement.auctions.core.tests.blanks.document_blanks import (
     put_auction_document_vdr
 )
 
-from openprocurement.auctions.rubble.tests.base import BaseAuctionWebTest,  test_financial_auction_data, test_bids, test_financial_bids
-from openprocurement.auctions.rubble.tests.blanks.document_blanks import (
+from openprocurement.auctions.landlease.tests.base import BaseAuctionWebTest,  test_financial_auction_data, test_bids, test_financial_bids
+from openprocurement.auctions.landlease.tests.blanks.document_blanks import (
     create_auction_document,
     put_auction_offline_document
 )

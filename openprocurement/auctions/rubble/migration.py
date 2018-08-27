@@ -52,7 +52,7 @@ def from0to1(registry):
     request = Request(registry)
     root = Root(request)
     procurement_method_types = get_procurement_method_types(
-        registry, ['rubbleOther', 'rubbleFinancial']
+        registry, ['landleaseOther', 'landleaseFinancial']
     )
     docs = []
     for i in results:

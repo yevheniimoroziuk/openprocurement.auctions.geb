@@ -14,15 +14,15 @@ from openprocurement.auctions.core.validation import (
 )
 from openprocurement.auctions.core.views.mixins import AuctionDocumentResource
 
-from openprocurement.auctions.rubble.utils import (
+from openprocurement.auctions.landlease.utils import (
     upload_file, get_file, invalidate_bids_data, generate_rectificationPeriod
 )
 
 
-@opresource(name='rubbleOther:Auction Documents',
+@opresource(name='landleaseOther:Auction Documents',
             collection_path='/auctions/{auction_id}/documents',
             path='/auctions/{auction_id}/documents/{document_id}',
-            auctionsprocurementMethodType="rubbleOther",
+            auctionsprocurementMethodType="landleaseOther",
             description="Auction related binary files (PDFs, etc.)")
 class AuctionDocumentResource(AuctionDocumentResource):
 

@@ -3,10 +3,10 @@ from openprocurement.auctions.core.utils import opresource
 from openprocurement.auctions.core.views.mixins import AuctionCancellationResource
 
 
-@opresource(name='rubbleOther:Auction Cancellations',
+@opresource(name='landleaseOther:Auction Cancellations',
             collection_path='/auctions/{auction_id}/cancellations',
             path='/auctions/{auction_id}/cancellations/{cancellation_id}',
-            auctionsprocurementMethodType="rubbleOther",
+            auctionsprocurementMethodType="landleaseOther",
             description="Auction cancellations")
 class AuctionCancellationResource(AuctionCancellationResource):
 

@@ -5,12 +5,12 @@ version = '1.2.1'
 
 entry_points = {
     'openprocurement.auctions.core.plugins': [
-        'auctions.rubble.other = openprocurement.auctions.rubble.includeme:includeme_other',
-        'auctions.rubble.financial = openprocurement.auctions.rubble.includeme:includeme_financial'
+        'auctions.landlease.other = openprocurement.auctions.landlease.includeme:includeme_other',
+        'auctions.landlease.financial = openprocurement.auctions.landlease.includeme:includeme_financial'
     ],
-    'openprocurement.auctions.rubble.plugins': [
-        'rubble.other.migration = openprocurement.auctions.rubble.migration:migrate_data',
-        'rubble.financial.migration = openprocurement.auctions.rubble.migration:migrate_data'
+    'openprocurement.auctions.landlease.plugins': [
+        'landlease.other.migration = openprocurement.auctions.landlease.migration:migrate_data',
+        'landlease.financial.migration = openprocurement.auctions.landlease.migration:migrate_data'
     ]
 }
 
@@ -26,7 +26,7 @@ docs_requires = requires + [
     'sphinxcontrib-httpdomain',
 ]
 
-setup(name='openprocurement.auctions.rubble',
+setup(name='openprocurement.auctions.landlease',
       version=version,
       description="",
       long_description=open("README.rst").read() + "\n" +
@@ -40,7 +40,7 @@ setup(name='openprocurement.auctions.rubble',
       author='Quintagroup, Ltd.',
       author_email='info@quintagroup.com',
       license='Apache License 2.0',
-      url='https://github.com/openprocurement/openprocurement.auctions.rubble',
+      url='https://github.com/openprocurement/openprocurement.auctions.landlease',
       packages=find_packages(exclude=['ez_setup']),
       namespace_packages=['openprocurement', 'openprocurement.auctions'],
       include_package_data=True,

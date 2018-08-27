@@ -3,15 +3,15 @@
 from openprocurement.auctions.core.utils import (
     opresource,
 )
-from openprocurement.auctions.rubble.views.other.complaint_document import (
+from openprocurement.auctions.landlease.views.other.complaint_document import (
     AuctionComplaintDocumentResource,
 )
 
 
-@opresource(name='rubbleFinancial:Auction Complaint Documents',
+@opresource(name='landleaseFinancial:Auction Complaint Documents',
             collection_path='/auctions/{auction_id}/complaints/{complaint_id}/documents',
             path='/auctions/{auction_id}/complaints/{complaint_id}/documents/{document_id}',
-            auctionsprocurementMethodType="rubbleFinancial",
+            auctionsprocurementMethodType="landleaseFinancial",
             description="Financial auction complaint documents")
 class FinancialComplaintDocumentResource(AuctionComplaintDocumentResource):
     pass

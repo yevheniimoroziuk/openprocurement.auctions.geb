@@ -3,15 +3,15 @@
 from openprocurement.auctions.core.utils import (
     opresource,
 )
-from openprocurement.auctions.rubble.views.other.lot import (
+from openprocurement.auctions.landlease.views.other.lot import (
     AuctionLotResource,
 )
 
 
-@opresource(name='rubbleFinancial:Auction Lots',
+@opresource(name='landleaseFinancial:Auction Lots',
             collection_path='/auctions/{auction_id}/lots',
             path='/auctions/{auction_id}/lots/{lot_id}',
-            auctionsprocurementMethodType="rubbleFinancial",
+            auctionsprocurementMethodType="landleaseFinancial",
             description="Financial auction lots")
 class FinancialAuctionLotResource(AuctionLotResource):
     pass

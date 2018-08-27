@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 import unittest
 
-from openprocurement.auctions.rubble.tests.base import BaseAuctionWebTest
+from openprocurement.auctions.landlease.tests.base import BaseAuctionWebTest
 from openprocurement.auctions.core.tests.plugins.transferring.mixins import (
     AuctionOwnershipChangeTestCaseMixin
 )

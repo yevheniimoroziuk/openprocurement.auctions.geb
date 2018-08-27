@@ -12,19 +12,19 @@ from openprocurement.auctions.core.validation import (
 from openprocurement.auctions.core.views.mixins import AuctionResource
 from openprocurement.auctions.core.interfaces import IAuctionManager
 
-from openprocurement.auctions.rubble.utils import (
+from openprocurement.auctions.landlease.utils import (
     check_status,
     invalidate_bids_data,
     generate_rectificationPeriod
 )
-from openprocurement.auctions.rubble.validation import (
+from openprocurement.auctions.landlease.validation import (
     validate_rectification_period_editing,
 )
 
 
-@opresource(name='rubbleOther:Auction',
+@opresource(name='landleaseOther:Auction',
             path='/auctions/{auction_id}',
-            auctionsprocurementMethodType="rubbleOther",
+            auctionsprocurementMethodType="landleaseOther",
             description="Open Contracting compatible data exchange format. See http://ocds.open-contracting.org/standard/r/master/#auction for more info")
 class AuctionResource(AuctionResource):
 

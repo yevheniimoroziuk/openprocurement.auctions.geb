@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 from openprocurement.auctions.core.utils import error_handler, get_now, TZ
 
-from openprocurement.auctions.rubble.utils import generate_rectificationPeriod
+from openprocurement.auctions.landlease.utils import generate_rectificationPeriod
 
 
 def validate_rectification_period_editing(request, **kwargs):

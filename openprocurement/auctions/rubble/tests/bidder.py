@@ -2,7 +2,7 @@
 import unittest
 from copy import deepcopy
 
-from openprocurement.auctions.rubble.tests.base import (
+from openprocurement.auctions.landlease.tests.base import (
     BaseAuctionWebTest,
     test_auction_data,
     test_features_auction_data,
@@ -13,7 +13,7 @@ from openprocurement.auctions.rubble.tests.base import (
     test_organization
 )
 
-from openprocurement.auctions.rubble.tests.blanks.bidder_blanks import (
+from openprocurement.auctions.landlease.tests.blanks.bidder_blanks import (
     # AuctionBidderResourceTest
     create_auction_bidder_invalid,
     patch_auction_bidder,
@@ -79,7 +79,7 @@ class AuctionBidInvalidationAuctionResourceTest(BaseAuctionWebTest):
     test_post_auction_one_invalid_bid = snitch(post_auction_one_invalid_bid)
     test_post_auction_one_valid_bid = snitch(post_auction_one_valid_bid)
 
-               
+
 class AuctionBidderProcessTest(BaseAuctionWebTest):
     initial_data = test_auction_data
     initial_bids = test_bids

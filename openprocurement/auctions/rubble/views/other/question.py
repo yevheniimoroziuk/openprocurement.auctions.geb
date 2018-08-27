@@ -14,10 +14,10 @@ from openprocurement.auctions.core.validation import (
 from openprocurement.auctions.core.views.mixins import AuctionQuestionResource
 
 
-@opresource(name='rubbleOther:Auction Questions',
+@opresource(name='landleaseOther:Auction Questions',
             collection_path='/auctions/{auction_id}/questions',
             path='/auctions/{auction_id}/questions/{question_id}',
-            auctionsprocurementMethodType="rubbleOther",
+            auctionsprocurementMethodType="landleaseOther",
             description="Auction questions")
 class AuctionQuestionResource(AuctionQuestionResource):
 

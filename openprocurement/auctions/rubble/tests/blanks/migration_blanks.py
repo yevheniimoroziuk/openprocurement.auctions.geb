@@ -5,7 +5,7 @@ from uuid import uuid4
 
 from openprocurement.auctions.core.utils import get_now
 
-from openprocurement.auctions.rubble.migration import migrate_data
+from openprocurement.auctions.landlease.migration import migrate_data
 # MigrateTestFrom1To2Bids
 
 def migrate_one_pending(self):

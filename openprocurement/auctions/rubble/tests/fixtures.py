@@ -1,8 +1,8 @@
 PARTIAL_MOCK_CONFIG = {
-    "auctions.rubble.financial":{
+    "auctions.landlease.financial":{
         "use_default":True,
         "plugins":{
-            "rubble.financial.migration":None
+            "landlease.financial.migration":None
         },
         "migration":False,
         "aliases":[],
@@ -11,10 +11,10 @@ PARTIAL_MOCK_CONFIG = {
             "edit": [2]
         }
     },
-    "auctions.rubble.other":{
+    "auctions.landlease.other":{
         "use_default":True,
         "plugins":{
-            "rubble.other.migration":None
+            "landlease.other.migration":None
         },
         "migration":False,
         "aliases":[],

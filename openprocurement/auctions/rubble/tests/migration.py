@@ -6,9 +6,9 @@ from copy import deepcopy
 
 from openprocurement.auctions.core.tests.base import snitch
 
-from openprocurement.auctions.rubble.migration import migrate_data, get_db_schema_version, set_db_schema_version, SCHEMA_VERSION
-from openprocurement.auctions.rubble.tests.base import BaseWebTest, BaseAuctionWebTest, test_bids
-from openprocurement.auctions.rubble.tests.blanks.migration_blanks import (
+from openprocurement.auctions.landlease.migration import migrate_data, get_db_schema_version, set_db_schema_version, SCHEMA_VERSION
+from openprocurement.auctions.landlease.tests.base import BaseWebTest, BaseAuctionWebTest, test_bids
+from openprocurement.auctions.landlease.tests.blanks.migration_blanks import (
     # MigrateTestFrom1To2Bids
     migrate_one_pending,
     migrate_one_active,

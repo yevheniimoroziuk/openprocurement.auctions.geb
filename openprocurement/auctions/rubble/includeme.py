@@ -12,18 +12,18 @@ from openprocurement.auctions.core.plugins.awarding.v2_1.adapters import (
     AwardingNextCheckV2_1
 )
 
-from openprocurement.auctions.rubble.adapters import (
+from openprocurement.auctions.landlease.adapters import (
     AuctionRubbleOtherConfigurator,
     AuctionRubbleFinancialConfigurator,
     AuctionRubbleOtherManagerAdapter,
     AuctionRubbleFinancialManagerAdapter
 )
-from openprocurement.auctions.rubble.constants import (
+from openprocurement.auctions.landlease.constants import (
     DEFAULT_LEVEL_OF_ACCREDITATION,
     DEFAULT_PROCUREMENT_METHOD_TYPE_OTHER,
     DEFAULT_PROCUREMENT_METHOD_TYPE_FINANCIAL
 )
-from openprocurement.auctions.rubble.models import (
+from openprocurement.auctions.landlease.models import (
     IRubbleOtherAuction,
     IRubbleFinancialAuction,
     RubbleOther,
@@ -43,7 +43,7 @@ def includeme_other(config, plugin_map):
         config.add_auction_procurementMethodType(RubbleOther,
                                                  procurementMethodType)
 
-    config.scan("openprocurement.auctions.rubble.views.other")
+    config.scan("openprocurement.auctions.landlease.views.other")
 
     # Register adapters
     config.registry.registerAdapter(
@@ -62,7 +62,7 @@ def includeme_other(config, plugin_map):
         IAuctionManager
     )
 
-    LOGGER.info("Included openprocurement.auctions.rubble.other plugin",
+    LOGGER.info("Included openprocurement.auctions.landlease.other plugin",
                 extra={'MESSAGE_ID': 'included_plugin'})
 
     # add accreditation level
@@ -73,7 +73,7 @@ def includeme_other(config, plugin_map):
 
     # migrate data
     if plugin_map['migration'] and not os.environ.get('MIGRATION_SKIP'):
-        get_evenly_plugins(config, plugin_map['plugins'], 'openprocurement.auctions.rubble.plugins')
+        get_evenly_plugins(config, plugin_map['plugins'], 'openprocurement.auctions.landlease.plugins')
 
 
 def includeme_financial(config, plugin_map):
@@ -86,7 +86,7 @@ def includeme_financial(config, plugin_map):
         config.add_auction_procurementMethodType(RubbleFinancial,
                                                  procurementMethodType)
 
-    config.scan("openprocurement.auctions.rubble.views.financial")
+    config.scan("openprocurement.auctions.landlease.views.financial")
 
     # Register Adapters
     config.registry.registerAdapter(
@@ -105,7 +105,7 @@ def includeme_financial(config, plugin_map):
         IAuctionManager
     )
 
-    LOGGER.info("Included openprocurement.auctions.rubble.financial plugin",
+    LOGGER.info("Included openprocurement.auctions.landlease.financial plugin",
                 extra={'MESSAGE_ID': 'included_plugin'})
 
     # add accreditation level
@@ -116,4 +116,4 @@ def includeme_financial(config, plugin_map):
 
     # migrate data
     if plugin_map['migration'] and not os.environ.get('MIGRATION_SKIP'):
-        get_evenly_plugins(config, plugin_map['plugins'], 'openprocurement.auctions.rubble.plugins')
+        get_evenly_plugins(config, plugin_map['plugins'], 'openprocurement.auctions.landlease.plugins')

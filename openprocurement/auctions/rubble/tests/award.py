@@ -3,7 +3,7 @@ import unittest
 from copy import deepcopy
 
 
-from openprocurement.auctions.rubble.tests.base import (
+from openprocurement.auctions.landlease.tests.base import (
     BaseAuctionWebTest, test_lots, test_organization,
     test_bids as base_bids,
     test_financial_auction_data,

@@ -3,10 +3,10 @@ from openprocurement.auctions.core.utils import get_now, opresource
 from openprocurement.auctions.core.views.mixins import AuctionBidDocumentResource
 
 
-@opresource(name='rubbleOther:Auction Bid Documents',
+@opresource(name='landleaseOther:Auction Bid Documents',
             collection_path='/auctions/{auction_id}/bids/{bid_id}/documents',
             path='/auctions/{auction_id}/bids/{bid_id}/documents/{document_id}',
-            auctionsprocurementMethodType="rubbleOther",
+            auctionsprocurementMethodType="landleaseOther",
             description="Auction bidder documents")
 class AuctionBidDocumentResource(AuctionBidDocumentResource):
 

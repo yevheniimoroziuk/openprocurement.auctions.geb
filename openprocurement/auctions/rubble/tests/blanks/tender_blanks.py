@@ -12,13 +12,13 @@ from openprocurement.auctions.core.constants import (
 from openprocurement.auctions.core.tests.base import JSON_RENDERER_ERROR
 from openprocurement.auctions.core.utils import get_now, SANDBOX_MODE, TZ
 
-from openprocurement.auctions.rubble.constants import (
+from openprocurement.auctions.landlease.constants import (
   MINIMAL_PERIOD_FROM_RECTIFICATION_END
 )
-from openprocurement.auctions.rubble.models import (
+from openprocurement.auctions.landlease.models import (
     DGF_ID_REQUIRED_FROM
 )
-from openprocurement.auctions.rubble.tests.base import (
+from openprocurement.auctions.landlease.tests.base import (
     test_financial_organization,
     DEFAULT_ACCELERATION,
 )

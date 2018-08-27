@@ -3,7 +3,7 @@ from copy import deepcopy
 
 from openprocurement.auctions.core.tests.base import JSON_RENDERER_ERROR
 
-from openprocurement.auctions.rubble.tests.base import test_financial_organization
+from openprocurement.auctions.landlease.tests.base import test_financial_organization
 
 
 # AuctionBidderResourceTest

@@ -16,10 +16,10 @@ from openprocurement.auctions.core.validation import (
 from openprocurement.auctions.core.views.mixins import AuctionComplaintResource
 
 
-@opresource(name='rubbleOther:Auction Complaints',
+@opresource(name='landleaseOther:Auction Complaints',
             collection_path='/auctions/{auction_id}/complaints',
             path='/auctions/{auction_id}/complaints/{complaint_id}',
-            auctionsprocurementMethodType="rubbleOther",
+            auctionsprocurementMethodType="landleaseOther",
             description="Auction complaints")
 class AuctionComplaintResource(AuctionComplaintResource):
 

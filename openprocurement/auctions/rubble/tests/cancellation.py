@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 import unittest
 
-from openprocurement.auctions.rubble.tests.base import BaseAuctionWebTest, test_lots, test_bids, test_financial_auction_data, test_financial_bids
+from openprocurement.auctions.landlease.tests.base import BaseAuctionWebTest, test_lots, test_bids, test_financial_auction_data, test_financial_bids
 from openprocurement.auctions.core.tests.cancellation import (
     AuctionCancellationResourceTestMixin,
     AuctionLotCancellationResourceTestMixin,

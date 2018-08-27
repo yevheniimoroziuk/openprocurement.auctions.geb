@@ -21,7 +21,7 @@ from openprocurement.auctions.core.plugins.contracting.v2_1.tests.blanks.contrac
 
 )
 from openprocurement.auctions.core.utils import get_now
-from openprocurement.auctions.rubble.tests.base import BaseAuctionWebTest, test_auction_data, test_bids, test_lots, test_financial_auction_data, test_financial_bids, test_financial_organization
+from openprocurement.auctions.landlease.tests.base import BaseAuctionWebTest, test_auction_data, test_bids, test_lots, test_financial_auction_data, test_financial_bids, test_financial_organization
 
 
 class AuctionContractResourceTest(BaseAuctionWebTest):

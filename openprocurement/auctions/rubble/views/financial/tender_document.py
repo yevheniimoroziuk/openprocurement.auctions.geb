@@ -3,15 +3,15 @@
 from openprocurement.auctions.core.utils import (
     opresource,
 )
-from openprocurement.auctions.rubble.views.other.tender_document import (
+from openprocurement.auctions.landlease.views.other.tender_document import (
     AuctionDocumentResource,
 )
 
 
-@opresource(name='rubbleFinancial:Auction Documents',
+@opresource(name='landleaseFinancial:Auction Documents',
             collection_path='/auctions/{auction_id}/documents',
             path='/auctions/{auction_id}/documents/{document_id}',
-            auctionsprocurementMethodType="rubbleFinancial",
+            auctionsprocurementMethodType="landleaseFinancial",
             description="Financial auction related binary files (PDFs, etc.)")
 class FinancialAuctionDocumentResource(AuctionDocumentResource):
     pass

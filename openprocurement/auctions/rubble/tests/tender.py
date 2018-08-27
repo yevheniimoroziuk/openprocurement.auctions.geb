@@ -7,11 +7,11 @@ import unittest
 # from iso8601 import parse_date
 # import pytz
 
-from openprocurement.auctions.rubble.models import (
+from openprocurement.auctions.landlease.models import (
     RubbleOther,
     RubbleFinancial,
 )
-from openprocurement.auctions.rubble.tests.base import (
+from openprocurement.auctions.landlease.tests.base import (
     test_auction_maximum_data,
     test_auction_data,
     test_financial_auction_data,
@@ -46,7 +46,7 @@ from openprocurement.auctions.core.tests.blanks.tender_blanks import (
     auction_not_found,
     invalid_auction_conditions
 )
-from openprocurement.auctions.rubble.tests.blanks.tender_blanks import (
+from openprocurement.auctions.landlease.tests.blanks.tender_blanks import (
     # AuctionTest
     create_role,
     edit_role,

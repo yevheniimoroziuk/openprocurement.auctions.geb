@@ -3,15 +3,15 @@
 from openprocurement.auctions.core.utils import (
     opresource,
 )
-from openprocurement.auctions.rubble.views.other.cancellation_document import (
+from openprocurement.auctions.landlease.views.other.cancellation_document import (
     AuctionCancellationDocumentResource,
 )
 
 
-@opresource(name='rubbleFinancial:Auction Cancellation Documents',
+@opresource(name='landleaseFinancial:Auction Cancellation Documents',
             collection_path='/auctions/{auction_id}/cancellations/{cancellation_id}/documents',
             path='/auctions/{auction_id}/cancellations/{cancellation_id}/documents/{document_id}',
-            auctionsprocurementMethodType="rubbleFinancial",
+            auctionsprocurementMethodType="landleaseFinancial",
             description="Financial auction cancellation documents")
 class FinancialAuctionCancellationDocumentResource(AuctionCancellationDocumentResource):
     pass

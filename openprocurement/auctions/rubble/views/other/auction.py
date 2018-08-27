@@ -12,15 +12,15 @@ from openprocurement.auctions.core.validation import (
 )
 from openprocurement.auctions.core.views.mixins import AuctionAuctionResource
 
-from openprocurement.auctions.rubble.utils import (
+from openprocurement.auctions.landlease.utils import (
     invalidate_bids_under_threshold
 )
 
 
-@opresource(name='rubbleOther:Auction Auction',
+@opresource(name='landleaseOther:Auction Auction',
             collection_path='/auctions/{auction_id}/auction',
             path='/auctions/{auction_id}/auction/{auction_lot_id}',
-            auctionsprocurementMethodType="rubbleOther",
+            auctionsprocurementMethodType="landleaseOther",
             description="auction auction data")
 class AuctionAuctionResource(AuctionAuctionResource):
 

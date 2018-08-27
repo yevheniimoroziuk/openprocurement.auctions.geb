@@ -10,7 +10,7 @@ from openprocurement.auctions.core.tests.blanks.complaint_blanks import (
     create_auction_complaint_lot
 )
 from openprocurement.auctions.core.tests.base import snitch
-from openprocurement.auctions.rubble.tests.base import (
+from openprocurement.auctions.landlease.tests.base import (
     BaseAuctionWebTest, test_auction_data, test_lots,
     test_financial_auction_data, test_financial_organization
 )

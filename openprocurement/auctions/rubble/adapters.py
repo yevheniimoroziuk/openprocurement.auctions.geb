@@ -3,7 +3,7 @@ from openprocurement.auctions.core.adapters import (
     AuctionConfigurator,
     AuctionManagerAdapter
 )
-from openprocurement.auctions.rubble.models import (
+from openprocurement.auctions.landlease.models import (
     RubbleOther,
     RubbleFinancial
 )

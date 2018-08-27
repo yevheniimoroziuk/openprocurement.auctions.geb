@@ -2,7 +2,7 @@
 
 import unittest
 
-from openprocurement.auctions.rubble.tests import auction, award, bidder, document, tender, question, complaint
+from openprocurement.auctions.landlease.tests import auction, award, bidder, document, tender, question, complaint
 
 
 def suite():

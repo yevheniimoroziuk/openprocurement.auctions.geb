@@ -16,12 +16,12 @@ from openprocurement.auctions.core.tests.blanks.auction_blanks import (
     get_auction_features_auction
 )
 
-from openprocurement.auctions.rubble.constants import DEFAULT_PROCUREMENT_METHOD_TYPE_FINANCIAL
-from openprocurement.auctions.rubble.tests.base import (
+from openprocurement.auctions.landlease.constants import DEFAULT_PROCUREMENT_METHOD_TYPE_FINANCIAL
+from openprocurement.auctions.landlease.tests.base import (
     BaseAuctionWebTest, test_bids, test_lots, test_organization, test_features_auction_data,
     test_financial_auction_data, test_financial_bids, test_financial_organization,
 )
-from openprocurement.auctions.rubble.tests.blanks.auction_blanks import (
+from openprocurement.auctions.landlease.tests.blanks.auction_blanks import (
     # AuctionAuctionResourceTest
     post_auction_auction,
     # AuctionLotAuctionResourceTest
