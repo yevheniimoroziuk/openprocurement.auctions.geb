@@ -11,25 +11,33 @@ from zope.interface import implementer
 
 from openprocurement.auctions.core.includeme import IAwardingNextCheck
 from openprocurement.auctions.core.models import (
-    get_auction,
+    Model,
+    Administrator_role,
+    AuctionParameters as BaseAuctionParameters,
+    Auction as BaseAuction,
+    BankAccount,
+    BaseOrganization,
+    Bid as BaseBid,
+    Guarantee,
+    IAuction,
+    IsoDateTimeType,
+    IsoDurationType,
+    ListType,
     Lot,
     Period,
+    Value,
+    auction_embedded_role,
+    calc_auction_end_time,
+    dgfCDB2Complaint,
+    dgfCDB2Document,
+    LokiItem,
     dgfCancellation,
+    edit_role,
+    get_auction,
     validate_items_uniq,
     validate_lots_uniq,
-    auction_embedded_role,
-    IsoDateTimeType,
-    IAuction,
-    calc_auction_end_time,
-    edit_role,
-    Administrator_role,
-    dgfCDB2Document,
-    dgfCDB2Item,
-    dgfCDB2Complaint,
-    ListType,
     validate_not_available,
-    Bid as BaseBid,
-    Auction as BaseAuction,
+    validate_contract_type
 )
 from openprocurement.auctions.core.plugins.awarding.v2_1.models import Award
 from openprocurement.auctions.core.plugins.contracting.v2_1.models import Contract
@@ -38,6 +46,7 @@ from openprocurement.auctions.core.utils import (
     AUCTIONS_COMPLAINT_STAND_STILL_TIME as COMPLAINT_STAND_STILL_TIME, get_auction_creation_date
 )
 
+from openprocurement.auctions.landlease.constants import AUCTION_STATUSES
 from .constants import (
     DGF_ID_REQUIRED_FROM,
     MINIMAL_EXPOSITION_PERIOD,
@@ -45,6 +54,19 @@ from .constants import (
     MINIMAL_PERIOD_FROM_RECTIFICATION_END
 )
 from .utils import generate_rectificationPeriod
+
+
+class LeaseTerms(Model):
+    leaseDuration = IsoDurationType(required=True)
+
+class ContractTermsLandLease(Model):
+
+    type = StringType(required=True, choices=['lease'])
+    leaseTerms = ModelType(LeaseTerms, required=True)
+
+
+class AuctionParameters(BaseAuctionParameters):
+    type = StringType(choices=['texas'])
 
 
 def bids_validation_wrapper(validation_func):
@@ -150,21 +172,48 @@ create_role = (blacklist(
     'tenderPeriod'
 ) + auction_embedded_role)
 
-edit_role = (edit_role + blacklist('enquiryPeriod', 'tenderPeriod', 'auction_value', 'auction_minimalStep', 'auction_guarantee', 'eligibilityCriteria', 'eligibilityCriteria_en', 'eligibilityCriteria_ru', 'awardCriteriaDetails', 'awardCriteriaDetails_en', 'awardCriteriaDetails_ru', 'procurementMethodRationale', 'procurementMethodRationale_en', 'procurementMethodRationale_ru', 'submissionMethodDetails', 'submissionMethodDetails_en', 'submissionMethodDetails_ru', 'minNumberOfQualifiedBids'))
+edit_role = (edit_role + blacklist('enquiryPeriod',
+                                   'tenderPeriod',
+                                   'auction_value',
+                                   'auction_minimalStep',
+                                   'auction_guarantee',
+                                   'eligibilityCriteria',
+                                   'eligibilityCriteria_en',
+                                   'eligibilityCriteria_ru',
+                                   'awardCriteriaDetails',
+                                   'awardCriteriaDetails_en',
+                                   'awardCriteriaDetails_ru',
+                                   'procurementMethodRationale',
+                                   'procurementMethodRationale_en',
+                                   'procurementMethodRationale_ru',
+                                   'submissionMethodDetails',
+                                   'submissionMethodDetails_en',
+                                   'submissionMethodDetails_ru',
+                                   'minNumberOfQualifiedBids'))
+
 Administrator_role = (Administrator_role + whitelist('awards'))
 
 
-class IRubbleAuction(IAuction):
-    """Marker interface for Rubble auctions"""
+class ILandLeaseAuction(IAuction):
+    """Marker interface for LandLease auctions"""
 
 
-@implementer(IRubbleAuction)
+@implementer(ILandLeaseAuction)
 class Auction(BaseAuction):
-    """Data regarding auction process - publicly inviting prospective contractors to submit bids for evaluation and selecting a winner or winners."""
+
     class Options:
         roles = {
             'create': create_role,
-            'edit_active.tendering': (blacklist('enquiryPeriod', 'tenderPeriod', 'rectificationPeriod', 'auction_value', 'auction_minimalStep', 'auction_guarantee', 'eligibilityCriteria', 'eligibilityCriteria_en', 'eligibilityCriteria_ru', 'minNumberOfQualifiedBids') + edit_role),
+            'edit_active.tendering': (blacklist('enquiryPeriod',
+                                                'tenderPeriod',
+                                                'rectificationPeriod',
+                                                'auction_value',
+                                                'auction_minimalStep',
+                                                'auction_guarantee',
+                                                'eligibilityCriteria',
+                                                'eligibilityCriteria_en',
+                                                'eligibilityCriteria_ru',
+                                                'minNumberOfQualifiedBids') + edit_role),
             'Administrator': (whitelist('rectificationPeriod') + Administrator_role),
         }
 
@@ -175,23 +224,74 @@ class Auction(BaseAuction):
         return roles
 
     _internal_type = "landlease"
-    awards = ListType(ModelType(Award), default=list())
-    bids = ListType(ModelType(Bid), default=list())  # A list of all the companies who entered submissions for the auction.
-    cancellations = ListType(ModelType(Cancellation), default=list())
-    complaints = ListType(ModelType(dgfCDB2Complaint), default=list())
-    contracts = ListType(ModelType(Contract), default=list())
-    dgfID = StringType()
-    documents = ListType(ModelType(dgfCDB2Document), default=list())  # All documents and attachments related to the auction.
-    enquiryPeriod = ModelType(Period)  # The period during which enquiries may be made and will be answered.
-    rectificationPeriod = ModelType(RectificationPeriod)  # The period during which editing of main procedure fields are allowed
-    tenderPeriod = ModelType(Period)  # The period when the auction is open for submissions. The end date is the closing date for auction submissions.
-    tenderAttempts = IntType(choices=[1, 2, 3, 4])
+
     auctionPeriod = ModelType(AuctionAuctionPeriod, required=True, default={})
-    procurementMethodType = StringType()
-    status = StringType(choices=['draft', 'active.tendering', 'active.auction', 'active.qualification', 'active.awarded', 'complete', 'cancelled', 'unsuccessful'], default='active.tendering')
-    lots = ListType(ModelType(Lot), default=list(), validators=[validate_lots_uniq, validate_not_available])
-    items = ListType(ModelType(dgfCDB2Item), required=True, min_size=1, validators=[validate_items_uniq])
+    auctionParameters = ModelType(AuctionParameters)
+    awardCriteria = StringType(choices=['highestCost'],
+                               default='highestCost')                           # Specify the selection criteria, by lowest cost,
+
+    awards = ListType(ModelType(Award), default=list())
+
+    bids = ListType(ModelType(Bid), default=list())                             # A list of all the companies who entered submissions for the auction.
+
+    bankAccount = ModelType(BankAccount)
+
+    budgetSpent = ModelType(Value, required=True)
+
+    cancellations = ListType(ModelType(Cancellation), default=list())
+
+    complaints = ListType(ModelType(dgfCDB2Complaint), default=list())
+
+    contracts = ListType(ModelType(Contract), default=list())
+
+    contractTerms = ModelType(ContractTermsLease,
+                              validators=[validate_contract_type])
+
+    description = StringType(required=True)
+
+    dgfID = StringType()
+
+    documents = ListType(ModelType(dgfCDB2Document), default=list())            # All documents and attachments related to the auction.
+
+    enquiryPeriod = ModelType(Period)                                           # The period during which enquiries may be made and will be answered.
+
+    guarantee = ModelType(Guarantee, required=True)
+
+    items = ListType(ModelType(LokiItem),
+                     required=True,
+                     min_size=1,
+                     validators=[validate_items_uniq])
+
+    lotIdentifier = StringType(required=True)                                   # The external identifier of the lot on which this procedure is carried out
+
+    lots = ListType(ModelType(Lot),
+                    default=list(),
+                    validators=[validate_lots_uniq, validate_not_available])
+
+    lotHolder = ModelType(BaseOrganization, required=True)
+
     minNumberOfQualifiedBids = IntType(choices=[1, 2])
+
+    mode = StringType()
+
+    procurementMethod = StringType(choices=['open'], default='open')
+
+    procurementMethodType = StringType()
+
+    procurementMethodType = StringType(required=True)
+
+    rectificationPeriod = ModelType(RectificationPeriod)                        # The period during which editing of main procedure fields are allowed
+
+    registrationFee = ModelType(Value, required=True)
+
+    status = StringType(choices=AUCTION_STATUSES, default='draft')
+
+    submissionMethod = StringType(choices=['electronicAuction'],
+                                  default='electronicAuction')
+
+    tenderAttempts = IntType(required=True, choices=range(1, 11))
+
+    tenderPeriod = ModelType(Period)                                            # The period when the auction is open for submissions. The end date is the closing date for auction submissions.
 
     def __acl__(self):
         return [
@@ -287,4 +387,4 @@ class Auction(BaseAuction):
         return min(checks).isoformat() if checks else None
 
 
-Rubble = Auction
+LandLease = Auction

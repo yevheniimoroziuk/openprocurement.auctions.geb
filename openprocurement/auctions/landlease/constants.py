@@ -32,8 +32,19 @@ CPV_NON_SPECIFIC_LOCATION_UNITS = ('45', '48', '50', '51', '55', '60', '63', '64
                                    '79', '80', '85', '90', '92', '98')
 CAV_NON_SPECIFIC_LOCATION_UNITS = ('07', '08')
 
-DEFAULT_PROCUREMENT_METHOD_TYPE_OTHER = "landlease"
-DEFAULT_PROCUREMENT_METHOD_TYPE_FINANCIAL = "landleaseFinancial"
+DEFAULT_PROCUREMENT_METHOD_TYPE = "landlease"
 
 DEFAULT_LEVEL_OF_ACCREDITATION = {'create': [1],
                                   'edit': [2]}
+
+
+AUCTION_STATUSES = ['draft',
+                    'active.rectification',
+                    'active.tendering',
+                    'active.enquiry',
+                    'active.auction',
+                    'active.qualification',
+                    'active.awarded',
+                    'unsuccessful',
+                    'cancelled',
+                    'complete']

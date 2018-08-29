@@ -13,16 +13,16 @@ from openprocurement.auctions.core.plugins.awarding.v2_1.adapters import (
 )
 
 from openprocurement.auctions.landlease.adapters import (
-    AuctionRubbleConfigurator,
-    AuctionRubbleManagerAdapter,
+    AuctionLandLeaseConfigurator,
+    AuctionLandLeaseManagerAdapter,
 )
 from openprocurement.auctions.landlease.constants import (
     DEFAULT_LEVEL_OF_ACCREDITATION,
-    DEFAULT_PROCUREMENT_METHOD_TYPE_OTHER,
+    DEFAULT_PROCUREMENT_METHOD_TYPE,
 )
 from openprocurement.auctions.landlease.models import (
-    IRubbleAuction,
-    Rubble,
+    ILandLeaseAuction,
+    LandLease,
 )
 
 LOGGER = logging.getLogger(__name__)
@@ -32,28 +32,28 @@ def includeme(config, plugin_map):
     procurement_method_types = plugin_map.get('aliases', [])
     if plugin_map.get('use_default', False):
         procurement_method_types.append(
-            DEFAULT_PROCUREMENT_METHOD_TYPE_OTHER
+            DEFAULT_PROCUREMENT_METHOD_TYPE
         )
     for procurementMethodType in procurement_method_types:
-        config.add_auction_procurementMethodType(Rubble,
+        config.add_auction_procurementMethodType(LandLease,
                                                  procurementMethodType)
 
     config.scan("openprocurement.auctions.landlease.views")
 
     # Register adapters
     config.registry.registerAdapter(
-        AuctionRubbleConfigurator,
-        (IRubbleAuction, IRequest),
+        AuctionLandLeaseConfigurator,
+        (ILandLeaseAuction, IRequest),
         IContentConfigurator
     )
     config.registry.registerAdapter(
         AwardingNextCheckV2_1,
-        (IRubbleAuction,),
+        (ILandLeaseAuction,),
         IAwardingNextCheck
     )
     config.registry.registerAdapter(
-        AuctionRubbleManagerAdapter,
-        (IRubbleAuction,),
+        AuctionLandLeaseManagerAdapter,
+        (ILandLeaseAuction,),
         IAuctionManager
     )
 
@@ -62,9 +62,9 @@ def includeme(config, plugin_map):
 
     # add accreditation level
     if not plugin_map.get('accreditation'):
-        config.registry.accreditation['auction'][Rubble._internal_type] = DEFAULT_LEVEL_OF_ACCREDITATION
+        config.registry.accreditation['auction'][LandLease._internal_type] = DEFAULT_LEVEL_OF_ACCREDITATION
     else:
-        config.registry.accreditation['auction'][Rubble._internal_type] = plugin_map['accreditation']
+        config.registry.accreditation['auction'][LandLease._internal_type] = plugin_map['accreditation']
 
     # migrate data
     if plugin_map['migration'] and not os.environ.get('MIGRATION_SKIP'):

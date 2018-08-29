@@ -4,20 +4,20 @@ from openprocurement.auctions.core.adapters import (
     AuctionManagerAdapter
 )
 from openprocurement.auctions.landlease.models import (
-    Rubble
+    LandLease
 )
 from openprocurement.auctions.core.plugins.awarding.v2_1.adapters import (
     AwardingV2_1ConfiguratorMixin
 )
 
 
-class AuctionRubbleConfigurator(AuctionConfigurator,
+class AuctionLandLeaseConfigurator(AuctionConfigurator,
                                      AwardingV2_1ConfiguratorMixin):
-    name = 'Auction Rubble Configurator'
-    model = Rubble
+    name = 'Auction LandLease Configurator'
+    model = LandLease
 
 
-class AuctionRubbleManagerAdapter(AuctionManagerAdapter):
+class AuctionLandLeaseManagerAdapter(AuctionManagerAdapter):
 
     def create_auction(self, request):
         pass

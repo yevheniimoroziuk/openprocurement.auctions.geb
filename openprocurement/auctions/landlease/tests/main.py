@@ -2,19 +2,12 @@
 
 import unittest
 
-from openprocurement.auctions.landlease.tests import auction, award, bidder, document, tender, question, complaint
+from openprocurement.auctions.landlease.tests import procedure
 
 
 def suite():
     suite = unittest.TestSuite()
-    suite.addTest(auction.suite())
-    suite.addTest(award.suite())
-    suite.addTest(bidder.suite())
-    suite.addTest(complaint.suite())
-    suite.addTest(document.suite())
-    suite.addTest(migration.suite())
-    suite.addTest(question.suite())
-    suite.addTest(tender.suite())
+    suite.addTest(procedure.suite())
     return suite
 
 
