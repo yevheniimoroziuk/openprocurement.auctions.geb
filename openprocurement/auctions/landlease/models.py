@@ -26,42 +26,52 @@ from openprocurement.auctions.core.models import (
     Lot,
     Period,
     Value,
-    auction_embedded_role,
     calc_auction_end_time,
     dgfCDB2Complaint,
     dgfCDB2Document,
-    LokiItem,
+    dgfCDB2Item,
     dgfCancellation,
     edit_role,
     get_auction,
     validate_items_uniq,
     validate_lots_uniq,
     validate_not_available,
-    validate_contract_type
 )
 from openprocurement.auctions.core.plugins.awarding.v2_1.models import Award
 from openprocurement.auctions.core.plugins.contracting.v2_1.models import Contract
 from openprocurement.auctions.core.utils import (
-    SANDBOX_MODE, TZ, calculate_business_date, get_request_from_root, get_now,
+    SANDBOX_MODE,
+    TZ,
+    calculate_business_date,
+    get_request_from_root,
+    get_now,
     AUCTIONS_COMPLAINT_STAND_STILL_TIME as COMPLAINT_STAND_STILL_TIME, get_auction_creation_date
 )
 
 from openprocurement.auctions.landlease.constants import AUCTION_STATUSES
 from .constants import (
-    DGF_ID_REQUIRED_FROM,
     MINIMAL_EXPOSITION_PERIOD,
     MINIMAL_EXPOSITION_REQUIRED_FROM,
     MINIMAL_PERIOD_FROM_RECTIFICATION_END
 )
-from .utils import generate_rectificationPeriod
+from .utils import generate_rectificationPeriod                                 # TODO
+from openprocurement.auctions.landlease.roles import (
+    auction_create_role,
+    auction_contractTerms_create_role
+)
 
 
 class LeaseTerms(Model):
     leaseDuration = IsoDurationType(required=True)
 
-class ContractTermsLandLease(Model):
 
-    type = StringType(required=True, choices=['lease'])
+class ContractTerms(Model):
+
+    class Options:
+        roles = {
+            'create': auction_contractTerms_create_role
+        }
+    type = StringType(choices=['lease'])
     leaseTerms = ModelType(LeaseTerms, required=True)
 
 
@@ -143,35 +153,6 @@ class RectificationPeriod(Period):
     invalidationDate = IsoDateTimeType()
 
 
-create_role = (blacklist(
-    '_attachments',
-    'auctionID',
-    'auctionUrl',
-    'awardCriteria',
-    'awardPeriod',
-    'awards',
-    'bids',
-    'cancellations',
-    'complaints',
-    'contracts',
-    'date',
-    'dateModified',
-    'doc_id',
-    'documents',
-    'eligibilityCriteria',
-    'eligibilityCriteria_en',
-    'eligibilityCriteria_ru',
-    'enquiryPeriod',
-    'numberOfBidders',
-    'owner',
-    'procurementMethod',
-    'questions',
-    'revisions',
-    'status',
-    'submissionMethod',
-    'tenderPeriod'
-) + auction_embedded_role)
-
 edit_role = (edit_role + blacklist('enquiryPeriod',
                                    'tenderPeriod',
                                    'auction_value',
@@ -203,7 +184,7 @@ class Auction(BaseAuction):
 
     class Options:
         roles = {
-            'create': create_role,
+            'create': auction_create_role,
             'edit_active.tendering': (blacklist('enquiryPeriod',
                                                 'tenderPeriod',
                                                 'rectificationPeriod',
@@ -244,12 +225,10 @@ class Auction(BaseAuction):
 
     contracts = ListType(ModelType(Contract), default=list())
 
-    contractTerms = ModelType(ContractTermsLease,
-                              validators=[validate_contract_type])
+    contractTerms = ModelType(ContractTerms,
+                              required=True)
 
     description = StringType(required=True)
-
-    dgfID = StringType()
 
     documents = ListType(ModelType(dgfCDB2Document), default=list())            # All documents and attachments related to the auction.
 
@@ -257,7 +236,7 @@ class Auction(BaseAuction):
 
     guarantee = ModelType(Guarantee, required=True)
 
-    items = ListType(ModelType(LokiItem),
+    items = ListType(ModelType(dgfCDB2Item),
                      required=True,
                      min_size=1,
                      validators=[validate_items_uniq])
@@ -270,7 +249,7 @@ class Auction(BaseAuction):
 
     lotHolder = ModelType(BaseOrganization, required=True)
 
-    minNumberOfQualifiedBids = IntType(choices=[1, 2])
+    minNumberOfQualifiedBids = IntType(choices=[1, 2], required=True)
 
     mode = StringType()
 
@@ -340,11 +319,6 @@ class Auction(BaseAuction):
     def validate_value(self, data, value):
         if value.currency != u'UAH':
             raise ValidationError(u"currency should be only UAH")
-
-    def validate_dgfID(self, data, dgfID):
-        if not dgfID:
-            if get_auction_creation_date(data) > DGF_ID_REQUIRED_FROM:
-                raise ValidationError(u'This field is required.')
 
     @serializable(serialize_when_none=False)
     def next_check(self):

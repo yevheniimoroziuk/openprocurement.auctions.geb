@@ -1,3 +1,12 @@
+from openprocurement.auctions.landlease.tests.helpers import (
+    get_specification_fields,
+    get_error_description
+)
+
+from collections import Mapping
+from openprocurement.auctions.landlease.tests.specifications import (
+    REQUIRED_SCHEME_DEFINITION
+)
 
 
 def create_auction_invalid_unsupported_media_type(self):
@@ -68,20 +77,12 @@ def create_auction_invalid_unprocessable_entity_common(self):
                        u'location': u'body', u'name': u'invalid_field'}])
 
 
-from openprocurement.auctions.landlease.models import LandLease
-from openprocurement.auctions.landlease.tests.helpers import (
-    get_resource_required_fields,
-    get_error_description
-)
-
-from collections import Mapping
-
-
 def create_auction_invalid_required_fields(self):
     entrypoint = '/auctions'
     expected_http_status = '422 Unprocessable Entity'
     response_required_fields = []
-    required_fields = get_resource_required_fields(LandLease)
+    required_fields = get_specification_fields(REQUIRED_SCHEME_DEFINITION,
+                                               field_type='required')
 
     request_data = {'data': {'procurementMethodType': self.initial_data['procurementMethodType']}}
     response = self.app.post_json(entrypoint, request_data, status=422)
@@ -90,6 +91,7 @@ def create_auction_invalid_required_fields(self):
     for error in response.json['errors']:
         if get_error_description(error['description']) == 'This field is required.':
             response_required_fields.append(error['name'])
+    response_required_fields.append('procurementMethodType')
 
     for field in required_fields:
         if isinstance(field, Mapping):
