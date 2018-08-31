@@ -13,16 +13,21 @@ from openprocurement.auctions.core.plugins.awarding.v2_1.adapters import (
 )
 
 from openprocurement.auctions.landlease.adapters import (
-    AuctionLandLeaseConfigurator,
-    AuctionLandLeaseManagerAdapter,
+    AuctionConfigurator,
+    AuctionManagerAdapter,
+    AuctionInitializator
 )
 from openprocurement.auctions.landlease.constants import (
     DEFAULT_LEVEL_OF_ACCREDITATION,
     DEFAULT_PROCUREMENT_METHOD_TYPE,
 )
 from openprocurement.auctions.landlease.models import (
-    ILandLeaseAuction,
-    LandLease,
+    LandLease
+)
+
+from openprocurement.auctions.landlease.interfaces import (
+    IAuction,
+    IAuctionInitializator
 )
 
 LOGGER = logging.getLogger(__name__)
@@ -40,21 +45,26 @@ def includeme(config, plugin_map):
 
     config.scan("openprocurement.auctions.landlease.views")
 
-    # Register adapters
     config.registry.registerAdapter(
-        AuctionLandLeaseConfigurator,
-        (ILandLeaseAuction, IRequest),
+        AuctionConfigurator,
+        (IAuction, IRequest),
         IContentConfigurator
     )
     config.registry.registerAdapter(
         AwardingNextCheckV2_1,
-        (ILandLeaseAuction,),
+        (IAuction,),
         IAwardingNextCheck
     )
     config.registry.registerAdapter(
-        AuctionLandLeaseManagerAdapter,
-        (ILandLeaseAuction,),
+        AuctionManagerAdapter,
+        (IAuction,),
         IAuctionManager
+    )
+
+    config.registry.registerAdapter(
+        AuctionInitializator,
+        (IAuction,),
+        IAuctionInitializator
     )
 
     LOGGER.info("Included openprocurement.auctions.landlease plugin",

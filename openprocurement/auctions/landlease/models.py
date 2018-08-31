@@ -10,16 +10,15 @@ from pyramid.security import Allow
 from zope.interface import implementer
 
 from openprocurement.auctions.core.includeme import IAwardingNextCheck
+from openprocurement.auctions.landlease.interfaces import IAuction
 from openprocurement.auctions.core.models import (
     Model,
     Administrator_role,
-    AuctionParameters as BaseAuctionParameters,
     Auction as BaseAuction,
     BankAccount,
     BaseOrganization,
     Bid as BaseBid,
     Guarantee,
-    IAuction,
     IsoDateTimeType,
     IsoDurationType,
     ListType,
@@ -48,13 +47,12 @@ from openprocurement.auctions.core.utils import (
     AUCTIONS_COMPLAINT_STAND_STILL_TIME as COMPLAINT_STAND_STILL_TIME, get_auction_creation_date
 )
 
-from openprocurement.auctions.landlease.constants import AUCTION_STATUSES
-from .constants import (
+from openprocurement.auctions.landlease.constants import (
+    AUCTION_STATUSES,
     MINIMAL_EXPOSITION_PERIOD,
     MINIMAL_EXPOSITION_REQUIRED_FROM,
     MINIMAL_PERIOD_FROM_RECTIFICATION_END
 )
-from .utils import generate_rectificationPeriod                                 # TODO
 from openprocurement.auctions.landlease.roles import (
     auction_create_role,
     auction_contractTerms_create_role
@@ -75,7 +73,9 @@ class ContractTerms(Model):
     leaseTerms = ModelType(LeaseTerms, required=True)
 
 
-class AuctionParameters(BaseAuctionParameters):
+class AuctionParameters(Model):
+    """Configurable auction parameters"""
+
     type = StringType(choices=['texas'])
 
 
@@ -175,11 +175,7 @@ edit_role = (edit_role + blacklist('enquiryPeriod',
 Administrator_role = (Administrator_role + whitelist('awards'))
 
 
-class ILandLeaseAuction(IAuction):
-    """Marker interface for LandLease auctions"""
-
-
-@implementer(ILandLeaseAuction)
+@implementer(IAuction)
 class Auction(BaseAuction):
 
     class Options:
@@ -278,28 +274,6 @@ class Auction(BaseAuction):
             (Allow, '{}_{}'.format(self.owner, self.owner_token), 'edit_auction_award'),
             (Allow, '{}_{}'.format(self.owner, self.owner_token), 'upload_auction_documents'),
         ]
-
-    def initialize(self):
-        if not self.enquiryPeriod:
-            self.enquiryPeriod = type(self).enquiryPeriod.model_class()
-        if not self.tenderPeriod:
-            self.tenderPeriod = type(self).tenderPeriod.model_class()
-        now = get_now()
-        start_date = TZ.localize(self.auctionPeriod.startDate.replace(tzinfo=None))
-        self.tenderPeriod.startDate = self.enquiryPeriod.startDate = now
-        pause_between_periods = start_date - (start_date.replace(hour=20, minute=0, second=0, microsecond=0) - timedelta(days=1))
-        end_date = calculate_business_date(start_date, -pause_between_periods, self)
-        self.enquiryPeriod.endDate = end_date
-        self.tenderPeriod.endDate = self.enquiryPeriod.endDate
-        if not self.rectificationPeriod:
-            self.rectificationPeriod = generate_rectificationPeriod(self)
-        self.rectificationPeriod.startDate = now
-        self.auctionPeriod.startDate = None
-        self.auctionPeriod.endDate = None
-        self.date = now
-        if self.lots:
-            for lot in self.lots:
-                lot.date = now
 
     def validate_tenderPeriod(self, data, period):
         """Auction start date must be not closer than MINIMAL_EXPOSITION_PERIOD days and not a holiday"""

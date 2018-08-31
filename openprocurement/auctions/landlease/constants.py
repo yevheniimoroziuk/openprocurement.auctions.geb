@@ -37,6 +37,7 @@ DEFAULT_PROCUREMENT_METHOD_TYPE = "landlease"
 DEFAULT_LEVEL_OF_ACCREDITATION = {'create': [1],
                                   'edit': [2]}
 
+AUCTION_PARAMETERS_TYPE = 'texas'
 
 AUCTION_STATUSES = ['draft',
                     'active.rectification',
