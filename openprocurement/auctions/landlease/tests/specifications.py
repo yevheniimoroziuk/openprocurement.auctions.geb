@@ -542,3 +542,14 @@ REQUIRED_SCHEME_DEFINITION = [
         "model": []
     },
 ]
+
+STATUS_CHANGES = {
+    "draft": {
+        "editing_permissions": ["auction_owner", "Administrator"],
+        "next_status": ["active.rectification"]
+    },
+    "active.rectification": {
+        "editing_permissions": ["auction_owner", "Administrator"],
+        "next_status": ["active.tendering"]
+    }
+}

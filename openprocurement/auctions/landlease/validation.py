@@ -2,6 +2,10 @@
 from openprocurement.auctions.core.utils import error_handler, get_now, TZ
 
 from openprocurement.auctions.landlease.utils import generate_rectificationPeriod
+from openprocurement.auctions.core.validation import (
+    validate_json_data,
+    validate_data
+)
 
 
 def validate_rectification_period_editing(request, **kwargs):
@@ -12,3 +16,9 @@ def validate_rectification_period_editing(request, **kwargs):
             request.errors.add('body', 'data', 'Auction can be edited only during the rectification period: from ({}) to ({}).'.format(rectificationPeriod.startDate.isoformat(), rectificationPeriod.endDate.isoformat()))
             request.errors.status = 403
             raise error_handler(request)
+
+
+
+def validate_patch_auction_data(request, **kwargs):
+    data = validate_json_data(request)
+    validate_data(request, request.auction.__class__, data=data)

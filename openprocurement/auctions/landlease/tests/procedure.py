@@ -53,6 +53,10 @@ class CreateAuctionWithInvalidFieldsTest(BaseWebTest):
 
     test_invalid_minNumberOfQualifiedBids = snitch(create_invalid_minNumberOfQualifiedBids)
     # test_tenderAttempts = snitch(create_invalid_tenderAttempts)
+    # test_minimalStep = snitch(test_minimalStep)
+    # test_budgetSpent = snitch(test_budgetSpent)
+    # test_registrationFee = snitch(test_registrationFee)
+    # test_guarantee = snitch(test_guarantee)
     # test_mode = snitch(create_invalid_mode)
 
 

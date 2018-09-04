@@ -18,6 +18,11 @@ from openprocurement.auctions.landlease.utils import (
     upload_file, get_file, invalidate_bids_data, generate_rectificationPeriod
 )
 
+from openprocurement.auctions.landlease.constants import (
+    API_DOCUMENT_STATUSES,
+    AUCTION_DOCUMENT_STATUSES
+)
+
 
 @opresource(name='landlease:Auction Documents',
             collection_path='/auctions/{auction_id}/documents',
@@ -27,19 +32,21 @@ from openprocurement.auctions.landlease.utils import (
 class AuctionDocumentResource(AuctionDocumentResource):
 
     def validate_document_editing_period(self, operation):
-        auction_not_in_editable_state = (self.request.authenticated_role != 'auction' and self.request.validated['auction_status'] != 'active.tendering' or \
-           self.request.authenticated_role == 'auction' and self.request.validated['auction_status'] not in ['active.auction', 'active.qualification'])
+        status = self.request.validated['auction_status']
+        role = self.request.authenticated_role
 
-        auction = self.request.validated['auction']
+        if role != 'auction':
+            auction_not_in_editable_state = status not in API_DOCUMENT_STATUSES
+        else:
+            auction_not_in_editable_state = status not in AUCTION_DOCUMENT_STATUSES
+
         if auction_not_in_editable_state:
-            self.request.errors.add('body', 'data', 'Can\'t {} document in current ({}) auction status'.format('add' if operation == 'add' else 'update', self.request.validated['auction_status']))
-            self.request.errors.status = 403
-            return
-        if auction.rectificationPeriod.endDate < get_now() and self.request.authenticated_role != 'auction':
-            self.request.errors.add('body', 'data', 'Document can be {} only during the rectificationPeriod period.'.format('added' if operation == 'add' else 'updated'))
+            err_msg = 'Can\'t {} document in current ({}) auction status'.format(operation, status)
+            self.request.errors.add('body', 'data', err_msg)
             self.request.errors.status = 403
             return
         return True
+
 
     @json_view(permission='upload_auction_documents', validators=(validate_file_upload,))
     def collection_post(self):

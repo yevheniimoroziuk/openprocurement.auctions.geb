@@ -12,11 +12,20 @@ from openprocurement.auctions.core.plugins.awarding.v2_1.adapters import (
     AwardingNextCheckV2_1
 )
 
-from openprocurement.auctions.landlease.adapters import (
-    AuctionConfigurator,
+from openprocurement.auctions.landlease.adapters.managers import (
     AuctionManagerAdapter,
+)
+
+from openprocurement.auctions.landlease.adapters.configurators import (
+    AuctionConfigurator,
+)
+from openprocurement.auctions.landlease.adapters.changers import (
+    AuctionChanger
+)
+from openprocurement.auctions.landlease.adapters.initializators import (
     AuctionInitializator
 )
+
 from openprocurement.auctions.landlease.constants import (
     DEFAULT_LEVEL_OF_ACCREDITATION,
     DEFAULT_PROCUREMENT_METHOD_TYPE,
@@ -27,6 +36,7 @@ from openprocurement.auctions.landlease.models import (
 
 from openprocurement.auctions.landlease.interfaces import (
     IAuction,
+    IAuctionChanger,
     IAuctionInitializator
 )
 
@@ -65,6 +75,12 @@ def includeme(config, plugin_map):
         AuctionInitializator,
         (IAuction,),
         IAuctionInitializator
+    )
+
+    config.registry.registerAdapter(
+        AuctionChanger,
+        (IRequest, IAuction),
+        IAuctionChanger
     )
 
     LOGGER.info("Included openprocurement.auctions.landlease plugin",

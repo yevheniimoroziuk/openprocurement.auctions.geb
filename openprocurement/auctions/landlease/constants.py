@@ -2,6 +2,9 @@ from datetime import datetime, timedelta
 
 from openprocurement.auctions.core.constants import TZ, ORA_CODES, read_json
 
+API_DOCUMENT_STATUSES = ['active.rectification']
+AUCTION_DOCUMENT_STATUSES = ['active.auction', 'active.qualification']
+
 # document types
 DOCUMENT_TYPE_OFFLINE = ['x_dgfAssetFamiliarization']
 DOCUMENT_TYPE_URL_ONLY = ['virtualDataRoom']        # requiremnt periods

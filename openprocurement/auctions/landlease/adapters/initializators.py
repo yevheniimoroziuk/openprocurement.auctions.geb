@@ -1,17 +1,7 @@
 # -*- coding: utf-8 -*-
 from zope.interface import implementer
 from datetime import timedelta
-
-from openprocurement.auctions.core.adapters import (
-    AuctionConfigurator as BaseAuctionConfigurator,
-    AuctionManagerAdapter as BaseAuctionManagerAdapter
-)
-from openprocurement.auctions.landlease.models import (
-    LandLease
-)
-from openprocurement.auctions.core.plugins.awarding.v2_1.adapters import (
-    AwardingV2_1ConfiguratorMixin
-)
+from random import randint
 
 from openprocurement.auctions.landlease.interfaces import (
     IAuctionInitializator
@@ -27,12 +17,6 @@ from openprocurement.auctions.landlease.constants import (
     MINIMAL_PERIOD_FROM_RECTIFICATION_END,
     AUCTION_PARAMETERS_TYPE
 )
-
-
-class AuctionConfigurator(BaseAuctionConfigurator,
-                          AwardingV2_1ConfiguratorMixin):
-    name = 'Auction LandLease Configurator'
-    model = LandLease
 
 
 @implementer(IAuctionInitializator)
@@ -60,7 +44,8 @@ class AuctionInitializator(object):
         self._context.enquiryPeriod.startDate = self._now
 
         start_date = TZ.localize(self._context.auctionPeriod.startDate.replace(tzinfo=None))
-        item = (start_date.replace(hour=20, minute=0, second=0, microsecond=0) - timedelta(days=1))
+        start_date_replace = start_date.replace(hour=20, minute=0, second=0, microsecond=0)
+        item = (start_date_replace - timedelta(days=1, minutes=randint(-30, 30)))
         pause_between_periods = start_date - item
         end_date = calculate_business_date(start_date, -pause_between_periods, self)
 
@@ -71,7 +56,8 @@ class AuctionInitializator(object):
         self._context.tenderPeriod.startDate = self._now
 
         start_date = TZ.localize(self._context.auctionPeriod.startDate.replace(tzinfo=None))
-        item = (start_date.replace(hour=20, minute=0, second=0, microsecond=0) - timedelta(days=1))
+        start_date_replace = start_date.replace(hour=20, minute=0, second=0, microsecond=0)
+        item = (start_date_replace - timedelta(days=1, minutes=randint(-30, 30)))
         pause_between_periods = start_date - item
         end_date = calculate_business_date(start_date, -pause_between_periods, self)
 
@@ -97,16 +83,3 @@ class AuctionInitializator(object):
         self._initialize_auctionParameters()
         self._initialize_date()
         self._clean_auctionPeriod()
-
-
-class AuctionManagerAdapter(BaseAuctionManagerAdapter):
-
-    def create_auction(self, request):
-        pass
-
-    def change_auction(self, request):
-        pass
-
-    def initialize(self, initializator):
-        self._initializator = initializator
-        self._initializator.initialize()

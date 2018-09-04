@@ -4,7 +4,7 @@ from datetime import datetime, timedelta
 
 from openprocurement.auctions.core.tests.base import (
     test_organization,
-    base_test_bids
+    base_test_bids,
 )
 from openprocurement.auctions.core.utils import (
     SANDBOX_MODE
@@ -29,6 +29,15 @@ PARTIAL_MOCK_CONFIG = {
     }
 }
 
+test_bankAccount = {
+    "bankName": "Test bank name",
+    "description": u"Test Bank Account",
+    "accountIdentification": [{
+        "scheme": u'UA-EDR',
+        "id": u"66113000-5",
+        "description": u"Test"
+    }]
+}
 
 now = datetime.now()
 test_procuringEntity = test_organization.copy()

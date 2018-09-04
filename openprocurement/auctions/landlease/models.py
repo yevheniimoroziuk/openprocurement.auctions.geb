@@ -15,8 +15,8 @@ from openprocurement.auctions.core.models import (
     Model,
     Administrator_role,
     Auction as BaseAuction,
-    BankAccount,
     BaseOrganization,
+    BankAccount,
     Bid as BaseBid,
     Guarantee,
     IsoDateTimeType,
@@ -27,7 +27,7 @@ from openprocurement.auctions.core.models import (
     Value,
     calc_auction_end_time,
     dgfCDB2Complaint,
-    dgfCDB2Document,
+    dgfDocument,
     dgfCDB2Item,
     dgfCancellation,
     edit_role,
@@ -55,8 +55,40 @@ from openprocurement.auctions.landlease.constants import (
 )
 from openprocurement.auctions.landlease.roles import (
     auction_create_role,
+    auction_active_rectification_role,
+    auction_edit_rectification_role,
     auction_contractTerms_create_role
 )
+
+
+class LandLeaseDocument(dgfDocument):
+    documentOf = StringType(required=True,
+                            choices=['auction',
+                                     'item',
+                                     'bid',
+                                     'award',
+                                     'contract'],
+                            default='auction')
+
+    documentType = StringType(choices=[
+        'technicalSpecifications',
+        'evaluationCriteria',
+        'clarifications',
+        'billOfQuantity',
+        'conflictOfInterest',
+        'evaluationReports',
+        'complaints',
+        'eligibilityCriteria',
+        'tenderNotice',
+        'illustration',
+        'x_financialLicense',
+        'x_virtualDataRoom',
+        'x_dgfAssetFamiliarization',
+        'x_presentation',
+        'x_nda',
+        'x_qualificationDocuments',
+        'cancellationDetails'
+    ])
 
 
 class LeaseTerms(Model):
@@ -105,7 +137,7 @@ class Bid(BaseBid):
         }
 
     status = StringType(choices=['active', 'draft', 'invalid'], default='active')
-    documents = ListType(ModelType(dgfCDB2Document), default=list())
+    documents = ListType(ModelType(LandLeaseDocument), default=list())
     qualified = BooleanType(required=True, choices=[True])
 
     @bids_validation_wrapper
@@ -114,7 +146,7 @@ class Bid(BaseBid):
 
 
 class Cancellation(dgfCancellation):
-    documents = ListType(ModelType(dgfCDB2Document), default=list())
+    documents = ListType(ModelType(LandLeaseDocument), default=list())
 
 
 def rounding_shouldStartAfter(start_after, auction, use_from=datetime(2016, 6, 1, tzinfo=TZ)):
@@ -181,6 +213,8 @@ class Auction(BaseAuction):
     class Options:
         roles = {
             'create': auction_create_role,
+            'active.rectification': auction_active_rectification_role,
+            'edit_active.rectification': auction_edit_rectification_role,
             'edit_active.tendering': (blacklist('enquiryPeriod',
                                                 'tenderPeriod',
                                                 'rectificationPeriod',
@@ -226,7 +260,7 @@ class Auction(BaseAuction):
 
     description = StringType(required=True)
 
-    documents = ListType(ModelType(dgfCDB2Document), default=list())            # All documents and attachments related to the auction.
+    documents = ListType(ModelType(LandLeaseDocument), default=list())            # All documents and attachments related to the auction.
 
     enquiryPeriod = ModelType(Period)                                           # The period during which enquiries may be made and will be answered.
 
@@ -250,8 +284,6 @@ class Auction(BaseAuction):
     mode = StringType()
 
     procurementMethod = StringType(choices=['open'], default='open')
-
-    procurementMethodType = StringType()
 
     procurementMethodType = StringType(required=True)
 
@@ -291,6 +323,14 @@ class Auction(BaseAuction):
             raise ValidationError(u"rectificationPeriod.endDate should come at least 5 working days earlier than tenderPeriod.endDate")
 
     def validate_value(self, data, value):
+        if value.currency != u'UAH':
+            raise ValidationError(u"currency should be only UAH")
+
+    def validate_minimalStep(self, data, value):
+        if value.amount > data['value'].amount:
+            raise ValidationError(u"minimalStep amount must be should be more then value amount")
+        if value.valueAddedTaxIncluded != data['value'].valueAddedTaxIncluded:
+            raise ValidationError(u"minimalStep.valueAddedTaxIncluded must be the same as value.valueAddedTaxIncluded")
         if value.currency != u'UAH':
             raise ValidationError(u"currency should be only UAH")
 
