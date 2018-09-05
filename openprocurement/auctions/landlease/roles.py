@@ -45,7 +45,7 @@ auction_active_rectification_role = whitelist(
     'description_ru',
     'enquiryPeriod',
     'guarantee',
-    'id',
+    'doc_id',
     'items',
     'lotHolder',
     'lotIdentifier',

@@ -31,7 +31,7 @@ class AuctionInitializator(object):
         period = self._context.__class__.rectificationPeriod.model_class()
 
         period.startDate = self._now
-        calculated_endDate = calculate_business_date(self._context.tenderPeriod.endDate,
+        calculated_endDate = calculate_business_date(self._now,
                                                      -MINIMAL_PERIOD_FROM_RECTIFICATION_END,
                                                      self._context)
 

@@ -5,9 +5,15 @@ from openprocurement.auctions.core.tests.base import snitch
 from openprocurement.auctions.landlease.tests.base import (
     test_auction_data,
     BaseAuctionWebTest,
+)
+
+from openprocurement.auctions.landlease.tests.states import (
     Procedure
 )
 
+from openprocurement.auctions.landlease.tests.helpers import (
+   get_procedure_state
+)
 from openprocurement.auctions.landlease.tests.blanks.draft import (
     phase_commit,
     change_forbidden_field_in_draft
@@ -24,12 +30,11 @@ class StatusDraftTest(BaseAuctionWebTest):
     def setUp(self):
         super(StatusDraftTest, self).setUp()
 
-        import ipdb; ipdb.set_trace()
         procedure = Procedure(self.auction,
                               {"token": self.auction_token},
-                              self.app)
-        procedure.next_status()
-        self.auction = procedure.state.auction
+                              self)
+        state = get_procedure_state(procedure, 'draft')
+        self.auction = state.auction
         self.entrypoint = '/auctions/{}?acc_token={}'.format(self.auction_id,
                                                              self.auction_token)
 

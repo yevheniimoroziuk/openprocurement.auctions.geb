@@ -317,7 +317,7 @@ class Auction(BaseAuction):
             raise ValidationError(u"tenderPeriod should be greater than 6 days")
 
     def validate_rectificationPeriod(self, data, period):
-        if not (period and period.startDate) or not period.endDate:
+        if not period:
             return
         if period.endDate > TZ.localize(calculate_business_date(data['tenderPeriod']['endDate'], -MINIMAL_PERIOD_FROM_RECTIFICATION_END, data).replace(tzinfo=None)):
             raise ValidationError(u"rectificationPeriod.endDate should come at least 5 working days earlier than tenderPeriod.endDate")

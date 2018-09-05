@@ -1,9 +1,5 @@
-from copy import deepcopy
 from collections import Mapping, Sequence
 from openprocurement.auctions.landlease.tests.specifications import STATUS_CHANGES
-from openprocurement.auctions.core.tests.base import (
-    test_document_data
-)
 
 
 def get_error_description(error):
@@ -71,7 +67,6 @@ def check_affilation(main, expected):
                 return item
 
 
-
 def get_next_status(current):
     status = STATUS_CHANGES.get(current)
     if status:
@@ -80,23 +75,8 @@ def get_next_status(current):
             return next_status[0]
 
 
-def post_document(test_case, contract, **kwargs):
-    data = {}
-    if not kwargs.get('data'):
-        data = deepcopy(test_document_data)
-        data.update({
-            'url': test_case.generate_docservice_url(),
-            'documentOf': 'lot',
-            'relatedItem': '01' * 16
-        })
-    else:
-        data.update(kwargs['data'])
-
-    target_status = 201
-    if kwargs.get('status_code'):
-        target_status = kwargs['status_code']
-
-    url = CORE_ENDPOINTS['documents_collection'].format( contract_id=contract.data.id) + "?acc_token={}".format(contract.access.token)
-
-    response = test_case.app.post_json(url, {'data': data}, status=target_status)
-    return response
+def get_procedure_state(procedure, status):
+    for state in procedure:
+        if state.status == status:
+            break
+    return state

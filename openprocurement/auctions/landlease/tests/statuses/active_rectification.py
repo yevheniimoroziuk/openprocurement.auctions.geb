@@ -8,7 +8,10 @@ from openprocurement.auctions.landlease.tests.base import (
     BaseAuctionWebTest
 )
 
-from openprocurement.auctions.landlease.tests.helpers import get_next_status
+from openprocurement.auctions.landlease.tests.states import (Procedure)
+from openprocurement.auctions.landlease.tests.helpers import (
+   get_procedure_state
+)
 
 from openprocurement.auctions.landlease.tests.blanks.active_rectification import (
     change_title,
@@ -51,14 +54,14 @@ class StatusActiveRectificationChangeFieldTest(BaseAuctionWebTest):
 
     def setUp(self):
         super(StatusActiveRectificationChangeFieldTest, self).setUp()
-        next_status = get_next_status(self.auction['status'])
 
+        procedure = Procedure(self.auction,
+                              {"token": self.auction_token},
+                              self)
+        state = get_procedure_state(procedure, 'active.rectification')
+        self.auction = state.auction
         self.entrypoint = '/auctions/{}?acc_token={}'.format(self.auction_id,
                                                              self.auction_token)
-        request_data = {"data": {"status": next_status}}
-        self.app.patch_json(self.entrypoint, request_data)
-        response = self.app.get('/auctions/{}'.format(self.auction_id))
-        self.auction = response.json['data']
 
 
 class StatusActiveRectificationDocumentTest(BaseAuctionWebTest):
@@ -66,14 +69,11 @@ class StatusActiveRectificationDocumentTest(BaseAuctionWebTest):
 
     def setUp(self):
         super(StatusActiveRectificationDocumentTest, self).setUp()
-        next_status = get_next_status(self.auction['status'])
-
-        self.entrypoint = '/auctions/{}?acc_token={}'.format(self.auction_id,
-                                                             self.auction_token)
-        request_data = {"data": {"status": next_status}}
-        self.app.patch_json(self.entrypoint, request_data)
-        response = self.app.get('/auctions/{}'.format(self.auction_id))
-        self.auction = response.json['data']
+        procedure = Procedure(self.auction,
+                              {"token": self.auction_token},
+                              self)
+        state = get_procedure_state(procedure, 'active.rectification')
+        self.auction = state.auction
         self.entrypoint = '/auctions/{}/documents/?acc_token={}'.format(self.auction_id,
                                                                         self.auction_token)
 

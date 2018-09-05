@@ -2,14 +2,14 @@ from datetime import datetime, timedelta
 
 from openprocurement.auctions.core.constants import TZ, ORA_CODES, read_json
 
-API_DOCUMENT_STATUSES = ['active.rectification']
+API_DOCUMENT_STATUSES = ['active.rectification', 'active.tendering']
 AUCTION_DOCUMENT_STATUSES = ['active.auction', 'active.qualification']
 
 # document types
 DOCUMENT_TYPE_OFFLINE = ['x_dgfAssetFamiliarization']
 DOCUMENT_TYPE_URL_ONLY = ['virtualDataRoom']        # requiremnt periods
 MINIMAL_EXPOSITION_PERIOD = timedelta(days=6)
-MINIMAL_PERIOD_FROM_RECTIFICATION_END = timedelta(days=5)
+MINIMAL_PERIOD_FROM_RECTIFICATION_END = timedelta(days=2)
 VERIFY_AUCTION_PROTOCOL_TIME = timedelta(days=6)
 AWARD_PAYMENT_TIME = timedelta(days=20)
 CONTRACT_SIGNING_TIME = timedelta(days=20)
