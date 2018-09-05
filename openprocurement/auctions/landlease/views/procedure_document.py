@@ -5,7 +5,6 @@ from openprocurement.auctions.core.utils import (
     save_auction,
     apply_patch,
     opresource,
-    get_now,
 )
 from openprocurement.auctions.core.validation import (
     validate_file_update,
@@ -15,7 +14,7 @@ from openprocurement.auctions.core.validation import (
 from openprocurement.auctions.core.views.mixins import AuctionDocumentResource
 
 from openprocurement.auctions.landlease.utils import (
-    upload_file, get_file, invalidate_bids_data, generate_rectificationPeriod
+    upload_file, get_file, invalidate_bids_data
 )
 
 from openprocurement.auctions.landlease.constants import (
@@ -47,7 +46,6 @@ class AuctionDocumentResource(AuctionDocumentResource):
             return
         return True
 
-
     @json_view(permission='upload_auction_documents', validators=(validate_file_upload,))
     def collection_post(self):
         """Auction Document Upload"""
@@ -55,13 +53,11 @@ class AuctionDocumentResource(AuctionDocumentResource):
             return
         document = upload_file(self.request)
         if self.request.authenticated_role != "auction":
-            if not self.request.auction.rectificationPeriod:
-                self.request.auction.rectificationPeriod = generate_rectificationPeriod(self.request.auction)
             invalidate_bids_data(self.request.auction)
         self.context.documents.append(document)
         if save_auction(self.request):
             self.LOGGER.info('Created auction document {}'.format(document.id),
-                        extra=context_unpack(self.request, {'MESSAGE_ID': 'auction_document_create'}, {'document_id': document.id}))
+                             extra=context_unpack(self.request, {'MESSAGE_ID': 'auction_document_create'}, {'document_id': document.id}))
             self.request.response.status = 201
             document_route = self.request.matched_route.name.replace("collection_", "")
             self.request.response.headers['Location'] = self.request.current_route_url(_route_name=document_route, document_id=document.id, _query={})
@@ -90,13 +86,11 @@ class AuctionDocumentResource(AuctionDocumentResource):
             return
         document = upload_file(self.request)
         if self.request.authenticated_role != "auction":
-            if not self.request.auction.rectificationPeriod:
-                self.request.auction.rectificationPeriod = generate_rectificationPeriod(self.request.auction)
             invalidate_bids_data(self.request.auction)
         self.request.validated['auction'].documents.append(document)
         if save_auction(self.request):
             self.LOGGER.info('Updated auction document {}'.format(self.request.context.id),
-                        extra=context_unpack(self.request, {'MESSAGE_ID': 'auction_document_put'}))
+                             extra=context_unpack(self.request, {'MESSAGE_ID': 'auction_document_put'}))
             return {'data': document.serialize("view")}
 
     @json_view(content_type="application/json", permission='upload_auction_documents', validators=(validate_patch_document_data,))
@@ -106,10 +100,8 @@ class AuctionDocumentResource(AuctionDocumentResource):
             return
         apply_patch(self.request, save=False, src=self.request.context.serialize())
         if self.request.authenticated_role != "auction":
-            if not self.request.auction.rectificationPeriod:
-                self.request.auction.rectificationPeriod = generate_rectificationPeriod(self.request.auction)
             invalidate_bids_data(self.request.auction)
         if save_auction(self.request):
             self.LOGGER.info('Updated auction document {}'.format(self.request.context.id),
-                        extra=context_unpack(self.request, {'MESSAGE_ID': 'auction_document_patch'}))
+                             extra=context_unpack(self.request, {'MESSAGE_ID': 'auction_document_patch'}))
             return {'data': self.request.context.serialize("view")}

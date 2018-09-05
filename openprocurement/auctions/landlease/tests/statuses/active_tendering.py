@@ -42,7 +42,7 @@ class StatusActiveTenderingDocumentTest(BaseAuctionWebTest):
     initial_data = test_auction_data
     docservice = True
 
-    #test_add_document = snitch(add_document)
+    test_add_document = snitch(add_document)
 
     def setUp(self):
         super(StatusActiveTenderingDocumentTest, self).setUp()

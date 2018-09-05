@@ -48,11 +48,9 @@ from openprocurement.auctions.core.utils import (
 )
 
 from openprocurement.auctions.landlease.constants import (
-    AUCTION_STATUSES,
-    MINIMAL_EXPOSITION_PERIOD,
-    MINIMAL_EXPOSITION_REQUIRED_FROM,
-    MINIMAL_PERIOD_FROM_RECTIFICATION_END
+    AUCTION_STATUSES
 )
+
 from openprocurement.auctions.landlease.roles import (
     auction_create_role,
     auction_active_rectification_role,
@@ -308,19 +306,12 @@ class Auction(BaseAuction):
         ]
 
     def validate_tenderPeriod(self, data, period):
-        """Auction start date must be not closer than MINIMAL_EXPOSITION_PERIOD days and not a holiday"""
-        if not (period and period.startDate and period.endDate):
+        if not period:
             return
-        if get_auction_creation_date(data) < MINIMAL_EXPOSITION_REQUIRED_FROM:
-            return
-        if calculate_business_date(period.startDate, MINIMAL_EXPOSITION_PERIOD, data) > period.endDate:
-            raise ValidationError(u"tenderPeriod should be greater than 6 days")
 
     def validate_rectificationPeriod(self, data, period):
         if not period:
             return
-        if period.endDate > TZ.localize(calculate_business_date(data['tenderPeriod']['endDate'], -MINIMAL_PERIOD_FROM_RECTIFICATION_END, data).replace(tzinfo=None)):
-            raise ValidationError(u"rectificationPeriod.endDate should come at least 5 working days earlier than tenderPeriod.endDate")
 
     def validate_value(self, data, value):
         if value.currency != u'UAH':

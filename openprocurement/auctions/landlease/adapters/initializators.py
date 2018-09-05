@@ -1,7 +1,6 @@
 # -*- coding: utf-8 -*-
 from zope.interface import implementer
 from datetime import timedelta
-from random import randint
 
 from openprocurement.auctions.landlease.interfaces import (
     IAuctionInitializator
@@ -9,12 +8,12 @@ from openprocurement.auctions.landlease.interfaces import (
 
 from openprocurement.auctions.core.utils import (
     calculate_business_date,
-    get_now,
-    TZ
+    get_now
 )
 
 from openprocurement.auctions.landlease.constants import (
-    MINIMAL_PERIOD_FROM_RECTIFICATION_END,
+    RECTIFICATION_PERIOD_DURATION,
+    TENDER_PERIOD_DURATION,
     AUCTION_PARAMETERS_TYPE
 )
 
@@ -27,44 +26,44 @@ class AuctionInitializator(object):
         self._now = get_now()
         self._context = context
 
-    def _generate_rectificationPeriod(self):
-        period = self._context.__class__.rectificationPeriod.model_class()
-
-        period.startDate = self._now
-        calculated_endDate = calculate_business_date(self._now,
-                                                     -MINIMAL_PERIOD_FROM_RECTIFICATION_END,
-                                                     self._context)
-
-        period.endDate = calculated_endDate if calculated_endDate > self._now else self._now
-        period.invalidationDate = None
-        return period
-
     def _initialize_enquiryPeriod(self):
-        self._context.enquiryPeriod = self._context.__class__.enquiryPeriod.model_class()
-        self._context.enquiryPeriod.startDate = self._now
+        period = self._context.__class__.enquiryPeriod.model_class()
 
-        start_date = TZ.localize(self._context.auctionPeriod.startDate.replace(tzinfo=None))
-        start_date_replace = start_date.replace(hour=20, minute=0, second=0, microsecond=0)
-        item = (start_date_replace - timedelta(days=1, minutes=randint(-30, 30)))
-        pause_between_periods = start_date - item
-        end_date = calculate_business_date(start_date, -pause_between_periods, self)
+        start_date = self._now
+        end_date = calculate_business_date(self._context.auctionPeriod.startDate,
+                                           -timedelta(days=1),
+                                           self._context)
 
-        self._context.enquiryPeriod.endDate = end_date
+        period.startDate = start_date
+        period.endDate = end_date
+
+        self._context.enquiryPeriod = period
 
     def _initialize_tenderPeriod(self):
-        self._context.tenderPeriod = self._context.__class__.tenderPeriod.model_class()
-        self._context.tenderPeriod.startDate = self._now
+        period = self._context.__class__.tenderPeriod.model_class()
 
-        start_date = TZ.localize(self._context.auctionPeriod.startDate.replace(tzinfo=None))
-        start_date_replace = start_date.replace(hour=20, minute=0, second=0, microsecond=0)
-        item = (start_date_replace - timedelta(days=1, minutes=randint(-30, 30)))
-        pause_between_periods = start_date - item
-        end_date = calculate_business_date(start_date, -pause_between_periods, self)
+        start_date = self._context.rectificationPeriod.endDate
+        end_date = calculate_business_date(start_date,
+                                           TENDER_PERIOD_DURATION,
+                                           self._context)
 
-        self._context.tenderPeriod.endDate = end_date
+        period.startDate = start_date
+        period.endDate = end_date
+
+        self._context.tenderPeriod = period
 
     def _initialize_rectificationPeriod(self):
-        self._context.rectificationPeriod = self._generate_rectificationPeriod()
+        period = self._context.__class__.rectificationPeriod.model_class()
+
+        start_date = self._now
+        end_date = calculate_business_date(self._now,
+                                           RECTIFICATION_PERIOD_DURATION,
+                                           self._context)
+
+        period.startDate = start_date
+        period.endDate = end_date
+
+        self._context.rectificationPeriod = period
 
     def _initialize_auctionParameters(self):
         self._context.auctionParameters = {'type': AUCTION_PARAMETERS_TYPE}
@@ -77,9 +76,9 @@ class AuctionInitializator(object):
         self._context.auctionPeriod.endDate = None
 
     def initialize(self):
-        self._initialize_enquiryPeriod()
-        self._initialize_tenderPeriod()
         self._initialize_rectificationPeriod()
+        self._initialize_tenderPeriod()
+        self._initialize_enquiryPeriod()
         self._initialize_auctionParameters()
         self._initialize_date()
         self._clean_auctionPeriod()

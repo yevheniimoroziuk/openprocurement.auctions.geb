@@ -1,6 +1,16 @@
-from openprocurement.auctions.landlease.tests.helpers import get_next_status
-from datetime import datetime, timedelta
-from openprocurement.auctions.core.utils import apply_data_patch
+from copy import deepcopy
+from openprocurement.auctions.core.utils import (
+    calculate_business_date,
+    get_now,
+    apply_data_patch
+)
+from openprocurement.auctions.core.tests.base import IsoDateTimeType
+from openprocurement.auctions.landlease.tests.specifications import REQUIRED_SCHEME_DEFINITION
+
+from openprocurement.auctions.landlease.tests.helpers import (
+    get_next_status,
+    get_period_duration
+)
 
 
 class State(object):
@@ -24,13 +34,22 @@ class ActiveTendering(State):
 
     def _context(self):
         context = {}
-        now = datetime.now()
+        now = get_now()
+        formater = IsoDateTimeType().to_primitive
         status = get_next_status(self.status)
-        tender_period = {"startDate": (now).isoformat(),
-                         "endDate": (now + timedelta(days=7)).isoformat()}
+        duration = get_period_duration(REQUIRED_SCHEME_DEFINITION, 'tenderPeriod')
+
+        end_date = calculate_business_date(now, duration, self.auction)
+
+        tender_period = {"startDate": formater(now),
+                         "endDate": formater(end_date)}
+
+        rectification_period = deepcopy(self.auction['rectificationPeriod'])
+        rectification_period["endDate"] = formater(now)
 
         context['status'] = status
         context['tenderPeriod'] = tender_period
+        context['rectificationPeriod'] = rectification_period
         return context
 
     def _db_save(self, context):

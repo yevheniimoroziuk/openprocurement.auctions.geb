@@ -1,3 +1,4 @@
+from datetime import timedelta
 from collections import Mapping, Sequence
 from openprocurement.auctions.landlease.tests.specifications import STATUS_CHANGES
 
@@ -25,7 +26,6 @@ def get_errors_names(response):
 
 def get_specification_fields(scheme, field_type=None):
     context = []
-
     for field in scheme:
         field_name = field['name']
 
@@ -80,3 +80,12 @@ def get_procedure_state(procedure, status):
         if state.status == status:
             break
     return state
+
+
+def get_period_duration(scheme, period):
+    for item in scheme:
+        if item['name'] == period:
+            duration = item.get('duration')
+            if duration:
+                return timedelta(days=duration)
+            return
