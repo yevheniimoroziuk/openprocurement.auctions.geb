@@ -44,6 +44,7 @@ class AuctionQuestionResource(AuctionQuestionResource):
             self.request.response.headers['Location'] = self.request.current_route_url(_route_name=route, question_id=question.id, _query={})
             return {'data': question.serialize("view")}
 
+
     @json_view(content_type="application/json", permission='edit_auction', validators=(validate_patch_question_data,))
     def patch(self):
         """Post an Answer

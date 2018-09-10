@@ -1,6 +1,10 @@
 from datetime import timedelta
 from collections import Mapping, Sequence
 from openprocurement.auctions.landlease.tests.specifications import STATUS_CHANGES
+from openprocurement.auctions.landlease.tests.fixtures import (
+    test_question_data,
+    test_bid_data
+)
 
 
 def get_error_description(error):
@@ -89,3 +93,17 @@ def get_period_duration(scheme, period):
             if duration:
                 return timedelta(days=duration)
             return
+
+
+def create_question(test_case, auction):
+    request_data = test_question_data
+    entrypoint = '/auctions/{}/questions'.format(auction['id'])
+    response = test_case.app.post_json(entrypoint, request_data)
+    return response.json['data']
+
+
+def create_bid(test_case, auction):
+    request_data = test_bid_data
+    entrypoint = '/auctions/{}/bids'.format(auction['id'])
+    response = test_case.app.post_json(entrypoint, request_data)
+    return response.json['data'], response.json['access']

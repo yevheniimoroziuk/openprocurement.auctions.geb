@@ -87,3 +87,45 @@ auction_edit_rectification_role = whitelist(
     'title_ru',
     'value'
 )
+
+bid_view_role = whitelist(
+    'id',
+    'status',
+    'tenderers',
+    'value',
+)
+
+bid_pending_role = whitelist(
+    'id',
+    'status',
+    'tenderers',
+    'value',
+    'date',
+    'id',
+    'owner',
+    'qualified',
+)
+
+bid_active_role = whitelist(
+    'id',
+    'status',
+    'tenderers',
+    'value',
+    'date',
+    'id',
+    'owner',
+    'qualified',
+    'bidNumber'
+)
+
+bid_create_role = whitelist(
+    'value',
+    'status',
+    'tenderers'
+)
+
+bid_edit_role = whitelist(
+    'value',
+    'status',
+    'tenderers'
+)

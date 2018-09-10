@@ -60,7 +60,8 @@ class ActiveTendering(State):
 
     def _dispose(self):
         context = self._context()
-        self._auction = self._db_save(context)
+        self._db_save(context)
+        self._auction.update(context)
 
     def _next(self):
         return ActiveTendering(self._auction, self._access, self._test)

@@ -13,34 +13,88 @@ from openprocurement.auctions.core.plugins.awarding.v2_1.adapters import (
 )
 
 from openprocurement.auctions.landlease.adapters.managers import (
-    AuctionManagerAdapter,
+    AuctionManager,
+    BidManager
 )
 
 from openprocurement.auctions.landlease.adapters.configurators import (
     AuctionConfigurator,
 )
 from openprocurement.auctions.landlease.adapters.changers import (
-    AuctionChanger
+    AuctionChanger,
+    BidChanger
 )
 from openprocurement.auctions.landlease.adapters.initializators import (
-    AuctionInitializator
+    AuctionInitializator,
+    BidInitializator
 )
 
 from openprocurement.auctions.landlease.constants import (
     DEFAULT_LEVEL_OF_ACCREDITATION,
     DEFAULT_PROCUREMENT_METHOD_TYPE,
 )
-from openprocurement.auctions.landlease.models import (
+from openprocurement.auctions.landlease.models.schemas import (
     LandLease
 )
 
 from openprocurement.auctions.landlease.interfaces import (
+    IBid,
+    IBidManager,
+    IBidChanger,
     IAuction,
     IAuctionChanger,
-    IAuctionInitializator
+    IAuctionInitializator,
+    IBidInitializator
 )
 
 LOGGER = logging.getLogger(__name__)
+
+
+def registrator(config):
+    config.registry.registerAdapter(
+        AuctionConfigurator,
+        (IAuction, IRequest),
+        IContentConfigurator
+    )
+    config.registry.registerAdapter(
+        AwardingNextCheckV2_1,
+        (IAuction,),
+        IAwardingNextCheck
+    )
+    config.registry.registerAdapter(
+        AuctionManager,
+        (IAuction,),
+        IAuctionManager)
+
+    config.registry.registerAdapter(
+        BidManager,
+        (IBid,),
+        IBidManager
+    )
+
+    config.registry.registerAdapter(
+        AuctionInitializator,
+        (IAuction,),
+        IAuctionInitializator
+    )
+
+    config.registry.registerAdapter(
+        BidInitializator,
+        (IRequest, IBid),
+        IBidInitializator
+    )
+
+    config.registry.registerAdapter(
+        AuctionChanger,
+        (IRequest, IAuction),
+        IAuctionChanger
+    )
+
+    config.registry.registerAdapter(
+        BidChanger,
+        (IRequest, IBid),
+        IBidChanger
+    )
 
 
 def includeme(config, plugin_map):
@@ -54,34 +108,7 @@ def includeme(config, plugin_map):
                                                  procurementMethodType)
 
     config.scan("openprocurement.auctions.landlease.views")
-
-    config.registry.registerAdapter(
-        AuctionConfigurator,
-        (IAuction, IRequest),
-        IContentConfigurator
-    )
-    config.registry.registerAdapter(
-        AwardingNextCheckV2_1,
-        (IAuction,),
-        IAwardingNextCheck
-    )
-    config.registry.registerAdapter(
-        AuctionManagerAdapter,
-        (IAuction,),
-        IAuctionManager
-    )
-
-    config.registry.registerAdapter(
-        AuctionInitializator,
-        (IAuction,),
-        IAuctionInitializator
-    )
-
-    config.registry.registerAdapter(
-        AuctionChanger,
-        (IRequest, IAuction),
-        IAuctionChanger
-    )
+    registrator(config)
 
     LOGGER.info("Included openprocurement.auctions.landlease plugin",
                 extra={'MESSAGE_ID': 'included_plugin'})

@@ -1,31 +1,28 @@
 # -*- coding: utf-8 -*-
 from datetime import datetime, timedelta, time
+from uuid import uuid4
 
 from schematics.exceptions import ValidationError
 from schematics.transforms import blacklist, whitelist
-from schematics.types import StringType, IntType, BooleanType
+from schematics.types import StringType, IntType, MD5Type, BooleanType
 from schematics.types.compound import ModelType
 from schematics.types.serializable import serializable
 from pyramid.security import Allow
 from zope.interface import implementer
-
 from openprocurement.auctions.core.includeme import IAwardingNextCheck
-from openprocurement.auctions.landlease.interfaces import IAuction
+from openprocurement.auctions.landlease.interfaces import IAuction, IBid
 from openprocurement.auctions.core.models import (
     Model,
     Administrator_role,
     Auction as BaseAuction,
     BaseOrganization,
     BankAccount,
-    Bid as BaseBid,
     Guarantee,
     IsoDateTimeType,
     IsoDurationType,
     ListType,
     Lot,
-    Period,
-    Value,
-    calc_auction_end_time,
+    Period, Value, calc_auction_end_time,
     dgfCDB2Complaint,
     dgfDocument,
     dgfCDB2Item,
@@ -35,58 +32,48 @@ from openprocurement.auctions.core.models import (
     validate_items_uniq,
     validate_lots_uniq,
     validate_not_available,
+    Administrator_bid_role
 )
 from openprocurement.auctions.core.plugins.awarding.v2_1.models import Award
 from openprocurement.auctions.core.plugins.contracting.v2_1.models import Contract
 from openprocurement.auctions.core.utils import (
     SANDBOX_MODE,
     TZ,
-    calculate_business_date,
     get_request_from_root,
     get_now,
-    AUCTIONS_COMPLAINT_STAND_STILL_TIME as COMPLAINT_STAND_STILL_TIME, get_auction_creation_date
+    AUCTIONS_COMPLAINT_STAND_STILL_TIME as COMPLAINT_STAND_STILL_TIME
 )
 
 from openprocurement.auctions.landlease.constants import (
-    AUCTION_STATUSES
+    AUCTION_DOCUMENT_TYPES,
+    AUCTION_STATUSES,
+    BID_DOCUMENT_TYPES,
+    BID_STATUSES,
 )
 
-from openprocurement.auctions.landlease.roles import (
+from openprocurement.auctions.landlease.models.roles import (
     auction_create_role,
     auction_active_rectification_role,
     auction_edit_rectification_role,
-    auction_contractTerms_create_role
+    auction_contractTerms_create_role,
+    bid_view_role,
+    bid_create_role,
+    bid_edit_role,
+    bid_pending_role,
+    bid_active_role
 )
 
 
-class LandLeaseDocument(dgfDocument):
-    documentOf = StringType(required=True,
-                            choices=['auction',
-                                     'item',
-                                     'bid',
-                                     'award',
-                                     'contract'],
-                            default='auction')
+class LandLeaseAuctionDocument(dgfDocument):
+    documentOf = StringType(required=True, choices=['auction'], default='auction')
 
-    documentType = StringType(choices=[
-        'technicalSpecifications',
-        'evaluationCriteria',
-        'clarifications',
-        'billOfQuantity',
-        'conflictOfInterest',
-        'evaluationReports',
-        'complaints',
-        'eligibilityCriteria',
-        'tenderNotice',
-        'illustration',
-        'x_financialLicense',
-        'x_virtualDataRoom',
-        'x_dgfAssetFamiliarization',
-        'x_presentation',
-        'x_nda',
-        'x_qualificationDocuments',
-        'cancellationDetails'
-    ])
+    documentType = StringType(choices=AUCTION_DOCUMENT_TYPES)
+
+
+class LandLeaseBidDocument(dgfDocument):
+    documentOf = StringType(required=True, choices=['bid'], default='bid')
+
+    documentType = StringType(choices=BID_DOCUMENT_TYPES)
 
 
 class LeaseTerms(Model):
@@ -109,42 +96,8 @@ class AuctionParameters(Model):
     type = StringType(choices=['texas'])
 
 
-def bids_validation_wrapper(validation_func):
-    def validator(klass, data, value):
-        orig_data = data
-        while not isinstance(data['__parent__'], BaseAuction):
-            # in case this validation wrapper is used for subelement of bid (such as parameters)
-            # traverse back to the bid to get possibility to check status  # troo-to-to =)
-            data = data['__parent__']
-        if data['status'] in ('invalid', 'draft'):
-            # skip not valid bids
-            return
-        tender = data['__parent__']
-        request = tender.__parent__.request
-        if request.method == "PATCH" and isinstance(tender, BaseAuction) and request.authenticated_role == "auction_owner":
-            # disable bids validation on tender PATCH requests as tender bids will be invalidated
-            return
-        return validation_func(klass, orig_data, value)
-    return validator
-
-
-class Bid(BaseBid):
-    class Options:
-        roles = {
-            'create': whitelist('value', 'tenderers', 'parameters', 'lotValues', 'status', 'qualified'),
-        }
-
-    status = StringType(choices=['active', 'draft', 'invalid'], default='active')
-    documents = ListType(ModelType(LandLeaseDocument), default=list())
-    qualified = BooleanType(required=True, choices=[True])
-
-    @bids_validation_wrapper
-    def validate_value(self, data, value):
-        BaseBid._validator_functions['value'](self, data, value)
-
-
 class Cancellation(dgfCancellation):
-    documents = ListType(ModelType(LandLeaseDocument), default=list())
+    documents = ListType(ModelType(LandLeaseAuctionDocument), default=list())
 
 
 def rounding_shouldStartAfter(start_after, auction, use_from=datetime(2016, 6, 1, tzinfo=TZ)):
@@ -205,6 +158,48 @@ edit_role = (edit_role + blacklist('enquiryPeriod',
 Administrator_role = (Administrator_role + whitelist('awards'))
 
 
+@implementer(IBid)
+class Bid(Model):
+    class Options:
+        roles = {
+            'Administrator': Administrator_bid_role,
+            'view': bid_view_role,
+            'create': bid_create_role,
+            'edit': bid_edit_role,
+            'pending': bid_pending_role,
+            'active': bid_active_role,
+
+        }
+
+    tenderers = ListType(ModelType(BaseOrganization), required=True, min_size=1, max_size=1)
+    date = IsoDateTimeType()
+    id = MD5Type(required=True, default=lambda: uuid4().hex)
+    status = StringType(choices=BID_STATUSES, default='draft')
+    value = ModelType(Value)
+    documents = ListType(ModelType(LandLeaseBidDocument), default=list())
+    owner_token = StringType()
+    owner = StringType()
+    qualified = BooleanType()
+
+    def validate_value(self, data, value):
+        auction = data['__parent__']
+        if auction.value.amount != value.amount:
+            raise ValidationError("Bid value amount should be equal as Auction value amount")
+        if value.currency and value.currency != auction.value.currency:
+            raise ValidationError("Bid value currency should be equal as Auction value currency")
+        if value.valueAddedTaxIncluded != auction.value.valueAddedTaxIncluded:
+            raise ValidationError("Bid value valueAddedTaxIncluded should be equal as Auction value valueAddedTaxIncluded")
+
+    def __local_roles__(self):
+        return dict(
+            [('{}_{}'.format(self.owner, self.owner_token), 'bid_owner')])
+
+    def __acl__(self):
+        return [
+            (Allow, '{}_{}'.format(self.owner, self.owner_token), 'edit_bid')
+        ]
+
+
 @implementer(IAuction)
 class Auction(BaseAuction):
 
@@ -237,11 +232,11 @@ class Auction(BaseAuction):
     auctionPeriod = ModelType(AuctionAuctionPeriod, required=True, default={})
     auctionParameters = ModelType(AuctionParameters)
     awardCriteria = StringType(choices=['highestCost'],
-                               default='highestCost')                           # Specify the selection criteria, by lowest cost,
+                               default='highestCost')
 
     awards = ListType(ModelType(Award), default=list())
 
-    bids = ListType(ModelType(Bid), default=list())                             # A list of all the companies who entered submissions for the auction.
+    bids = ListType(ModelType(Bid), default=list())
 
     bankAccount = ModelType(BankAccount)
 
@@ -258,9 +253,9 @@ class Auction(BaseAuction):
 
     description = StringType(required=True)
 
-    documents = ListType(ModelType(LandLeaseDocument), default=list())            # All documents and attachments related to the auction.
+    documents = ListType(ModelType(LandLeaseAuctionDocument), default=list())
 
-    enquiryPeriod = ModelType(Period)                                           # The period during which enquiries may be made and will be answered.
+    enquiryPeriod = ModelType(Period)
 
     guarantee = ModelType(Guarantee, required=True)
 
@@ -269,7 +264,7 @@ class Auction(BaseAuction):
                      min_size=1,
                      validators=[validate_items_uniq])
 
-    lotIdentifier = StringType(required=True)                                   # The external identifier of the lot on which this procedure is carried out
+    lotIdentifier = StringType(required=True)
 
     lots = ListType(ModelType(Lot),
                     default=list(),

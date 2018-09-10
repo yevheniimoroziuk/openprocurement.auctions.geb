@@ -3,7 +3,8 @@ from zope.interface import implementer
 from datetime import timedelta
 
 from openprocurement.auctions.landlease.interfaces import (
-    IAuctionInitializator
+    IAuctionInitializator,
+    IBidInitializator
 )
 
 from openprocurement.auctions.core.utils import (
@@ -82,3 +83,23 @@ class AuctionInitializator(object):
         self._initialize_auctionParameters()
         self._initialize_date()
         self._clean_auctionPeriod()
+
+
+@implementer(IBidInitializator)
+class BidInitializator(object):
+
+    def __init__(self, request, context):
+        self._now = get_now()
+        self._request = request
+        self._context = context
+
+    def _initialize_qualified(self):
+        self._context.qualified = False
+
+    def _initialize_date(self):
+        self._context.date = self._now
+
+    def initialize(self):
+        if self._request.validated['data'].get('status') == 'pending':
+            self._initialize_qualified()
+            self._initialize_date()
