@@ -34,6 +34,7 @@ auction_contractTerms_create_role = whitelist('leaseTerms')
 auction_active_rectification_role = whitelist(
     'auctionID',
     'auctionParameters',
+    'auctionPeriod',
     'awardCriteria',
     'bankAccount',
     'budgetSpent',
@@ -106,7 +107,30 @@ bid_pending_role = whitelist(
     'qualified',
 )
 
+bid_edit_pending_role = whitelist(
+    'id',
+    'status',
+    'tenderers',
+    'value',
+    'date',
+    'id',
+    'owner',
+    'qualified',
+)
+
 bid_active_role = whitelist(
+    'id',
+    'status',
+    'tenderers',
+    'value',
+    'date',
+    'id',
+    'owner',
+    'qualified',
+    'bidNumber'
+)
+
+bid_edit_active_role = whitelist(
     'id',
     'status',
     'tenderers',
@@ -124,7 +148,8 @@ bid_create_role = whitelist(
     'tenderers'
 )
 
-bid_edit_role = whitelist(
+
+bid_edit_draft_role = whitelist(
     'value',
     'status',
     'tenderers'

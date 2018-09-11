@@ -4,25 +4,26 @@ from pyramid.interfaces import IRequest
 
 from openprocurement.auctions.core.includeme import (
     IContentConfigurator,
-    IAwardingNextCheck,
     get_evenly_plugins
 )
 from openprocurement.auctions.core.interfaces import IAuctionManager
-from openprocurement.auctions.core.plugins.awarding.v2_1.adapters import (
-    AwardingNextCheckV2_1
-)
 
 from openprocurement.auctions.landlease.adapters.managers import (
-    AuctionManager,
     BidManager
 )
 
+from openprocurement.auctions.core.adapters import (
+    AuctionManagerAdapter
+)
 from openprocurement.auctions.landlease.adapters.configurators import (
     AuctionConfigurator,
 )
 from openprocurement.auctions.landlease.adapters.changers import (
     AuctionChanger,
     BidChanger
+)
+from openprocurement.auctions.landlease.adapters.checkers import (
+    AuctionChecker
 )
 from openprocurement.auctions.landlease.adapters.initializators import (
     AuctionInitializator,
@@ -43,6 +44,7 @@ from openprocurement.auctions.landlease.interfaces import (
     IBidChanger,
     IAuction,
     IAuctionChanger,
+    IAuctionChecker,
     IAuctionInitializator,
     IBidInitializator
 )
@@ -56,40 +58,38 @@ def registrator(config):
         (IAuction, IRequest),
         IContentConfigurator
     )
+# Auction Adapters
     config.registry.registerAdapter(
-        AwardingNextCheckV2_1,
+        AuctionManagerAdapter,
+        (IRequest, IAuction),
+        IAuctionManager
+    )
+    config.registry.registerAdapter(
+        AuctionChecker,
         (IAuction,),
-        IAwardingNextCheck
+        IAuctionChecker
     )
-    config.registry.registerAdapter(
-        AuctionManager,
-        (IAuction,),
-        IAuctionManager)
-
-    config.registry.registerAdapter(
-        BidManager,
-        (IBid,),
-        IBidManager
-    )
-
-    config.registry.registerAdapter(
-        AuctionInitializator,
-        (IAuction,),
-        IAuctionInitializator
-    )
-
-    config.registry.registerAdapter(
-        BidInitializator,
-        (IRequest, IBid),
-        IBidInitializator
-    )
-
     config.registry.registerAdapter(
         AuctionChanger,
         (IRequest, IAuction),
         IAuctionChanger
     )
-
+    config.registry.registerAdapter(
+        AuctionInitializator,
+        (IAuction,),
+        IAuctionInitializator
+    )
+# Bid Adapters
+    config.registry.registerAdapter(
+        BidManager,
+        (IRequest, IBid),
+        IBidManager
+    )
+    config.registry.registerAdapter(
+        BidInitializator,
+        (IBid,),
+        IBidInitializator
+    )
     config.registry.registerAdapter(
         BidChanger,
         (IRequest, IBid),

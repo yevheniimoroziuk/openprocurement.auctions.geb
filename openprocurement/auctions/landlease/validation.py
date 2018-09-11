@@ -21,11 +21,8 @@ def validate_change_bid_check_auction_status(request):
 
 
 def validate_change_bid_check_status(request):
-    import ipdb; ipdb.set_trace()
-    now = get_now()
     status = request.context.status
     auction_status = request.validated['auction_status']
-    auction = request.validated['auction']
     new_status = request.validated['data'].get('status')
 
     if request.authenticated_role == 'Administrator':
@@ -36,10 +33,33 @@ def validate_change_bid_check_status(request):
             raise Exception('Can\'t update bid status, only from draft you can switch to pending')
 
         if new_status == 'pending' and auction_status != 'active.tendering':
-            raise Exception('Can activate bid, only only in active.tendering Auction status')
+            raise Exception('Can`t activate bid, can only in active.tendering Auction status')
 
-        if new_status == 'active' and now > auction.enquiryPeriod.endDate:
-            raise Exception('Can activate bid, only only in active.tendering Auction status')
+    except Exception as err:
+        request.errors.add('body', 'data', err.message)
+        request.errors.status = 403
+        return False
+    return True
+
+
+def validate_make_active_status_bid(request):
+    now = get_now()
+    bid_documents = request.context.documents
+    auction = request.validated['auction']
+    new_status = request.validated['data'].get('status')
+
+    if request.authenticated_role == 'Administrator' or new_status != 'active':
+        return True
+
+    try:
+        if now > auction.enquiryPeriod.endDate:
+            raise Exception('Can`t activate bid, can only in active.tendering Auction status')
+
+        if not any([document.documentType == 'eligibilityDocuments' for document in bid_documents]):
+            raise Exception('Can`t activate bid, need document of documentType: eligibilityDocuments')
+
+        if request.context.qualified is not True:
+            raise Exception('Can`t activate bid, qualified must be True')
 
     except Exception as err:
         request.errors.add('body', 'data', err.message)

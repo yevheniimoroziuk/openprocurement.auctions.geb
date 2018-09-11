@@ -9,7 +9,6 @@ from schematics.types.compound import ModelType
 from schematics.types.serializable import serializable
 from pyramid.security import Allow
 from zope.interface import implementer
-from openprocurement.auctions.core.includeme import IAwardingNextCheck
 from openprocurement.auctions.landlease.interfaces import IAuction, IBid
 from openprocurement.auctions.core.models import (
     Model,
@@ -22,7 +21,8 @@ from openprocurement.auctions.core.models import (
     IsoDurationType,
     ListType,
     Lot,
-    Period, Value, calc_auction_end_time,
+    Period,
+    Value,
     dgfCDB2Complaint,
     dgfDocument,
     dgfCDB2Item,
@@ -39,7 +39,6 @@ from openprocurement.auctions.core.plugins.contracting.v2_1.models import Contra
 from openprocurement.auctions.core.utils import (
     SANDBOX_MODE,
     TZ,
-    get_request_from_root,
     get_now,
     AUCTIONS_COMPLAINT_STAND_STILL_TIME as COMPLAINT_STAND_STILL_TIME
 )
@@ -58,9 +57,11 @@ from openprocurement.auctions.landlease.models.roles import (
     auction_contractTerms_create_role,
     bid_view_role,
     bid_create_role,
-    bid_edit_role,
     bid_pending_role,
-    bid_active_role
+    bid_active_role,
+    bid_edit_draft_role,
+    bid_edit_active_role,
+    bid_edit_pending_role
 )
 
 
@@ -116,14 +117,9 @@ class AuctionAuctionPeriod(Period):
         if self.endDate:
             return
         auction = self.__parent__
-        if auction.lots or auction.status not in ['active.tendering', 'active.auction']:
+        if auction.status in ['draft']:
             return
-        if self.startDate and get_now() > calc_auction_end_time(auction.numberOfBids, self.startDate):
-            start_after = calc_auction_end_time(auction.numberOfBids, self.startDate)
-        elif auction.tenderPeriod and auction.tenderPeriod.endDate:
-            start_after = auction.tenderPeriod.endDate
-        else:
-            return
+        start_after = auction.enquiryPeriod.endDate
         return rounding_shouldStartAfter(start_after, auction).isoformat()
 
     def validate_startDate(self, data, startDate):
@@ -165,9 +161,12 @@ class Bid(Model):
             'Administrator': Administrator_bid_role,
             'view': bid_view_role,
             'create': bid_create_role,
-            'edit': bid_edit_role,
+            'draft': bid_view_role,
+            'edit_draft': bid_edit_draft_role,
             'pending': bid_pending_role,
+            'edit_pending': bid_edit_pending_role,
             'active': bid_active_role,
+            'edit_active': bid_edit_active_role,
 
         }
 
@@ -180,6 +179,17 @@ class Bid(Model):
     owner_token = StringType()
     owner = StringType()
     qualified = BooleanType()
+    bidNumber = IntType()
+
+    def get_role(self):
+        auction = self.__parent__
+        root = auction.__parent__
+        request = root.request
+        if request.authenticated_role == 'Administrator':
+            role = 'Administrator'
+        else:
+            role = 'edit_{}'.format(request.context.status)
+        return role
 
     def validate_value(self, data, value):
         auction = data['__parent__']
@@ -322,42 +332,13 @@ class Auction(BaseAuction):
 
     @serializable(serialize_when_none=False)
     def next_check(self):
-        now = get_now()
         checks = []
-        if self.status == 'active.tendering' and self.tenderPeriod and self.tenderPeriod.endDate:
+        if self.status == 'active.rectification':
+            checks.append(self.rectificationPeriod.endDate.astimezone(TZ))
+        if self.status == 'active.tendering':
             checks.append(self.tenderPeriod.endDate.astimezone(TZ))
-        elif not self.lots and self.status == 'active.auction' and self.auctionPeriod and self.auctionPeriod.startDate and not self.auctionPeriod.endDate:
-            if now < self.auctionPeriod.startDate:
-                checks.append(self.auctionPeriod.startDate.astimezone(TZ))
-            elif now < calc_auction_end_time(self.numberOfBids, self.auctionPeriod.startDate).astimezone(TZ):
-                checks.append(calc_auction_end_time(self.numberOfBids, self.auctionPeriod.startDate).astimezone(TZ))
-        elif self.lots and self.status == 'active.auction':
-            for lot in self.lots:
-                if lot.status != 'active' or not lot.auctionPeriod or not lot.auctionPeriod.startDate or lot.auctionPeriod.endDate:
-                    continue
-                if now < lot.auctionPeriod.startDate:
-                    checks.append(lot.auctionPeriod.startDate.astimezone(TZ))
-                elif now < calc_auction_end_time(lot.numberOfBids, lot.auctionPeriod.startDate).astimezone(TZ):
-                    checks.append(calc_auction_end_time(lot.numberOfBids, lot.auctionPeriod.startDate).astimezone(TZ))
-        # Use next_check part from awarding
-        request = get_request_from_root(self)
-        if request is not None:
-            awarding_check = request.registry.getAdapter(self, IAwardingNextCheck).add_awarding_checks(self)
-            if awarding_check is not None:
-                checks.append(awarding_check)
-        if self.status.startswith('active'):
-            from openprocurement.auctions.core.utils import calculate_business_date
-            for complaint in self.complaints:
-                if complaint.status == 'claim' and complaint.dateSubmitted:
-                    checks.append(calculate_business_date(complaint.dateSubmitted, COMPLAINT_STAND_STILL_TIME, self))
-                elif complaint.status == 'answered' and complaint.dateAnswered:
-                    checks.append(calculate_business_date(complaint.dateAnswered, COMPLAINT_STAND_STILL_TIME, self))
-            for award in self.awards:
-                for complaint in award.complaints:
-                    if complaint.status == 'claim' and complaint.dateSubmitted:
-                        checks.append(calculate_business_date(complaint.dateSubmitted, COMPLAINT_STAND_STILL_TIME, self))
-                    elif complaint.status == 'answered' and complaint.dateAnswered:
-                        checks.append(calculate_business_date(complaint.dateAnswered, COMPLAINT_STAND_STILL_TIME, self))
+        if self.status == 'active.enquiry':
+            checks.append(self.tenderPeriod.endDate.astimezone(TZ))
         return min(checks).isoformat() if checks else None
 
 

@@ -13,6 +13,7 @@ from openprocurement.auctions.landlease.tests.helpers import (
 
 
 def add_document(test_case):
+    import ipdb; ipdb.set_trace()  # XXX BREAKPOINT
     document = deepcopy(test_document_data)
     url = test_case.generate_docservice_url(),
     document['url'] = url[0]
@@ -90,6 +91,11 @@ def add_document_to_bid(test_case):
     request_data = {'data': document}
     response = test_case.app.post_json(test_case.ENTRYPOINTS['add_document'], request_data)
     test_case.assertEqual(expected_http_status, response.status)
+    response = test_case.app.get('/auctions/{}/bids/{}/documents/{}?acc_token={}'.format(test_case.auction['id'],
+                                                                                         test_case.bid['id'],
+                                                                                         response.json['data']['id'],
+                                                                                         test_case.bid_token))
+    test_case.assertEqual('200 OK', response.status)
 
 
 def activate_bid(test_case):
@@ -104,13 +110,29 @@ def activate_bid(test_case):
 
 def make_active_status_bid(test_case):
     expected_http_status = '200 OK'
+    document = deepcopy(test_document_data)
+    document['documentType'] = 'eligibilityDocuments'
+    url = test_case.generate_docservice_url(),
+    document['url'] = url[0]
 
     request_data = {"data": {"status": "pending"}}
     response = test_case.app.patch_json(test_case.ENTRYPOINTS['patch_bid'], request_data)
 
-
-    import ipdb; ipdb.set_trace()  # XXX BREAKPOINT
     request_data = {"data": {"status": "active"}}
+    response = test_case.app.patch_json(test_case.ENTRYPOINTS['patch_bid'], request_data, status=403)
+    test_case.assertEqual('403 Forbidden', response.status)
+
+    request_data = {'data': document}
+    response = test_case.app.post_json(test_case.ENTRYPOINTS['add_document'], request_data)
+
+    request_data = {"data": {"status": "active"}}
+    response = test_case.app.patch_json(test_case.ENTRYPOINTS['patch_bid'], request_data, status=403)
+    test_case.assertEqual('403 Forbidden', response.status)
+
+    request_data = {"data": {"qualified": True}}
     response = test_case.app.patch_json(test_case.ENTRYPOINTS['patch_bid'], request_data)
     test_case.assertEqual(expected_http_status, response.status)
 
+    request_data = {"data": {"status": "active"}}
+    response = test_case.app.patch_json(test_case.ENTRYPOINTS['patch_bid'], request_data)
+    test_case.assertEqual(expected_http_status, response.status)

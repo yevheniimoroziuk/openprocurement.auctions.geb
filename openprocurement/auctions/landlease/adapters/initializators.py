@@ -88,9 +88,8 @@ class AuctionInitializator(object):
 @implementer(IBidInitializator)
 class BidInitializator(object):
 
-    def __init__(self, request, context):
+    def __init__(self, context):
         self._now = get_now()
-        self._request = request
         self._context = context
 
     def _initialize_qualified(self):
@@ -100,6 +99,5 @@ class BidInitializator(object):
         self._context.date = self._now
 
     def initialize(self):
-        if self._request.validated['data'].get('status') == 'pending':
-            self._initialize_qualified()
-            self._initialize_date()
+        self._initialize_qualified()
+        self._initialize_date()

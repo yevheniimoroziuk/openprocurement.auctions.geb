@@ -22,6 +22,10 @@ class IAuctionChanger(BaseIAuctionChanger):
     """Marker interface for LandLease auctions"""
 
 
+class IAuctionChecker(Interface):
+    """Marker interface for LandLease auctions"""
+
+
 class IBid(Interface):
     """Marker interface for LandLease auctions"""
 

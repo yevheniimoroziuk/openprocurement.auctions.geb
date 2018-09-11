@@ -107,3 +107,15 @@ def create_bid(test_case, auction):
     entrypoint = '/auctions/{}/bids'.format(auction['id'])
     response = test_case.app.post_json(entrypoint, request_data)
     return response.json['data'], response.json['access']
+
+
+def set_auction_period(test_case, auction):
+
+    auth = test_case.app.authorization
+
+    test_case.app.authorization = ('Basic', ('chronograph', ''))
+    request_data = {'data': {'id': auction['id']}}
+    entrypoint = '/auctions/{}'.format(auction['id'])
+    test_case.app.patch_json(entrypoint, request_data)
+
+    test_case.app.authorization = auth

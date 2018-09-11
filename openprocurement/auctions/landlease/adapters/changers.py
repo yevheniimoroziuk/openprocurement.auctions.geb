@@ -7,12 +7,12 @@ from openprocurement.auctions.landlease.interfaces import (
 
 from openprocurement.auctions.core.utils import (
     apply_patch,
-    save_auction,
 )
 
 from openprocurement.auctions.landlease.validation import (
     validate_change_bid_check_auction_status,
-    validate_change_bid_check_status
+    validate_change_bid_check_status,
+    validate_make_active_status_bid
 )
 
 
@@ -25,16 +25,15 @@ class AuctionChanger(object):
         self._context = context
 
     def change(self):
-        patch = apply_patch(self._request, save=False, src=self._request.validated['auction_src'])
-        if patch:
-            save_auction(self._request)
+        return apply_patch(self._request, save=False, src=self._request.validated['auction_src'])
 
 
 @implementer(IBidChanger)
 class BidChanger(object):
     name = 'Bid Changer'
     validators = [validate_change_bid_check_auction_status,
-                  validate_change_bid_check_status]
+                  validate_change_bid_check_status,
+                  validate_make_active_status_bid]
 
     def __init__(self, request, context):
         self._request = request
@@ -49,6 +48,3 @@ class BidChanger(object):
     def change(self):
         if self.validate():
             return apply_patch(self._request, save=False, src=self._context.serialize())
-
-    def save(self):
-        return save_auction(self._request)

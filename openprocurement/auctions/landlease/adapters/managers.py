@@ -1,15 +1,15 @@
-from openprocurement.auctions.core.adapters import (
-    AuctionManagerAdapter as BaseAuctionManagerAdapter
+from openprocurement.auctions.core.utils import (
+    save_auction,
+    apply_patch
 )
 
 
-class AuctionManager(BaseAuctionManagerAdapter):
+class AuctionManager(object):
+    name = 'Auction Manager'
 
-    def create_auction(self, request):
-        pass
-
-    def change_auction(self, request):
-        pass
+    def __inti__(self, request, context):
+        self._request = request
+        self._context = context
 
     def initialize(self, initializator):
         self._initializator = initializator
@@ -17,18 +17,33 @@ class AuctionManager(BaseAuctionManagerAdapter):
 
     def change(self, changer):
         self._changer = changer
-        self._changer.change()
+        if self._changer.change():
+            self.save()
+
+    def check(self, checker):
+        apply_patch(self._request, save=False, src=self._request.validated['auction_src'])
+        self._checker = checker
+        self._checker.check()
+        self.save()
+
+    def save(self):
+        save_auction(self._request)
 
 
 class BidManager(object):
     name = 'Bid Manager'
 
-    def __init__(self, context):
+    def __init__(self, request, context):
+        self._request = request
         self._context = context
 
-    def change(self, changer, initializator):
-        self._changer = changer
-        change = self._changer.change()
-        if change:
+    def initialize(self, initializator):
+        if self._request.validated['json_data'].get('status') == 'pending':
             initializator.initialize()
-            return self._changer.save()
+
+    def change(self, changer):
+        self._changer = changer
+        return self._changer.change()
+
+    def save(self):
+        save_auction(self._request)

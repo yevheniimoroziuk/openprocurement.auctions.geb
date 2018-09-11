@@ -25,10 +25,15 @@ class AuctionBidResource(AuctionBidResource):
 
     @json_view(content_type="application/json", permission='edit_bid', validators=(validate_patch_bid_data,))
     def patch(self):
-        manager = self.request.registry.getAdapter(self.context, IBidManager)
+
+        manager = self.request.registry.queryMultiAdapter((self.request, self.context), IBidManager)
         changer = self.request.registry.queryMultiAdapter((self.request, self.context), IBidChanger)
-        initializator = self.request.registry.queryMultiAdapter((self.request, self.context), IBidInitializator)
+        initializator = self.request.registry.getAdapter(self.context, IBidInitializator)
+
         if manager.change(changer, initializator):
+            manager.initialize(initializator)
+            manager.save()
+
             extra = context_unpack(self.request, {'MESSAGE_ID': 'auction_bid_patch'})
             self.LOGGER.info('Updated auction bid {}'.format(self.request.context.id), extra=extra)
             return {'data': self.request.context.serialize(self.request.context.status)}
