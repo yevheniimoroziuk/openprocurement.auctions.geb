@@ -9,7 +9,8 @@ from openprocurement.auctions.core.tests.base import IsoDateTimeType
 from openprocurement.auctions.landlease.tests.helpers import (
     get_next_status,
     get_period_duration,
-    create_active_bid
+    create_active_bid,
+    create_bid
 )
 
 
@@ -38,6 +39,7 @@ class ActiveEnquiry(State):
 
         bids.append(create_active_bid(self._test, self._auction))
         bids.append(create_active_bid(self._test, self._auction))
+        bids.append(create_bid(self._test, self._auction))
         self.extra['bids'] = bids
 
     def _context(self):

@@ -1,6 +1,6 @@
 from datetime import timedelta
 
-API_DOCUMENT_STATUSES = ['active.rectification', 'active.tendering']
+PROCEDURE_DOCUMENT_STATUSES = ['active.rectification', 'active.tendering', 'active.enquiry']
 AUCTION_DOCUMENT_STATUSES = ['active.auction', 'active.qualification']
 
 # duration of periods
@@ -19,7 +19,6 @@ AUCTION_DOCUMENT_TYPES = [
         'billOfQuantity',
         'conflictOfInterest',
         'evaluationReports',
-        'complaints',
         'eligibilityCriteria',
         'tenderNotice',
         'illustration',
@@ -31,30 +30,49 @@ AUCTION_DOCUMENT_TYPES = [
         'x_qualificationDocuments',
         'cancellationDetails'
     ]
+
 BID_DOCUMENT_TYPES = [
-   'commercialProposal',
-   'qualificationDocuments',
-   'eligibilityDocuments',
+    'commercialProposal',
+    'qualificationDocuments',
+    'eligibilityDocuments',
 ]
 NUMBER_OF_BIDS_TO_BE_QUALIFIED = 2
-DEFAULT_LEVEL_OF_ACCREDITATION = {'create': [1],                                # TODO ask what permissions
-                                  'edit': [2]}
+
+DEFAULT_LEVEL_OF_ACCREDITATION = {
+    'create': [1],                                # TODO ask what permissions
+    'edit': [2]
+}
 
 DEFAULT_PROCUREMENT_METHOD_TYPE = "landlease"
 AUCTION_PARAMETERS_TYPE = 'texas'
 
-AUCTION_STATUSES = ['draft',
-                    'active.rectification',
-                    'active.tendering',
-                    'active.enquiry',
-                    'active.auction',
-                    'active.qualification',
-                    'active.awarded',
-                    'unsuccessful',
-                    'cancelled',
-                    'complete']
+AUCTION_STATUSES = [
+    'draft',
+    'active.rectification',
+    'active.tendering',
+    'active.enquiry',
+    'active.auction',
+    'active.qualification',
+    'active.awarded',
+    'unsuccessful',
+    'cancelled',
+    'complete'
+]
 
-AUCTION_STATUS_FOR_DELETING_BIDS = ['active.tendering',
-                                    'active.enquiry']
+AUCTION_STATUS_FOR_DELETING_BIDS = [
+    'active.tendering',
+    'active.enquiry'
+]
 
-BID_STATUSES = ['draft', 'pending', 'active', 'deleted']
+BID_STATUSES = [
+    'draft',
+    'pending',
+    'active',
+    'deleted'
+]
+
+BID_STATUSES_FOR_ADDING_DOCUMENTS = [
+    'active.tendering',
+    'active.enquiry',
+    'active.qualification'
+]

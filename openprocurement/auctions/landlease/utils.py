@@ -4,10 +4,13 @@ from logging import getLogger
 from pkg_resources import get_distribution
 
 from openprocurement.auctions.core.utils import (
-    check_complaint_status, check_auction_status, remove_draft_bids,
-    upload_file as base_upload_file, get_file as base_get_file,
+    # remove_draft_bids,
+    upload_file as base_upload_file,
+    get_file as base_get_file,
     API_DOCUMENT_BLACKLISTED_FIELDS as DOCUMENT_BLACKLISTED_FIELDS,
-    context_unpack, calculate_business_date, get_now, TZ
+    context_unpack,
+    calculate_business_date,
+    get_now
 )
 
 from openprocurement.auctions.landlease.constants import (
@@ -61,62 +64,6 @@ def check_auction_protocol(award):
             if document['documentType'] == 'auctionProtocol' and document['author'] == 'auction_owner':
                 return True
     return False
-
-
-def check_status(request):
-    auction = request.validated['auction']
-    now = get_now()
-    for complaint in auction.complaints:
-        check_complaint_status(request, complaint, now)
-    for award in auction.awards:
-        for complaint in award.complaints:
-            check_complaint_status(request, complaint, now)
-    if not auction.lots and auction.status == 'active.tendering' and auction.tenderPeriod.endDate <= now:
-        LOGGER.info('Switched auction {} to {}'.format(auction['id'], 'active.auction'),
-                    extra=context_unpack(request, {'MESSAGE_ID': 'switched_auction_active.auction'}))
-        auction.status = 'active.auction'
-        remove_draft_bids(request)
-        remove_invalid_bids(request)
-        check_bids(request)
-        return
-    elif auction.lots and auction.status == 'active.tendering' and auction.tenderPeriod.endDate <= now:
-        LOGGER.info('Switched auction {} to {}'.format(auction['id'], 'active.auction'),
-                    extra=context_unpack(request, {'MESSAGE_ID': 'switched_auction_active.auction'}))
-        auction.status = 'active.auction'
-        remove_draft_bids(request)
-        remove_invalid_bids(request)
-        check_bids(request)
-        [setattr(i.auctionPeriod, 'startDate', None) for i in auction.lots if i.numberOfBids < 2 and i.auctionPeriod]
-        return
-    elif not auction.lots and auction.status == 'active.awarded':
-        standStillEnds = [
-            a.complaintPeriod.endDate.astimezone(TZ)
-            for a in auction.awards
-            if a.complaintPeriod.endDate
-        ]
-        if not standStillEnds:
-            return
-        standStillEnd = max(standStillEnds)
-        if standStillEnd <= now:
-            check_auction_status(request)
-    elif auction.lots and auction.status in ['active.qualification', 'active.awarded']:
-        if any([i['status'] in auction.block_complaint_status and i.relatedLot is None for i in auction.complaints]):
-            return
-        for lot in auction.lots:
-            if lot['status'] != 'active':
-                continue
-            lot_awards = [i for i in auction.awards if i.lotID == lot.id]
-            standStillEnds = [
-                a.complaintPeriod.endDate.astimezone(TZ)
-                for a in lot_awards
-                if a.complaintPeriod.endDate
-            ]
-            if not standStillEnds:
-                continue
-            standStillEnd = max(standStillEnds)
-            if standStillEnd <= now:
-                check_auction_status(request)
-                return
 
 
 def calculate_enddate(auction, period, duration):

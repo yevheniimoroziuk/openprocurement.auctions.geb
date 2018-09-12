@@ -4,9 +4,6 @@ from zope.interface import (
 
 from openprocurement.auctions.core.interfaces import (
     IAuction as BaseIAuction,
-    IAuctionInitializator as BaseIAuctionInitializator,
-    IAuctionChanger as BaseIAuctionChanger
-
 )
 
 
@@ -14,15 +11,19 @@ class IAuction(BaseIAuction):
     """Marker interface for LandLease auctions"""
 
 
-class IAuctionInitializator(BaseIAuctionInitializator):
+class IAuctionInitializator(Interface):
     """Marker interface for LandLease auctions"""
 
 
-class IAuctionChanger(BaseIAuctionChanger):
+class IAuctionChanger(Interface):
     """Marker interface for LandLease auctions"""
 
 
 class IAuctionChecker(Interface):
+    """Marker interface for LandLease auctions"""
+
+
+class IAuctionDocumenter(Interface):
     """Marker interface for LandLease auctions"""
 
 

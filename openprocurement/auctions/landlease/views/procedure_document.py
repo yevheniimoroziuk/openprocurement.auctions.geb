@@ -13,12 +13,19 @@ from openprocurement.auctions.core.validation import (
 )
 from openprocurement.auctions.core.views.mixins import AuctionDocumentResource
 
+from openprocurement.auctions.core.interfaces import (
+    IAuctionManager
+)
+
+from openprocurement.auctions.landlease.interfaces import (
+    IAuctionDocumenter
+)
 from openprocurement.auctions.landlease.utils import (
     upload_file, get_file, invalidate_bids_data
 )
 
 from openprocurement.auctions.landlease.constants import (
-    API_DOCUMENT_STATUSES,
+    PROCEDURE_DOCUMENT_STATUSES,
     AUCTION_DOCUMENT_STATUSES
 )
 
@@ -35,7 +42,7 @@ class AuctionDocumentResource(AuctionDocumentResource):
         role = self.request.authenticated_role
 
         if role != 'auction':
-            auction_not_in_editable_state = status not in API_DOCUMENT_STATUSES
+            auction_not_in_editable_state = status not in PROCEDURE_DOCUMENT_STATUSES
         else:
             auction_not_in_editable_state = status not in AUCTION_DOCUMENT_STATUSES
 
@@ -49,18 +56,24 @@ class AuctionDocumentResource(AuctionDocumentResource):
     @json_view(permission='upload_auction_documents', validators=(validate_file_upload,))
     def collection_post(self):
         """Auction Document Upload"""
-        if not self.validate_document_editing_period('add'):
-            return
-        document = upload_file(self.request)
-        if self.request.authenticated_role != "auction":
-            invalidate_bids_data(self.request.auction)
-        self.context.documents.append(document)
-        if save_auction(self.request):
-            self.LOGGER.info('Created auction document {}'.format(document.id),
-                             extra=context_unpack(self.request, {'MESSAGE_ID': 'auction_document_create'}, {'document_id': document.id}))
+        save = None
+        manager = self.request.registry.queryMultiAdapter((self.request, self.context), IAuctionManager)
+
+        documenter = self.request.registry.queryMultiAdapter((self.request, self.context), IAuctionDocumenter)
+        document = manager.upload_document(documenter)
+        if document:
+            save = manager.save()
+        if save:
+            msg = 'Created auction document {}'.format(document.id)
+            extra = context_unpack(self.request, {'MESSAGE_ID': 'auction_document_create'}, {'document_id': document['id']})
+            self.LOGGER.info(msg, extra=extra)
+
             self.request.response.status = 201
+
             document_route = self.request.matched_route.name.replace("collection_", "")
-            self.request.response.headers['Location'] = self.request.current_route_url(_route_name=document_route, document_id=document.id, _query={})
+            locations = self.request.current_route_url(_route_name=document_route, document_id=document.id, _query={})
+            self.request.response.headers['Location'] = locations
+
             return {'data': document.serialize("view")}
 
     @json_view(permission='view_auction')

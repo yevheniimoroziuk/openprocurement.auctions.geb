@@ -27,16 +27,18 @@ class AuctionResource(AuctionResource):
                validators=(validate_patch_auction_data,),
                permission='edit_auction')
     def patch(self):
-
+        check, change, save = None, None, None
         manager = self.request.registry.queryMultiAdapter((self.request, self.context), IAuctionManager)
 
         if self.request.authenticated_role == 'chronograph':
             checker = self.request.registry.getAdapter(self.context, IAuctionChecker)
-            manager.check(checker)
+            check = manager.check(checker)
         else:
             changer = self.request.registry.queryMultiAdapter((self.request, self.context), IAuctionChanger)
-            manager.change(changer)
-
-        extra = context_unpack(self.request, {'MESSAGE_ID': 'auction_patch'})
-        self.LOGGER.info('Updated auction {}'.format(self.context.id), extra=extra)
-        return {'data': self.context.serialize(self.context.status)}
+            change = manager.change(changer)
+        if check or change:
+            save = manager.save()
+        if save:
+            extra = context_unpack(self.request, {'MESSAGE_ID': 'auction_patch'})
+            self.LOGGER.info('Updated auction {}'.format(self.context.id), extra=extra)
+            return {'data': self.context.serialize(self.context.status)}

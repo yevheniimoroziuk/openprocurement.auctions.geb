@@ -38,7 +38,6 @@ class AuctionChecker(object):
             raise StopChecks()
 
     def _check_enquiry_minNumberOfQualifiedBids(self):
-        import ipdb; ipdb.set_trace()  # XXX BREAKPOINT
         min_number = self._context.minNumberOfQualifiedBids
         bids = len([bid for bid in self._context.bids if bid.status in ('active', 'pending')])
         if min_number == 1:
@@ -87,3 +86,4 @@ class AuctionChecker(object):
         except StopChecks:
             pass
         self._set_next_status()
+        return True

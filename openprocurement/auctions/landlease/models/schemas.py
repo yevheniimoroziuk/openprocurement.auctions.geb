@@ -20,17 +20,13 @@ from openprocurement.auctions.core.models import (
     IsoDateTimeType,
     IsoDurationType,
     ListType,
-    Lot,
     Period,
     Value,
-    dgfCDB2Complaint,
     dgfDocument,
     dgfCDB2Item,
     dgfCancellation,
     get_auction,
     validate_items_uniq,
-    validate_lots_uniq,
-    validate_not_available,
     Administrator_bid_role
 )
 from openprocurement.auctions.core.plugins.awarding.v2_1.models import Award
@@ -103,7 +99,7 @@ class Cancellation(dgfCancellation):
     documents = ListType(ModelType(LandLeaseAuctionDocument), default=list())
 
 
-def rounding_shouldStartAfter(start_after, auction, use_from=datetime(2016, 6, 1, tzinfo=TZ)):
+def rounding_shouldStartAfter(start_after, auction, use_from=datetime(2016, 6, 1, tzinfo=TZ)):  # TODO rm -rf black box
     if (auction.enquiryPeriod and auction.enquiryPeriod.startDate or get_now()) > use_from and not (SANDBOX_MODE and auction.submissionMethodDetails and u'quick' in auction.submissionMethodDetails):
         midnigth = datetime.combine(start_after.date(), time(0, tzinfo=start_after.tzinfo))
         if start_after >= midnigth:
@@ -212,7 +208,7 @@ class Auction(BaseAuction):
             'Administrator': (whitelist('rectificationPeriod') + Administrator_role),
         }
 
-    def __local_roles__(self):
+    def __local_roles__(self):                                                  # TODO rm black box
         roles = dict([('{}_{}'.format(self.owner, self.owner_token), 'auction_owner')])
         for i in self.bids:
             roles['{}_{}'.format(i.owner, i.owner_token)] = 'bid_owner'
@@ -235,12 +231,14 @@ class Auction(BaseAuction):
 
     cancellations = ListType(ModelType(Cancellation), default=list())
 
-    complaints = ListType(ModelType(dgfCDB2Complaint), default=list())
-
     contracts = ListType(ModelType(Contract), default=list())
 
     contractTerms = ModelType(ContractTerms,
                               required=True)
+
+    lotIdentifier = StringType(required=True)
+
+    lotHolder = ModelType(BaseOrganization, required=True)
 
     description = StringType(required=True)
 
@@ -254,14 +252,6 @@ class Auction(BaseAuction):
                      required=True,
                      min_size=1,
                      validators=[validate_items_uniq])
-
-    lotIdentifier = StringType(required=True)
-
-    lots = ListType(ModelType(Lot),
-                    default=list(),
-                    validators=[validate_lots_uniq, validate_not_available])
-
-    lotHolder = ModelType(BaseOrganization, required=True)
 
     minNumberOfQualifiedBids = IntType(choices=[1, 2], required=True)
 

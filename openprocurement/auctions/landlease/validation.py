@@ -8,14 +8,16 @@ from openprocurement.auctions.core.utils import (
     get_now
 )
 from openprocurement.auctions.landlease.constants import (
-    AUCTION_STATUS_FOR_DELETING_BIDS
+    AUCTION_STATUS_FOR_DELETING_BIDS,
+    PROCEDURE_DOCUMENT_STATUSES,
+    AUCTION_DOCUMENT_STATUSES
 )
 
 
 def validate_change_bid_check_auction_status(request):
     if request.authenticated_role == 'Administrator':
         return True
-    if request.validated['auction_status'] not in ['active.tendering', 'active.tendering']:
+    if request.validated['auction_status'] not in ['active.tendering', 'active.enquiry']:
         err_msg = 'Can\'t update bid in current ({}) auction status'.format(request.validated['auction_status'])
         request.errors.add('body', 'data', err_msg)
         request.errors.status = 403
@@ -26,7 +28,7 @@ def validate_change_bid_check_auction_status(request):
 def validate_change_bid_check_status(request):
     status = request.context.status
     auction_status = request.validated['auction_status']
-    new_status = request.validated['data'].get('status')
+    new_status = request.validated['json_data'].get('status')
 
     if request.authenticated_role == 'Administrator':
         return True
@@ -49,7 +51,7 @@ def validate_make_active_status_bid(request):
     now = get_now()
     bid_documents = request.context.documents
     auction = request.validated['auction']
-    new_status = request.validated['data'].get('status')
+    new_status = request.validated['json_data'].get('status')
 
     if request.authenticated_role == 'Administrator' or new_status != 'active':
         return True
@@ -82,6 +84,23 @@ def check_auction_status_for_deleting_bids(request):
 
     if status not in AUCTION_STATUS_FOR_DELETING_BIDS:
         err_msg = 'Can\'t delete bid in current ({}) auction status'.format(status)
+        request.errors.add('body', 'data', err_msg)
+        request.errors.status = 403
+        return False
+    return True
+
+
+def validate_document_editing_period(request, *kwargs):
+    status = request.context.status
+    role = request.authenticated_role
+
+    if role != 'auction':
+        auction_not_in_editable_state = status not in PROCEDURE_DOCUMENT_STATUSES
+    else:
+        auction_not_in_editable_state = status not in AUCTION_DOCUMENT_STATUSES
+
+    if auction_not_in_editable_state:
+        err_msg = 'Can\'t make document operations in current ({}) auction status'.format(status)
         request.errors.add('body', 'data', err_msg)
         request.errors.status = 403
         return False

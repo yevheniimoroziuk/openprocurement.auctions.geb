@@ -36,7 +36,8 @@ class AuctionBidResource(AuctionBidResource):
             manager.save()
 
             extra = context_unpack(self.request, {'MESSAGE_ID': 'auction_bid_patch'})
-            self.LOGGER.info('Updated auction bid {}'.format(self.request.context.id), extra=extra)
+            msg = 'Updated auction bid {}'.format(self.request.context.id)
+            self.LOGGER.info(msg, extra=extra)
             return {'data': self.request.context.serialize(self.request.context.status)}
 
     @json_view(permission='edit_bid')
@@ -49,5 +50,6 @@ class AuctionBidResource(AuctionBidResource):
         if bid:
             manager.save()
             extra = context_unpack(self.request, {'MESSAGE_ID': 'auction_bid_delete'})
-            self.LOGGER.info('Deleted auction bid {}'.format(self.request.context.id), extra=extra)
+            msg = 'Deleted auction bid {}'.format(self.request.context.id)
+            self.LOGGER.info(msg, extra=extra)
             return {'data': bid.serialize('view')}

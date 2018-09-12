@@ -121,12 +121,14 @@ def create_active_bid(test_case, auction):
 
 
 def create_bid(test_case, auction):
+
     request_data = test_bid_data
     entrypoint = '/auctions/{}/bids'.format(auction['id'])
     response = test_case.app.post_json(entrypoint, request_data)
 
     bid = response.json['data']
     access = response.json['access']
+
     return bid, access
 
 

@@ -6,7 +6,10 @@ from openprocurement.auctions.core.includeme import (
     IContentConfigurator,
     get_evenly_plugins
 )
-from openprocurement.auctions.core.interfaces import IAuctionManager
+from openprocurement.auctions.core.interfaces import (
+    IAuctionManager,
+    IAuctionInitializator
+)
 
 from openprocurement.auctions.landlease.adapters.managers import (
     BidManager
@@ -21,6 +24,9 @@ from openprocurement.auctions.landlease.adapters.configurators import (
 from openprocurement.auctions.landlease.adapters.changers import (
     AuctionChanger,
     BidChanger
+)
+from openprocurement.auctions.landlease.adapters.documenters import (
+    AuctionDocumenter
 )
 from openprocurement.auctions.landlease.adapters.checkers import (
     AuctionChecker
@@ -45,7 +51,7 @@ from openprocurement.auctions.landlease.interfaces import (
     IAuction,
     IAuctionChanger,
     IAuctionChecker,
-    IAuctionInitializator,
+    IAuctionDocumenter,
     IBid,
     IBidChanger,
     IBidDeleter,
@@ -77,6 +83,11 @@ def registrator(config):
         AuctionChanger,
         (IRequest, IAuction),
         IAuctionChanger
+    )
+    config.registry.registerAdapter(
+        AuctionDocumenter,
+        (IRequest, IAuction),
+        IAuctionDocumenter
     )
     config.registry.registerAdapter(
         AuctionInitializator,
