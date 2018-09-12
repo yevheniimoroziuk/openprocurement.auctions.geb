@@ -7,6 +7,9 @@ from openprocurement.auctions.core.validation import (
 from openprocurement.auctions.core.utils import (
     get_now
 )
+from openprocurement.auctions.landlease.constants import (
+    AUCTION_STATUS_FOR_DELETING_BIDS
+)
 
 
 def validate_change_bid_check_auction_status(request):
@@ -71,3 +74,15 @@ def validate_make_active_status_bid(request):
 def validate_patch_auction_data(request, **kwargs):
     data = validate_json_data(request)
     validate_data(request, request.auction.__class__, data=data)
+
+
+def check_auction_status_for_deleting_bids(request):
+    auction = request.context.__parent__
+    status = auction['status']
+
+    if status not in AUCTION_STATUS_FOR_DELETING_BIDS:
+        err_msg = 'Can\'t delete bid in current ({}) auction status'.format(status)
+        request.errors.add('body', 'data', err_msg)
+        request.errors.status = 403
+        return False
+    return True

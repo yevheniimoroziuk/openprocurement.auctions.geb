@@ -38,5 +38,9 @@ class IBidChanger(Interface):
     """Marker interface for LandLease auctions"""
 
 
+class IBidDeleter(Interface):
+    """Marker interface for LandLease auctions"""
+
+
 class IBidInitializator(Interface):
     """Marker interface for LandLease auctions"""

@@ -23,7 +23,8 @@ from openprocurement.auctions.landlease.tests.blanks.active_tendering import (
     add_invalid_bid,
     add_document_to_bid,
     activate_bid,
-    make_active_status_bid
+    make_active_status_bid,
+    delete_bid
 )
 
 
@@ -53,6 +54,7 @@ class StatusActiveTenderingBidsTest(BaseAuctionWebTest):
     test_add_document_to_bid = snitch(add_document_to_bid)
     test_activate_bid = snitch(activate_bid)
     test_make_active_status_bid = snitch(make_active_status_bid)
+    test_delete_bid = snitch(delete_bid)
 
     def setUp(self):
         super(StatusActiveTenderingBidsTest, self).setUp()
@@ -69,12 +71,13 @@ class StatusActiveTenderingBidsTest(BaseAuctionWebTest):
                                                                             self.bid['id'],
                                                                             access['token'])
         entrypoints['create_bid'] = '/auctions/{}/bids'.format(self.auction_id)
+
         entrypoints['add_document'] = add_document
 
-        patch_bid = '/auctions/{}/bids/{}?acc_token={}'.format(self.auction_id,
-                                                               self.bid['id'],
-                                                               access['token'])
-        entrypoints['patch_bid'] = patch_bid
+        edit_bid = '/auctions/{}/bids/{}?acc_token={}'.format(self.auction_id,
+                                                              self.bid['id'],
+                                                              access['token'])
+        entrypoints['bid'] = edit_bid
         self.ENTRYPOINTS = entrypoints
 
 

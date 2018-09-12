@@ -3,7 +3,7 @@ from datetime import datetime, timedelta, time
 from uuid import uuid4
 
 from schematics.exceptions import ValidationError
-from schematics.transforms import blacklist, whitelist
+from schematics.transforms import whitelist
 from schematics.types import StringType, IntType, MD5Type, BooleanType
 from schematics.types.compound import ModelType
 from schematics.types.serializable import serializable
@@ -27,7 +27,6 @@ from openprocurement.auctions.core.models import (
     dgfDocument,
     dgfCDB2Item,
     dgfCancellation,
-    edit_role,
     get_auction,
     validate_items_uniq,
     validate_lots_uniq,
@@ -39,8 +38,7 @@ from openprocurement.auctions.core.plugins.contracting.v2_1.models import Contra
 from openprocurement.auctions.core.utils import (
     SANDBOX_MODE,
     TZ,
-    get_now,
-    AUCTIONS_COMPLAINT_STAND_STILL_TIME as COMPLAINT_STAND_STILL_TIME
+    get_now
 )
 
 from openprocurement.auctions.landlease.constants import (
@@ -52,8 +50,12 @@ from openprocurement.auctions.landlease.constants import (
 
 from openprocurement.auctions.landlease.models.roles import (
     auction_create_role,
-    auction_active_rectification_role,
+    auction_rectification_role,
     auction_edit_rectification_role,
+    auction_tendering_role,
+    auction_edit_tendering_role,
+    auction_enquiry_role,
+    auction_edit_enquiry_role,
     auction_contractTerms_create_role,
     bid_view_role,
     bid_create_role,
@@ -132,25 +134,6 @@ class RectificationPeriod(Period):
     invalidationDate = IsoDateTimeType()
 
 
-edit_role = (edit_role + blacklist('enquiryPeriod',
-                                   'tenderPeriod',
-                                   'auction_value',
-                                   'auction_minimalStep',
-                                   'auction_guarantee',
-                                   'eligibilityCriteria',
-                                   'eligibilityCriteria_en',
-                                   'eligibilityCriteria_ru',
-                                   'awardCriteriaDetails',
-                                   'awardCriteriaDetails_en',
-                                   'awardCriteriaDetails_ru',
-                                   'procurementMethodRationale',
-                                   'procurementMethodRationale_en',
-                                   'procurementMethodRationale_ru',
-                                   'submissionMethodDetails',
-                                   'submissionMethodDetails_en',
-                                   'submissionMethodDetails_ru',
-                                   'minNumberOfQualifiedBids'))
-
 Administrator_role = (Administrator_role + whitelist('awards'))
 
 
@@ -216,18 +199,16 @@ class Auction(BaseAuction):
     class Options:
         roles = {
             'create': auction_create_role,
-            'active.rectification': auction_active_rectification_role,
+
+            'active.rectification': auction_rectification_role,
             'edit_active.rectification': auction_edit_rectification_role,
-            'edit_active.tendering': (blacklist('enquiryPeriod',
-                                                'tenderPeriod',
-                                                'rectificationPeriod',
-                                                'auction_value',
-                                                'auction_minimalStep',
-                                                'auction_guarantee',
-                                                'eligibilityCriteria',
-                                                'eligibilityCriteria_en',
-                                                'eligibilityCriteria_ru',
-                                                'minNumberOfQualifiedBids') + edit_role),
+
+            'active.tendering': auction_tendering_role,
+            'edit_active.tendering': auction_edit_tendering_role,
+
+            'active.enquiry': auction_enquiry_role,
+            'edit_active.enquiry': auction_edit_enquiry_role,
+
             'Administrator': (whitelist('rectificationPeriod') + Administrator_role),
         }
 
@@ -290,7 +271,7 @@ class Auction(BaseAuction):
 
     procurementMethodType = StringType(required=True)
 
-    rectificationPeriod = ModelType(RectificationPeriod)                        # The period during which editing of main procedure fields are allowed
+    rectificationPeriod = ModelType(RectificationPeriod)
 
     registrationFee = ModelType(Value, required=True)
 
@@ -301,7 +282,7 @@ class Auction(BaseAuction):
 
     tenderAttempts = IntType(required=True, choices=range(1, 11))
 
-    tenderPeriod = ModelType(Period)                                            # The period when the auction is open for submissions. The end date is the closing date for auction submissions.
+    tenderPeriod = ModelType(Period)
 
     def __acl__(self):
         return [

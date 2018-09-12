@@ -54,4 +54,7 @@ AUCTION_STATUSES = ['draft',
                     'cancelled',
                     'complete']
 
+AUCTION_STATUS_FOR_DELETING_BIDS = ['active.tendering',
+                                    'active.enquiry']
+
 BID_STATUSES = ['draft', 'pending', 'active', 'deleted']

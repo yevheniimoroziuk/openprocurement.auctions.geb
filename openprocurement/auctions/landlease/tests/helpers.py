@@ -1,4 +1,4 @@
-from datetime import timedelta
+import iso8601
 from collections import Mapping, Sequence
 from openprocurement.auctions.landlease.tests.specifications import STATUS_CHANGES
 from openprocurement.auctions.landlease.tests.fixtures import (
@@ -86,13 +86,10 @@ def get_procedure_state(procedure, status):
     return state
 
 
-def get_period_duration(scheme, period):
-    for item in scheme:
-        if item['name'] == period:
-            duration = item.get('duration')
-            if duration:
-                return timedelta(days=duration)
-            return
+def get_period_duration(auction, period):
+    start_date = auction[period]['startDate']
+    end_date = auction[period]['endDate']
+    return iso8601.parse_date(end_date) - iso8601.parse_date(start_date)
 
 
 def create_question(test_case, auction):
@@ -102,11 +99,43 @@ def create_question(test_case, auction):
     return response.json['data']
 
 
+def create_active_bid(test_case, auction):
+    auth = test_case.app.authorization
+
+    bid_owner = ('Basic', ('broker', ''))
+    test_case.app.authorization = bid_owner
+    request_data = test_bid_data
+    entrypoint = '/auctions/{}/bids'.format(auction['id'])
+    response = test_case.app.post_json(entrypoint, request_data)
+
+    bid = response.json['data']
+    access = response.json['access']
+    entrypoint = '/auctions/{}/bids/{}?acc_token={}'.format(auction['id'],
+                                                            bid['id'],
+                                                            access['token'])
+    request_data = {"data": {"status": "pending"}}
+    response = test_case.app.patch_json(entrypoint, request_data)
+
+    test_case.app.authorization = auth
+    return {'data': response.json['data'], 'access': access, 'owner': bid_owner}
+
+
 def create_bid(test_case, auction):
     request_data = test_bid_data
     entrypoint = '/auctions/{}/bids'.format(auction['id'])
     response = test_case.app.post_json(entrypoint, request_data)
-    return response.json['data'], response.json['access']
+
+    bid = response.json['data']
+    access = response.json['access']
+    return bid, access
+
+
+def delete_bid(test_case, auction, bid, access):
+
+    entrypoint = '/auctions/{}/bids/{}?acc_token={}'.format(auction['id'],
+                                                            bid['id'],
+                                                            access['token'])
+    test_case.app.delete_json(entrypoint)
 
 
 def set_auction_period(test_case, auction):

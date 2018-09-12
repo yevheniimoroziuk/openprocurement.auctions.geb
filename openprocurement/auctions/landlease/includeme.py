@@ -25,6 +25,9 @@ from openprocurement.auctions.landlease.adapters.changers import (
 from openprocurement.auctions.landlease.adapters.checkers import (
     AuctionChecker
 )
+from openprocurement.auctions.landlease.adapters.deleters import (
+    BidDeleter
+)
 from openprocurement.auctions.landlease.adapters.initializators import (
     AuctionInitializator,
     BidInitializator
@@ -39,14 +42,15 @@ from openprocurement.auctions.landlease.models.schemas import (
 )
 
 from openprocurement.auctions.landlease.interfaces import (
-    IBid,
-    IBidManager,
-    IBidChanger,
     IAuction,
     IAuctionChanger,
     IAuctionChecker,
     IAuctionInitializator,
-    IBidInitializator
+    IBid,
+    IBidChanger,
+    IBidDeleter,
+    IBidInitializator,
+    IBidManager,
 )
 
 LOGGER = logging.getLogger(__name__)
@@ -94,6 +98,11 @@ def registrator(config):
         BidChanger,
         (IRequest, IBid),
         IBidChanger
+    )
+    config.registry.registerAdapter(
+        BidDeleter,
+        (IRequest, IBid),
+        IBidDeleter
     )
 
 

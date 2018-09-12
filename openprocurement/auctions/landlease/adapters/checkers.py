@@ -20,25 +20,41 @@ class AuctionChecker(object):
     def __init__(self, context):
         self._now = get_now()
         self._context = context
+        self._next_status = None
 
     def _check_bids(self):
-        import ipdb; ipdb.set_trace()  # XXX BREAKPOINT
         for bid in self._context.bids:
             if bid.status in ['pending', 'active']:
                 return
-        self._context.status = 'unsuccessful'
+        self._next_status = 'unsuccessful'
         raise StopChecks()
 
-    def _check_status(self):
-        status = self._context.status
+    def _check_tendering_minNumberOfQualifiedBids(self):
+        min_number = self._context.minNumberOfQualifiedBids
+        bids = len([bid for bid in self._context.bids if bid.status in ('active', 'pending')])
 
-        if status == 'active.rectification':
-            new_status = 'active.tendering'
+        if min_number == 2 and bids == 1:
+            self._next_status = 'unsuccessful'
+            raise StopChecks()
 
-        self._context.status = new_status
-
-    def _check_minNumberOfQualifiedBids(self):
-        pass
+    def _check_enquiry_minNumberOfQualifiedBids(self):
+        import ipdb; ipdb.set_trace()  # XXX BREAKPOINT
+        min_number = self._context.minNumberOfQualifiedBids
+        bids = len([bid for bid in self._context.bids if bid.status in ('active', 'pending')])
+        if min_number == 1:
+            if bids == 0:
+                self._next_status = 'unsuccessful'
+            elif bids == 1:
+                self._next_status = 'active.qualification'
+            elif bids >= 2:
+                self._next_status = 'active.auction'
+        elif min_number == 2:
+            if bids == 0:
+                self._next_status = 'unsuccessful'
+            elif bids == 1:
+                self._next_status = 'unsuccessful'
+            elif bids >= 2:
+                self._next_status = 'active.auction'
 
     def _get_check_date(self):
         status = self._context.status
@@ -53,13 +69,21 @@ class AuctionChecker(object):
         elif status == 'active.enquiry' and self._now > enquiry_period.endDate:
             return enquiry_period.endDate
 
+    def _set_next_status(self):
+        if self._next_status:
+            self._context.status = self._next_status
+
     def check(self):
         date = self._get_check_date()
         try:
             if date == self._context.rectificationPeriod.endDate:
-                self._check_status()
+                self._next_status = 'active.tendering'
             elif date == self._context.tenderPeriod.endDate:
                 self._check_bids()
-                self._check_minNumberOfQualifiedBids()
+                self._check_tendering_minNumberOfQualifiedBids()
+                self._next_status = 'active.enquiry'
+            elif date == self._context.enquiryPeriod.endDate:
+                self._check_enquiry_minNumberOfQualifiedBids()
         except StopChecks:
             pass
+        self._set_next_status()

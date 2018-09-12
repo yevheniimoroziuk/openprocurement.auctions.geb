@@ -47,3 +47,8 @@ class BidManager(object):
 
     def save(self):
         save_auction(self._request)
+
+    def delete(self, deleter):
+        self._deleter = deleter
+        if self._deleter.validate():
+            return self._deleter.delete()
