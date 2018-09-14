@@ -24,11 +24,6 @@ from openprocurement.auctions.landlease.utils import (
     upload_file, get_file, invalidate_bids_data
 )
 
-from openprocurement.auctions.landlease.constants import (
-    PROCEDURE_DOCUMENT_STATUSES,
-    AUCTION_DOCUMENT_STATUSES
-)
-
 
 @opresource(name='landlease:Auction Documents',
             collection_path='/auctions/{auction_id}/documents',
@@ -37,32 +32,19 @@ from openprocurement.auctions.landlease.constants import (
             description="Auction related binary files (PDFs, etc.)")
 class AuctionDocumentResource(AuctionDocumentResource):
 
-    def validate_document_editing_period(self, operation):
-        status = self.request.validated['auction_status']
-        role = self.request.authenticated_role
-
-        if role != 'auction':
-            auction_not_in_editable_state = status not in PROCEDURE_DOCUMENT_STATUSES
-        else:
-            auction_not_in_editable_state = status not in AUCTION_DOCUMENT_STATUSES
-
-        if auction_not_in_editable_state:
-            err_msg = 'Can\'t {} document in current ({}) auction status'.format(operation, status)
-            self.request.errors.add('body', 'data', err_msg)
-            self.request.errors.status = 403
-            return
-        return True
-
     @json_view(permission='upload_auction_documents', validators=(validate_file_upload,))
     def collection_post(self):
         """Auction Document Upload"""
         save = None
-        manager = self.request.registry.queryMultiAdapter((self.request, self.context), IAuctionManager)
 
+        manager = self.request.registry.queryMultiAdapter((self.request, self.context), IAuctionManager)
         documenter = self.request.registry.queryMultiAdapter((self.request, self.context), IAuctionDocumenter)
+
         document = manager.upload_document(documenter)
+
         if document:
             save = manager.save()
+
         if save:
             msg = 'Created auction document {}'.format(document.id)
             extra = context_unpack(self.request, {'MESSAGE_ID': 'auction_document_create'}, {'document_id': document['id']})
@@ -70,10 +52,9 @@ class AuctionDocumentResource(AuctionDocumentResource):
 
             self.request.response.status = 201
 
-            document_route = self.request.matched_route.name.replace("collection_", "")
-            locations = self.request.current_route_url(_route_name=document_route, document_id=document.id, _query={})
+            route = self.request.matched_route.name.replace("collection_", "")
+            locations = self.request.current_route_url(_route_name=route, document_id=document.id, _query={})
             self.request.response.headers['Location'] = locations
-
             return {'data': document.serialize("view")}
 
     @json_view(permission='view_auction')

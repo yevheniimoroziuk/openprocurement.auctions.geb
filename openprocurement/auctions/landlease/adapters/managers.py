@@ -46,9 +46,24 @@ class BidManager(object):
         return self._changer.change()
 
     def save(self):
-        save_auction(self._request)
+        return save_auction(self._request)
 
     def delete(self, deleter):
         self._deleter = deleter
         if self._deleter.validate():
             return self._deleter.delete()
+
+
+class QuestionManager(object):
+    name = 'Question Manager'
+
+    def __init__(self, request, context):
+        self._request = request
+        self._context = context
+
+    def change(self, changer):
+        self._changer = changer
+        return self._changer.change()
+
+    def save(self):
+        return save_auction(self._request)

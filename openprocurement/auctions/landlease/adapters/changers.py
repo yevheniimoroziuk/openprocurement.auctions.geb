@@ -2,7 +2,8 @@ from zope.interface import implementer
 
 from openprocurement.auctions.landlease.interfaces import (
     IAuctionChanger,
-    IBidChanger
+    IBidChanger,
+    IQuestionChanger
 )
 
 from openprocurement.auctions.core.utils import (
@@ -12,7 +13,8 @@ from openprocurement.auctions.core.utils import (
 from openprocurement.auctions.landlease.validation import (
     validate_change_bid_check_auction_status,
     validate_change_bid_check_status,
-    validate_make_active_status_bid
+    validate_make_active_status_bid,
+    validate_question_changing_period
 )
 
 
@@ -34,6 +36,26 @@ class BidChanger(object):
     validators = [validate_change_bid_check_auction_status,
                   validate_change_bid_check_status,
                   validate_make_active_status_bid]
+
+    def __init__(self, request, context):
+        self._request = request
+        self._context = context
+
+    def validate(self):
+        for validator in self.validators:
+            if not validator(self._request):
+                return
+        return True
+
+    def change(self):
+        if self.validate():
+            return apply_patch(self._request, save=False, src=self._context.serialize())
+
+
+@implementer(IQuestionChanger)
+class QuestionChanger(object):
+    name = 'Question Changer'
+    validators = [validate_question_changing_period]
 
     def __init__(self, request, context):
         self._request = request

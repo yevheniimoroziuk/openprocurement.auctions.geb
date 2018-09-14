@@ -143,5 +143,13 @@ def make_active_status_bid(test_case):
     test_case.assertEqual(expected_http_status, response.status)
 
     request_data = {"data": {"status": "active"}}
+    response = test_case.app.patch_json(test_case.ENTRYPOINTS['bid'], request_data, status=403)
+    test_case.assertEqual('403 Forbidden', response.status)
+
+    request_data = {"data": {"bidNumber": 1}}
+    response = test_case.app.patch_json(test_case.ENTRYPOINTS['bid'], request_data)
+    test_case.assertEqual(expected_http_status, response.status)
+
+    request_data = {"data": {"status": "active"}}
     response = test_case.app.patch_json(test_case.ENTRYPOINTS['bid'], request_data)
     test_case.assertEqual(expected_http_status, response.status)

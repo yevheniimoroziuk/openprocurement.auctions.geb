@@ -19,4 +19,8 @@ def change_forbidden_field_in_draft(self):
 
     request_data = {"data": {field: new_title}}
     response = self.app.patch_json(self.entrypoint, request_data)
+
+    entrypoint = '/auctions/{}'.format(self.auction['id'])
+    response = self.app.get(entrypoint)
+
     self.assertNotEqual(new_title, response.json['data'][field])

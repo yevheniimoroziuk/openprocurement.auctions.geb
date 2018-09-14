@@ -27,6 +27,22 @@ class IAuctionDocumenter(Interface):
     """Marker interface for LandLease auctions"""
 
 
+class IAuctionQuestioner(Interface):
+    """Marker interface for LandLease auctions"""
+
+
+class IQuestion(Interface):
+    """Marker interface for LandLease auctions"""
+
+
+class IQuestionManager(Interface):
+    """Marker interface for LandLease auctions"""
+
+
+class IQuestionChanger(Interface):
+    """Marker interface for LandLease auctions"""
+
+
 class IBid(Interface):
     """Marker interface for LandLease auctions"""
 

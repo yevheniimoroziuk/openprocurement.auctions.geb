@@ -20,9 +20,7 @@ def add_document(test_case):
     expected_http_status = '201 Created'
 
     request_data = {'data': document}
-    import ipdb; ipdb.set_trace()  # XXX BREAKPOINT
     response = test_case.app.post_json(test_case.entrypoint, request_data)
-    import ipdb; ipdb.set_trace()  # XXX BREAKPOINT
     test_case.assertEqual(expected_http_status, response.status)
 
 
@@ -32,6 +30,11 @@ def add_question(test_case):
     request_data = test_question_data
     response = test_case.app.post_json(test_case.entrypoint, request_data)
     test_case.assertEqual(response.status, expected_http_status)
+
+    question = response.json['data']
+    entrypoint = '/auctions/{}/questions/{}'.format(test_case.auction['id'], question['id'])
+    response = test_case.app.get(entrypoint)
+    test_case.assertEqual(response.status, '200 OK')
 
 
 def answer_question(test_case):
@@ -127,7 +130,16 @@ def make_active_status_bid(test_case):
     request_data = {"data": {"status": "active"}}
     response = test_case.app.patch_json(test_case.ENTRYPOINTS['bid'], request_data, status=403)
     test_case.assertEqual('403 Forbidden', response.status)
+
     request_data = {"data": {"qualified": True}}
+    response = test_case.app.patch_json(test_case.ENTRYPOINTS['bid'], request_data)
+    test_case.assertEqual(expected_http_status, response.status)
+
+    request_data = {"data": {"status": "active"}}
+    response = test_case.app.patch_json(test_case.ENTRYPOINTS['bid'], request_data, status=403)
+    test_case.assertEqual('403 Forbidden', response.status)
+
+    request_data = {"data": {"bidNumber": 1}}
     response = test_case.app.patch_json(test_case.ENTRYPOINTS['bid'], request_data)
     test_case.assertEqual(expected_http_status, response.status)
 

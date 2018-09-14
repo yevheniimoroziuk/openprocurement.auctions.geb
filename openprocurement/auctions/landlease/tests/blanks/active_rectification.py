@@ -40,6 +40,10 @@ def change_tenderAttempts(self):
     field = "tenderAttempts"
 
     for value in new:
+        response = self.app.get('/auctions/{}'.format(self.auction['id']))
+        if response.json['data']['tenderAttempts'] == value:
+            continue
+
         request_data = {"data": {field: value}}
         response = self.app.patch_json(self.entrypoint, request_data)
         self.assertEqual(value, response.json['data'][field])

@@ -64,6 +64,16 @@ AUCTION_STATUS_FOR_DELETING_BIDS = [
     'active.enquiry'
 ]
 
+AUCTION_STATUS_FOR_ADDING_QUESTIONS = [
+    'active.tendering',
+    'active.enquiry'
+]
+
+AUCTION_STATUS_FOR_CHANGING_QUESTIONS = [
+    'active.tendering',
+    'active.enquiry'
+]
+
 BID_STATUSES = [
     'draft',
     'pending',

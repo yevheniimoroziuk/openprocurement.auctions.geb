@@ -12,7 +12,8 @@ from openprocurement.auctions.core.interfaces import (
 )
 
 from openprocurement.auctions.landlease.adapters.managers import (
-    BidManager
+    BidManager,
+    QuestionManager
 )
 
 from openprocurement.auctions.core.adapters import (
@@ -23,10 +24,14 @@ from openprocurement.auctions.landlease.adapters.configurators import (
 )
 from openprocurement.auctions.landlease.adapters.changers import (
     AuctionChanger,
+    QuestionChanger,
     BidChanger
 )
 from openprocurement.auctions.landlease.adapters.documenters import (
     AuctionDocumenter
+)
+from openprocurement.auctions.landlease.adapters.questioners import (
+    AuctionQuestioner
 )
 from openprocurement.auctions.landlease.adapters.checkers import (
     AuctionChecker
@@ -52,11 +57,15 @@ from openprocurement.auctions.landlease.interfaces import (
     IAuctionChanger,
     IAuctionChecker,
     IAuctionDocumenter,
+    IAuctionQuestioner,
     IBid,
     IBidChanger,
     IBidDeleter,
     IBidInitializator,
     IBidManager,
+    IQuestion,
+    IQuestionChanger,
+    IQuestionManager
 )
 
 LOGGER = logging.getLogger(__name__)
@@ -90,6 +99,11 @@ def registrator(config):
         IAuctionDocumenter
     )
     config.registry.registerAdapter(
+        AuctionQuestioner,
+        (IRequest, IAuction),
+        IAuctionQuestioner
+    )
+    config.registry.registerAdapter(
         AuctionInitializator,
         (IAuction,),
         IAuctionInitializator
@@ -114,6 +128,17 @@ def registrator(config):
         BidDeleter,
         (IRequest, IBid),
         IBidDeleter
+    )
+# QuestionAdapters
+    config.registry.registerAdapter(
+        QuestionManager,
+        (IRequest, IQuestion),
+        IQuestionManager
+    )
+    config.registry.registerAdapter(
+        QuestionChanger,
+        (IRequest, IQuestion),
+        IQuestionChanger
     )
 
 

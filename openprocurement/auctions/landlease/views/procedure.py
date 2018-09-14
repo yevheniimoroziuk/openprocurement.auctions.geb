@@ -36,8 +36,10 @@ class AuctionResource(AuctionResource):
         else:
             changer = self.request.registry.queryMultiAdapter((self.request, self.context), IAuctionChanger)
             change = manager.change(changer)
+
         if check or change:
             save = manager.save()
+
         if save:
             extra = context_unpack(self.request, {'MESSAGE_ID': 'auction_patch'})
             self.LOGGER.info('Updated auction {}'.format(self.context.id), extra=extra)

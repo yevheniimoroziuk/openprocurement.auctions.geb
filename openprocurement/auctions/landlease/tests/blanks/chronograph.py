@@ -8,16 +8,6 @@ from openprocurement.auctions.landlease.tests.helpers import (
 )
 
 
-def set_auctionPeriod(test_case):
-    expected_data = 'shouldStartAfter'
-
-    request_data = {'data': {'id': test_case.auction_id}}
-    response = test_case.app.patch_json(test_case.ENTRYPOINTS['auction'], request_data)
-    test_case.assertEqual(response.status, '200 OK')
-    test_case.assertEqual(response.json['data']["status"], 'active.rectification')
-    test_case.assertIn(expected_data, response.json['data']['auctionPeriod'].keys())
-
-
 def check_rectification_period_end(test_case):
     set_auction_period(test_case, test_case.auction)
     request_data = {'data': {'id': test_case.auction_id}}

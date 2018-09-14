@@ -128,8 +128,9 @@ def create_bid(test_case, auction):
 
     bid = response.json['data']
     access = response.json['access']
+    bid_owner = test_case.app.authorization
 
-    return bid, access
+    return {'data': bid, 'access': access, 'owner': bid_owner}
 
 
 def delete_bid(test_case, auction, bid, access):

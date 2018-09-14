@@ -64,8 +64,10 @@ class StatusActiveTenderingBidsTest(BaseAuctionWebTest):
                               self)
         state = get_procedure_state(procedure, 'active.tendering')
         self.auction = state.auction
-        self.bid, access = create_bid(self, self.auction)
-        self.bid_token = access['token']
+        bid_context = create_bid(self, self.auction)
+        self.bid_token = bid_context['access']['token']
+        access = bid_context['access']
+        self.bid = bid_context['data']
         entrypoints = {}
         add_document = '/auctions/{}/bids/{}/documents?acc_token={}'.format(self.auction_id,
                                                                             self.bid['id'],

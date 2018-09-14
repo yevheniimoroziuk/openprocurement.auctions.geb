@@ -9,25 +9,30 @@ from schematics.types.compound import ModelType
 from schematics.types.serializable import serializable
 from pyramid.security import Allow
 from zope.interface import implementer
-from openprocurement.auctions.landlease.interfaces import IAuction, IBid
+from openprocurement.auctions.landlease.interfaces import (
+    IAuction,
+    IBid,
+    IQuestion
+)
 from openprocurement.auctions.core.models import (
-    Model,
+    Administrator_bid_role,
     Administrator_role,
     Auction as BaseAuction,
-    BaseOrganization,
     BankAccount,
+    BaseOrganization,
     Guarantee,
+    Question,
     IsoDateTimeType,
     IsoDurationType,
     ListType,
+    Model,
     Period,
     Value,
-    dgfDocument,
     dgfCDB2Item,
     dgfCancellation,
+    dgfDocument,
     get_auction,
     validate_items_uniq,
-    Administrator_bid_role
 )
 from openprocurement.auctions.core.plugins.awarding.v2_1.models import Award
 from openprocurement.auctions.core.plugins.contracting.v2_1.models import Contract
@@ -53,6 +58,7 @@ from openprocurement.auctions.landlease.models.roles import (
     auction_enquiry_role,
     auction_edit_enquiry_role,
     auction_contractTerms_create_role,
+    question_enquiry_role,
     bid_view_role,
     bid_create_role,
     bid_pending_role,
@@ -73,6 +79,26 @@ class LandLeaseBidDocument(dgfDocument):
     documentOf = StringType(required=True, choices=['bid'], default='bid')
 
     documentType = StringType(choices=BID_DOCUMENT_TYPES)
+
+
+@implementer(IQuestion)
+class LandLeaseQuestion(Question):
+
+    class Options:
+        roles = {
+            'active.enquiry': question_enquiry_role
+        }
+
+    questionOf = StringType(required=True, choices=['tender', 'item'], default='tender')
+
+    def validate_relatedItem(self, data, relatedItem):
+        if not relatedItem and data.get('questionOf') in ['item']:
+            raise ValidationError(u'This field is required.')
+
+        if relatedItem:
+            auction = get_auction(data['__parent__'])
+            if data.get('questionOf') == 'item' and relatedItem not in [item.id for item in auction.items]:
+                raise ValidationError(u"relatedItem should be one of items")
 
 
 class LeaseTerms(Model):
@@ -99,7 +125,7 @@ class Cancellation(dgfCancellation):
     documents = ListType(ModelType(LandLeaseAuctionDocument), default=list())
 
 
-def rounding_shouldStartAfter(start_after, auction, use_from=datetime(2016, 6, 1, tzinfo=TZ)):  # TODO rm -rf black box
+def rounding_shouldStartAfter(start_after, auction, use_from=datetime(2016, 6, 1, tzinfo=TZ)):  # TODO rm black box
     if (auction.enquiryPeriod and auction.enquiryPeriod.startDate or get_now()) > use_from and not (SANDBOX_MODE and auction.submissionMethodDetails and u'quick' in auction.submissionMethodDetails):
         midnigth = datetime.combine(start_after.date(), time(0, tzinfo=start_after.tzinfo))
         if start_after >= midnigth:
@@ -134,7 +160,7 @@ Administrator_role = (Administrator_role + whitelist('awards'))
 
 
 @implementer(IBid)
-class Bid(Model):
+class LandLeaseBid(Model):
     class Options:
         roles = {
             'Administrator': Administrator_bid_role,
@@ -178,6 +204,14 @@ class Bid(Model):
             raise ValidationError("Bid value currency should be equal as Auction value currency")
         if value.valueAddedTaxIncluded != auction.value.valueAddedTaxIncluded:
             raise ValidationError("Bid value valueAddedTaxIncluded should be equal as Auction value valueAddedTaxIncluded")
+
+    def validate_bidNumber(self, data, bidNumber):
+        auction = data['__parent__']
+        if not bidNumber:
+            return
+        for bid in auction.bids:
+            if data['id'] != bid.id and bidNumber == bid.bidNumber:
+                raise ValidationError("bidNumber must be unique")
 
     def __local_roles__(self):
         return dict(
@@ -223,7 +257,9 @@ class Auction(BaseAuction):
 
     awards = ListType(ModelType(Award), default=list())
 
-    bids = ListType(ModelType(Bid), default=list())
+    bids = ListType(ModelType(LandLeaseBid), default=list())
+
+    questions = ListType(ModelType(LandLeaseQuestion), default=list())
 
     bankAccount = ModelType(BankAccount)
 
@@ -303,14 +339,16 @@ class Auction(BaseAuction):
 
     @serializable(serialize_when_none=False)
     def next_check(self):
-        checks = []
+        check = None
+
         if self.status == 'active.rectification':
-            checks.append(self.rectificationPeriod.endDate.astimezone(TZ))
-        if self.status == 'active.tendering':
-            checks.append(self.tenderPeriod.endDate.astimezone(TZ))
-        if self.status == 'active.enquiry':
-            checks.append(self.tenderPeriod.endDate.astimezone(TZ))
-        return min(checks).isoformat() if checks else None
+            check = self.rectificationPeriod.endDate.astimezone(TZ)
+        elif self.status == 'active.tendering':
+            check = self.tenderPeriod.endDate.astimezone(TZ)
+        elif self.status == 'active.enquiry':
+            check = self.tenderPeriod.endDate.astimezone(TZ)
+
+        return check.isoformat() if check else None
 
 
 LandLease = Auction

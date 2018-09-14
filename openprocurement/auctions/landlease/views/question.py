@@ -2,16 +2,26 @@
 from openprocurement.auctions.core.utils import (
     json_view,
     context_unpack,
-    get_now,
-    apply_patch,
-    save_auction,
     opresource,
 )
 from openprocurement.auctions.core.validation import (
     validate_question_data,
     validate_patch_question_data,
 )
-from openprocurement.auctions.core.views.mixins import AuctionQuestionResource
+
+from openprocurement.auctions.core.interfaces import (
+    IAuctionManager
+)
+
+from openprocurement.auctions.core.views.mixins import (
+    AuctionQuestionResource
+)
+
+from openprocurement.auctions.landlease.interfaces import (
+    IAuctionQuestioner,
+    IQuestionManager,
+    IQuestionChanger
+)
 
 
 @opresource(name='landlease:Auction Questions',
@@ -25,29 +35,42 @@ class AuctionQuestionResource(AuctionQuestionResource):
     def collection_post(self):
         """Post a question
         """
-        auction = self.request.validated['auction']
-        if auction.status != 'active.tendering' or get_now() < auction.enquiryPeriod.startDate or get_now() > auction.enquiryPeriod.endDate:
-            self.request.errors.add('body', 'data', 'Can add question only in enquiryPeriod')
-            self.request.errors.status = 403
-            return
-        question = self.request.validated['question']
-        auction.questions.append(question)
-        if save_auction(self.request):
-            self.LOGGER.info('Created auction question {}'.format(question.id), extra=context_unpack(self.request, {'MESSAGE_ID': 'auction_question_create'}, {'question_id': question.id}))
+        save = None
+
+        manager = self.request.registry.queryMultiAdapter((self.request, self.context), IAuctionManager)
+        questioner = self.request.registry.queryMultiAdapter((self.request, self.context), IAuctionQuestioner)
+
+        question = manager.add_question(questioner)
+        if question:
+            save = manager.save()
+
+        if save:
+            msg = 'Created auction question {}'.format(question['id'])
+            extra = context_unpack(self.request, {'MESSAGE_ID': 'auction_question_create'}, {'document_id': question['id']})
+            self.LOGGER.info(msg, extra=extra)
+
             self.request.response.status = 201
+
             route = self.request.matched_route.name.replace("collection_", "")
-            self.request.response.headers['Location'] = self.request.current_route_url(_route_name=route, question_id=question.id, _query={})
+            location = self.request.current_route_url(_route_name=route, question_id=question['id'], _query={})
+            self.request.response.headers['Location'] = location
             return {'data': question.serialize("view")}
 
     @json_view(content_type="application/json", permission='edit_auction', validators=(validate_patch_question_data,))
     def patch(self):
         """Post an Answer
         """
-        auction = self.request.validated['auction']
-        if auction.status != 'active.tendering':
-            self.request.errors.add('body', 'data', 'Can\'t update question in current ({}) auction status'.format(auction.status))
-            self.request.errors.status = 403
-            return
-        if apply_patch(self.request, src=self.request.context.serialize()):
-            self.LOGGER.info('Updated auction question {}'.format(self.request.context.id), extra=context_unpack(self.request, {'MESSAGE_ID': 'auction_question_patch'}))
-            return {'data': self.request.context.serialize(auction.status)}
+        save = None
+        question = self.request.context
+
+        manager = self.request.registry.queryMultiAdapter((self.request, self.context), IQuestionManager)
+        changer = self.request.registry.queryMultiAdapter((self.request, self.context), IQuestionChanger)
+
+        if manager.change(changer):
+            save = manager.save()
+
+        if save:
+            extra = context_unpack(self.request, {'MESSAGE_ID': 'auction_question_patch'})
+            msg = 'Updated auction question {}'.format(self.request.context.id)
+            self.LOGGER.info(msg, extra=extra)
+            return {'data': question.serialize(question.__parent__.status)}

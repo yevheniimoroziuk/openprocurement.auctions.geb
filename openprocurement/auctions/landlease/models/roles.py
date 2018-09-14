@@ -142,27 +142,6 @@ auction_enquiry_role = whitelist(
     'value'
 )
 
-auction_edit_rectification_role = whitelist(
-    'bankAccount',
-    'budgetSpent',
-    'contractTerms',
-    'description',
-    'description_en',
-    'description_ru',
-    'guarantee',
-    'items',
-    'lotHolder',
-    'lotIdentifier',
-    'minimalStep',
-    'procuringEntity',
-    'registrationFee',
-    'tenderAttempts',
-    'title',
-    'title_en',
-    'title_ru',
-    'value'
-)
-
 auction_edit_enquiry_role = whitelist(
     'bankAccount',
     'budgetSpent',
@@ -226,6 +205,15 @@ auction_edit_rectification_role = whitelist(
     'value'
 )
 
+question_enquiry_role = whitelist(
+    'date',
+    'title',
+    'description',
+    'questionOf',
+    'relatedItem',
+    'id'
+)
+
 bid_view_role = whitelist(
     'id',
     'status',
@@ -253,6 +241,7 @@ bid_edit_pending_role = whitelist(
     'id',
     'owner',
     'qualified',
+    'bidNumber'
 )
 
 bid_active_role = whitelist(

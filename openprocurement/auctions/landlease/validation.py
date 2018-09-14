@@ -8,9 +8,11 @@ from openprocurement.auctions.core.utils import (
     get_now
 )
 from openprocurement.auctions.landlease.constants import (
+    AUCTION_DOCUMENT_STATUSES,
+    AUCTION_STATUS_FOR_ADDING_QUESTIONS,
+    AUCTION_STATUS_FOR_CHANGING_QUESTIONS,
     AUCTION_STATUS_FOR_DELETING_BIDS,
-    PROCEDURE_DOCUMENT_STATUSES,
-    AUCTION_DOCUMENT_STATUSES
+    PROCEDURE_DOCUMENT_STATUSES
 )
 
 
@@ -49,22 +51,26 @@ def validate_change_bid_check_status(request):
 
 def validate_make_active_status_bid(request):
     now = get_now()
-    bid_documents = request.context.documents
-    auction = request.validated['auction']
+    bid = request.context
+    bid_documents = bid.documents
+    auction = bid.__parent__
     new_status = request.validated['json_data'].get('status')
 
     if request.authenticated_role == 'Administrator' or new_status != 'active':
         return True
 
     try:
-        if now > auction.enquiryPeriod.endDate:
-            raise Exception('Can`t activate bid, can only in active.tendering Auction status')
+        if auction.enquiryPeriod.startDate > now or now > auction.enquiryPeriod.endDate:
+            raise Exception('Can`t activate bid, can only in enquiry Period Auction status')
 
         if not any([document.documentType == 'eligibilityDocuments' for document in bid_documents]):
             raise Exception('Can`t activate bid, need document of documentType: eligibilityDocuments')
 
-        if request.context.qualified is not True:
+        if bid.qualified is not True:
             raise Exception('Can`t activate bid, qualified must be True')
+
+        if not bid.bidNumber:
+            raise Exception('Can`t activate bid, you must add the bidNumber')
 
     except Exception as err:
         request.errors.add('body', 'data', err.message)
@@ -101,6 +107,28 @@ def validate_document_editing_period(request, *kwargs):
 
     if auction_not_in_editable_state:
         err_msg = 'Can\'t make document operations in current ({}) auction status'.format(status)
+        request.errors.add('body', 'data', err_msg)
+        request.errors.status = 403
+        return False
+    return True
+
+
+def validate_question_adding_period(request):
+    auction = request.context
+
+    if auction.status not in AUCTION_STATUS_FOR_ADDING_QUESTIONS:
+        err_msg = 'Can add question only in {}'.format(AUCTION_STATUS_FOR_ADDING_QUESTIONS)
+        request.errors.add('body', 'data', err_msg)
+        request.errors.status = 403
+        return False
+    return True
+
+
+def validate_question_changing_period(request):
+    auction = request.context.__parent__
+
+    if auction.status not in AUCTION_STATUS_FOR_CHANGING_QUESTIONS:
+        err_msg = 'Can update question only in {}'.format(AUCTION_STATUS_FOR_CHANGING_QUESTIONS)
         request.errors.add('body', 'data', err_msg)
         request.errors.status = 403
         return False

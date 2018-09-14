@@ -17,7 +17,6 @@ from openprocurement.auctions.landlease.tests.helpers import (
 
 
 from openprocurement.auctions.landlease.tests.blanks.chronograph import (
-    set_auctionPeriod,
     check_tender_period_end_no_active_bids,
     check_tender_period_end_no_minNumberOfQualifiedBids,
     check_tender_period_end_successful,
@@ -31,7 +30,6 @@ from openprocurement.auctions.landlease.tests.blanks.chronograph import (
 class ChronographRectificationTest(BaseAuctionWebTest):
     initial_data = test_auction_data
 
-    test_set_auction_period = snitch(set_auctionPeriod)
     test_check_rectification_period_end = snitch(check_rectification_period_end)
 
     def setUp(self):
