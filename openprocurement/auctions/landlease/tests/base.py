@@ -8,12 +8,12 @@ from openprocurement.auctions.core.tests.base import (
 from openprocurement.auctions.core.tests.base import MOCK_CONFIG as BASE_MOCK_CONFIG
 from openprocurement.auctions.core.utils import connection_mock_config
 
-from openprocurement.auctions.landlease.tests.fixtures import (
+from openprocurement.auctions.geb.tests.fixtures import (
     PARTIAL_MOCK_CONFIG,
     test_auction_data
 )
 
-from openprocurement.auctions.landlease.tests.helpers import get_next_status
+from openprocurement.auctions.geb.tests.helpers import get_next_status
 
 MOCK_CONFIG = connection_mock_config(PARTIAL_MOCK_CONFIG,
                                      base=BASE_MOCK_CONFIG,
@@ -23,7 +23,7 @@ MOCK_CONFIG = connection_mock_config(PARTIAL_MOCK_CONFIG,
 
 class BaseWebTest(CoreBaseWebTest):
 
-    """Base Web Test to test openprocurement.auctions.landlease.
+    """Base Web Test to test openprocurement.auctions.geb.
 
     It setups the database before each test and delete it after.
     """

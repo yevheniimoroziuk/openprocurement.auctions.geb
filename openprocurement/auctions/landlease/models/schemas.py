@@ -9,7 +9,7 @@ from schematics.types.compound import ModelType
 from schematics.types.serializable import serializable
 from pyramid.security import Allow
 from zope.interface import implementer
-from openprocurement.auctions.landlease.interfaces import (
+from openprocurement.auctions.geb.interfaces import (
     IAuction,
     IBid,
     IQuestion
@@ -47,7 +47,7 @@ from openprocurement.auctions.core.validation import (
     kvtspz_validator
 )
 
-from openprocurement.auctions.landlease.constants import (
+from openprocurement.auctions.geb.constants import (
     AUCTION_DOCUMENT_TYPES,
     AUCTION_STATUSES,
     BID_DOCUMENT_TYPES,
@@ -55,7 +55,7 @@ from openprocurement.auctions.landlease.constants import (
     LANDLEASE_ITEM_ADDITIONAL_CLASSIFICATIONS
 )
 
-from openprocurement.auctions.landlease.models.roles import (
+from openprocurement.auctions.geb.models.roles import (
     auction_create_role,
     auction_rectification_role,
     auction_edit_rectification_role,
@@ -74,7 +74,7 @@ from openprocurement.auctions.landlease.models.roles import (
     bid_edit_pending_role
 )
 
-from openprocurement.auctions.landlease.validation import (
+from openprocurement.auctions.geb.validation import (
     cav_ps_code_validator
 )
 
@@ -285,7 +285,7 @@ class Auction(BaseAuction):
             roles['{}_{}'.format(i.owner, i.owner_token)] = 'bid_owner'
         return roles
 
-    _internal_type = "landlease"
+    _internal_type = "geb"
 
     auctionPeriod = ModelType(AuctionAuctionPeriod, required=True, default={})
     auctionParameters = ModelType(AuctionParameters)

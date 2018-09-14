@@ -1,10 +1,10 @@
 from zope.interface import implementer
 
-from openprocurement.auctions.landlease.interfaces import (
+from openprocurement.auctions.geb.interfaces import (
     IBidDeleter
 )
 
-from openprocurement.auctions.landlease.validation import (
+from openprocurement.auctions.geb.validation import (
     check_auction_status_for_deleting_bids
 )
 

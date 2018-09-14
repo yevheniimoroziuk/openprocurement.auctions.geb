@@ -3,11 +3,11 @@ from copy import deepcopy
 from openprocurement.auctions.core.tests.base import (
     test_document_data,
 )
-from openprocurement.auctions.landlease.tests.fixtures import (
+from openprocurement.auctions.geb.tests.fixtures import (
     test_question_data,
     test_bid_data
 )
-from openprocurement.auctions.landlease.tests.helpers import (
+from openprocurement.auctions.geb.tests.helpers import (
     create_question,
     get_errors_names
 )

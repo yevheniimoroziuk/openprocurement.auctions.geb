@@ -5,15 +5,15 @@ from openprocurement.auctions.core.tests.base import (
     test_organization,
 )
 
-from openprocurement.auctions.landlease.constants import (
+from openprocurement.auctions.geb.constants import (
     DEFAULT_PROCUREMENT_METHOD_TYPE
 )
 
 PARTIAL_MOCK_CONFIG = {
-    "auctions.landlease": {
+    "auctions.geb": {
         "use_default": True,
         "plugins": {
-            "landlease.migration": None
+            "geb.migration": None
         },
         "migration": False,
         "aliases": [],

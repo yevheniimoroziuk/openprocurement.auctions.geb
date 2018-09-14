@@ -11,7 +11,7 @@
 Introduction
 ============
 
-openprocurement.auctions.landlease
+openprocurement.auctions.geb
 
 Documentation will be ...
 

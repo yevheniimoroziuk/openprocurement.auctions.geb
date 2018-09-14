@@ -1,7 +1,7 @@
 import datetime
 import iso8601
 from mock import patch
-from openprocurement.auctions.landlease.tests.helpers import (
+from openprocurement.auctions.geb.tests.helpers import (
     set_auction_period,
     create_active_bid,
     delete_bid
@@ -14,7 +14,7 @@ def check_rectification_period_end(test_case):
     endDate = test_case.auction['rectificationPeriod']['endDate']
     mock_time = iso8601.parse_date(endDate) + datetime.timedelta(minutes=5)
 
-    with patch('openprocurement.auctions.landlease.adapters.checkers.get_now',) as mock_get_now:
+    with patch('openprocurement.auctions.geb.adapters.checkers.get_now',) as mock_get_now:
         mock_get_now.return_value = mock_time
         response = test_case.app.patch_json(test_case.ENTRYPOINTS['auction'], request_data)
 
@@ -28,7 +28,7 @@ def check_tender_period_end_no_active_bids(test_case):
     endDate = test_case.auction['tenderPeriod']['endDate']
     mock_time = iso8601.parse_date(endDate) + datetime.timedelta(minutes=5)
 
-    with patch('openprocurement.auctions.landlease.adapters.checkers.get_now',) as mock_get_now:
+    with patch('openprocurement.auctions.geb.adapters.checkers.get_now',) as mock_get_now:
         mock_get_now.return_value = mock_time
         response = test_case.app.patch_json(test_case.ENTRYPOINTS['auction'], request_data)
 
@@ -45,7 +45,7 @@ def check_tender_period_end_no_minNumberOfQualifiedBids(test_case):
     endDate = test_case.auction['tenderPeriod']['endDate']
     mock_time = iso8601.parse_date(endDate) + datetime.timedelta(minutes=5)
 
-    with patch('openprocurement.auctions.landlease.adapters.checkers.get_now',) as mock_get_now:
+    with patch('openprocurement.auctions.geb.adapters.checkers.get_now',) as mock_get_now:
         mock_get_now.return_value = mock_time
         response = test_case.app.patch_json(test_case.ENTRYPOINTS['auction'], request_data)
 
@@ -63,7 +63,7 @@ def check_tender_period_end_successful(test_case):
     endDate = test_case.auction['tenderPeriod']['endDate']
     mock_time = iso8601.parse_date(endDate) + datetime.timedelta(minutes=5)
 
-    with patch('openprocurement.auctions.landlease.adapters.checkers.get_now',) as mock_get_now:
+    with patch('openprocurement.auctions.geb.adapters.checkers.get_now',) as mock_get_now:
         mock_get_now.return_value = mock_time
         response = test_case.app.patch_json(test_case.ENTRYPOINTS['auction'], request_data)
 
@@ -84,7 +84,7 @@ def check_enquiry_period_end_unsuccessful(test_case):
     endDate = test_case.auction['enquiryPeriod']['endDate']
     mock_time = iso8601.parse_date(endDate) + datetime.timedelta(minutes=5)
 
-    with patch('openprocurement.auctions.landlease.adapters.checkers.get_now',) as mock_get_now:
+    with patch('openprocurement.auctions.geb.adapters.checkers.get_now',) as mock_get_now:
         mock_get_now.return_value = mock_time
         response = test_case.app.patch_json(test_case.ENTRYPOINTS['auction'], request_data)
 
@@ -111,7 +111,7 @@ def check_enquiry_period_end_active_qualification(test_case):
     endDate = test_case.auction['enquiryPeriod']['endDate']
     mock_time = iso8601.parse_date(endDate) + datetime.timedelta(minutes=5)
 
-    with patch('openprocurement.auctions.landlease.adapters.checkers.get_now',) as mock_get_now:
+    with patch('openprocurement.auctions.geb.adapters.checkers.get_now',) as mock_get_now:
         mock_get_now.return_value = mock_time
         response = test_case.app.patch_json(test_case.ENTRYPOINTS['auction'], request_data)
 
@@ -126,7 +126,7 @@ def check_enquiry_period_end_active_auction(test_case):
     endDate = test_case.auction['enquiryPeriod']['endDate']
     mock_time = iso8601.parse_date(endDate) + datetime.timedelta(minutes=5)
 
-    with patch('openprocurement.auctions.landlease.adapters.checkers.get_now',) as mock_get_now:
+    with patch('openprocurement.auctions.geb.adapters.checkers.get_now',) as mock_get_now:
         mock_get_now.return_value = mock_time
         response = test_case.app.patch_json(test_case.ENTRYPOINTS['auction'], request_data)
 
@@ -141,7 +141,7 @@ def check_enquiry_period_end_set_unsuccessful_bids(test_case):
     endDate = test_case.auction['enquiryPeriod']['endDate']
     mock_time = iso8601.parse_date(endDate) + datetime.timedelta(minutes=5)
 
-    with patch('openprocurement.auctions.landlease.adapters.checkers.get_now',) as mock_get_now:
+    with patch('openprocurement.auctions.geb.adapters.checkers.get_now',) as mock_get_now:
         mock_get_now.return_value = mock_time
         test_case.app.patch_json(test_case.ENTRYPOINTS['auction'], request_data)
 

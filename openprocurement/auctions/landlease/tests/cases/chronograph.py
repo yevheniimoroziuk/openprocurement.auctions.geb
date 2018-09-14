@@ -2,21 +2,21 @@
 import unittest
 
 from openprocurement.auctions.core.tests.base import snitch
-from openprocurement.auctions.landlease.tests.base import (
+from openprocurement.auctions.geb.tests.base import (
     test_auction_data,
     BaseAuctionWebTest,
 )
 
-from openprocurement.auctions.landlease.tests.states import (
+from openprocurement.auctions.geb.tests.states import (
     Procedure
 )
 
-from openprocurement.auctions.landlease.tests.helpers import (
+from openprocurement.auctions.geb.tests.helpers import (
     get_procedure_state
 )
 
 
-from openprocurement.auctions.landlease.tests.blanks.chronograph import (
+from openprocurement.auctions.geb.tests.blanks.chronograph import (
     check_tender_period_end_no_active_bids,
     check_tender_period_end_no_minNumberOfQualifiedBids,
     check_tender_period_end_successful,

@@ -1,7 +1,7 @@
 import iso8601
 from collections import Mapping, Sequence
-from openprocurement.auctions.landlease.tests.specifications import STATUS_CHANGES
-from openprocurement.auctions.landlease.tests.fixtures import (
+from openprocurement.auctions.geb.tests.specifications import STATUS_CHANGES
+from openprocurement.auctions.geb.tests.fixtures import (
     test_question_data,
     test_bid_data
 )

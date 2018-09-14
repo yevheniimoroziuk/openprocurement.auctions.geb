@@ -1,5 +1,5 @@
 
-from openprocurement.auctions.landlease.tests.helpers import (
+from openprocurement.auctions.geb.tests.helpers import (
     get_next_status,
 )
 

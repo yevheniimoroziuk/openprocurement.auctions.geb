@@ -3,7 +3,7 @@
 from openprocurement.auctions.core.adapters import (
     AuctionConfigurator as BaseAuctionConfigurator,
 )
-from openprocurement.auctions.landlease.models.schemas import (
+from openprocurement.auctions.geb.models.schemas import (
     LandLease
 )
 from openprocurement.auctions.core.plugins.awarding.v2_1.adapters import (

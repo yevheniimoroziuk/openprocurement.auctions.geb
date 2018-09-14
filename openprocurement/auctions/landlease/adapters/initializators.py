@@ -2,7 +2,7 @@
 from zope.interface import implementer
 from datetime import timedelta
 
-from openprocurement.auctions.landlease.interfaces import (
+from openprocurement.auctions.geb.interfaces import (
     IAuctionInitializator,
     IBidInitializator
 )
@@ -12,7 +12,7 @@ from openprocurement.auctions.core.utils import (
     get_now
 )
 
-from openprocurement.auctions.landlease.constants import (
+from openprocurement.auctions.geb.constants import (
     RECTIFICATION_PERIOD_DURATION,
     TENDER_PERIOD_DURATION,
     AUCTION_PARAMETERS_TYPE

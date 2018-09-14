@@ -17,18 +17,18 @@ from openprocurement.auctions.core.interfaces import (
     IAuctionManager
 )
 
-from openprocurement.auctions.landlease.interfaces import (
+from openprocurement.auctions.geb.interfaces import (
     IAuctionDocumenter
 )
-from openprocurement.auctions.landlease.utils import (
+from openprocurement.auctions.geb.utils import (
     upload_file, get_file, invalidate_bids_data
 )
 
 
-@opresource(name='landlease:Auction Documents',
+@opresource(name='geb:Auction Documents',
             collection_path='/auctions/{auction_id}/documents',
             path='/auctions/{auction_id}/documents/{document_id}',
-            auctionsprocurementMethodType="landlease",
+            auctionsprocurementMethodType="geb",
             description="Auction related binary files (PDFs, etc.)")
 class AuctionDocumentResource(AuctionDocumentResource):
 

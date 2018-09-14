@@ -1,6 +1,6 @@
 from zope.interface import implementer
 
-from openprocurement.auctions.landlease.interfaces import (
+from openprocurement.auctions.geb.interfaces import (
     IAuctionChanger,
     IBidChanger,
     IQuestionChanger
@@ -10,7 +10,7 @@ from openprocurement.auctions.core.utils import (
     apply_patch,
 )
 
-from openprocurement.auctions.landlease.validation import (
+from openprocurement.auctions.geb.validation import (
     validate_change_bid_check_auction_status,
     validate_change_bid_check_status,
     validate_make_active_status_bid,

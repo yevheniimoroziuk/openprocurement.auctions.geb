@@ -1,14 +1,14 @@
 from zope.interface import implementer
 
-from openprocurement.auctions.landlease.interfaces import (
+from openprocurement.auctions.geb.interfaces import (
     IAuctionDocumenter
 )
 
-from openprocurement.auctions.landlease.validation import (
+from openprocurement.auctions.geb.validation import (
     validate_document_editing_period
 )
 
-from openprocurement.auctions.landlease.utils import (
+from openprocurement.auctions.geb.utils import (
     upload_file
 )
 

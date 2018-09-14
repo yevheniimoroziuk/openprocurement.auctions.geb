@@ -6,7 +6,7 @@ from openprocurement.auctions.core.utils import (
 )
 from openprocurement.auctions.core.tests.base import IsoDateTimeType
 
-from openprocurement.auctions.landlease.tests.helpers import (
+from openprocurement.auctions.geb.tests.helpers import (
     get_next_status,
     get_period_duration,
     create_active_bid,

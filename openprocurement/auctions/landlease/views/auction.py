@@ -12,15 +12,15 @@ from openprocurement.auctions.core.validation import (
 )
 from openprocurement.auctions.core.views.mixins import AuctionAuctionResource
 
-from openprocurement.auctions.landlease.utils import (
+from openprocurement.auctions.geb.utils import (
     invalidate_bids_under_threshold
 )
 
 
-@opresource(name='landlease:Auction Auction',
+@opresource(name='geb:Auction Auction',
             collection_path='/auctions/{auction_id}/auction',
             path='/auctions/{auction_id}/auction/{auction_lot_id}',
-            auctionsprocurementMethodType="landlease",
+            auctionsprocurementMethodType="geb",
             description="auction auction data")
 class AuctionAuctionResource(AuctionAuctionResource):
 

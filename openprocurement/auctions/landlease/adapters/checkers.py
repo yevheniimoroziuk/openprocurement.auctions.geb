@@ -1,6 +1,6 @@
 from zope.interface import implementer
 
-from openprocurement.auctions.landlease.interfaces import (
+from openprocurement.auctions.geb.interfaces import (
     IAuctionChecker
 )
 

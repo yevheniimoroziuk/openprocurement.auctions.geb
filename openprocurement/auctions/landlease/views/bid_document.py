@@ -2,13 +2,13 @@
 from openprocurement.auctions.core.utils import opresource
 from openprocurement.auctions.core.views.mixins import AuctionBidDocumentResource
 
-from openprocurement.auctions.landlease.constants import BID_STATUSES_FOR_ADDING_DOCUMENTS
+from openprocurement.auctions.geb.constants import BID_STATUSES_FOR_ADDING_DOCUMENTS
 
 
-@opresource(name='landlease:Auction Bid Documents',
+@opresource(name='geb:Auction Bid Documents',
             collection_path='/auctions/{auction_id}/bids/{bid_id}/documents',
             path='/auctions/{auction_id}/bids/{bid_id}/documents/{document_id}',
-            auctionsprocurementMethodType="landlease",
+            auctionsprocurementMethodType="geb",
             description="Auction bidder documents")
 class AuctionBidDocumentResource(AuctionBidDocumentResource):
 

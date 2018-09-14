@@ -8,19 +8,19 @@ from openprocurement.auctions.core.views.mixins import AuctionResource
 from openprocurement.auctions.core.interfaces import (
     IAuctionManager
 )
-from openprocurement.auctions.landlease.interfaces import (
+from openprocurement.auctions.geb.interfaces import (
     IAuctionChanger,
     IAuctionChecker
 )
 
-from openprocurement.auctions.landlease.validation import (
+from openprocurement.auctions.geb.validation import (
     validate_patch_auction_data
 )
 
 
-@opresource(name='landlease:Auction',
+@opresource(name='geb:Auction',
             path='/auctions/{auction_id}',
-            auctionsprocurementMethodType="landlease")
+            auctionsprocurementMethodType="geb")
 class AuctionResource(AuctionResource):
 
     @json_view(content_type="application/json",

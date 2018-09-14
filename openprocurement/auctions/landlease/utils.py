@@ -13,7 +13,7 @@ from openprocurement.auctions.core.utils import (
     get_now
 )
 
-from openprocurement.auctions.landlease.constants import (
+from openprocurement.auctions.geb.constants import (
     DOCUMENT_TYPE_URL_ONLY,
     DOCUMENT_TYPE_OFFLINE
 )

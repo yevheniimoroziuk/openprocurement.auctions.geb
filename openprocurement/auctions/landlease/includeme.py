@@ -11,7 +11,7 @@ from openprocurement.auctions.core.interfaces import (
     IAuctionInitializator
 )
 
-from openprocurement.auctions.landlease.adapters.managers import (
+from openprocurement.auctions.geb.adapters.managers import (
     BidManager,
     QuestionManager
 )
@@ -19,40 +19,40 @@ from openprocurement.auctions.landlease.adapters.managers import (
 from openprocurement.auctions.core.adapters import (
     AuctionManagerAdapter
 )
-from openprocurement.auctions.landlease.adapters.configurators import (
+from openprocurement.auctions.geb.adapters.configurators import (
     AuctionConfigurator,
 )
-from openprocurement.auctions.landlease.adapters.changers import (
+from openprocurement.auctions.geb.adapters.changers import (
     AuctionChanger,
     QuestionChanger,
     BidChanger
 )
-from openprocurement.auctions.landlease.adapters.documenters import (
+from openprocurement.auctions.geb.adapters.documenters import (
     AuctionDocumenter
 )
-from openprocurement.auctions.landlease.adapters.questioners import (
+from openprocurement.auctions.geb.adapters.questioners import (
     AuctionQuestioner
 )
-from openprocurement.auctions.landlease.adapters.checkers import (
+from openprocurement.auctions.geb.adapters.checkers import (
     AuctionChecker
 )
-from openprocurement.auctions.landlease.adapters.deleters import (
+from openprocurement.auctions.geb.adapters.deleters import (
     BidDeleter
 )
-from openprocurement.auctions.landlease.adapters.initializators import (
+from openprocurement.auctions.geb.adapters.initializators import (
     AuctionInitializator,
     BidInitializator
 )
 
-from openprocurement.auctions.landlease.constants import (
+from openprocurement.auctions.geb.constants import (
     DEFAULT_LEVEL_OF_ACCREDITATION,
     DEFAULT_PROCUREMENT_METHOD_TYPE,
 )
-from openprocurement.auctions.landlease.models.schemas import (
+from openprocurement.auctions.geb.models.schemas import (
     LandLease
 )
 
-from openprocurement.auctions.landlease.interfaces import (
+from openprocurement.auctions.geb.interfaces import (
     IAuction,
     IAuctionChanger,
     IAuctionChecker,
@@ -152,10 +152,10 @@ def includeme(config, plugin_map):
         config.add_auction_procurementMethodType(LandLease,
                                                  procurementMethodType)
 
-    config.scan("openprocurement.auctions.landlease.views")
+    config.scan("openprocurement.auctions.geb.views")
     registrator(config)
 
-    LOGGER.info("Included openprocurement.auctions.landlease plugin",
+    LOGGER.info("Included openprocurement.auctions.geb plugin",
                 extra={'MESSAGE_ID': 'included_plugin'})
 
     # add accreditation level
@@ -166,4 +166,4 @@ def includeme(config, plugin_map):
 
     # migrate data
     if plugin_map['migration'] and not os.environ.get('MIGRATION_SKIP'):
-        get_evenly_plugins(config, plugin_map['plugins'], 'openprocurement.auctions.landlease.plugins')
+        get_evenly_plugins(config, plugin_map['plugins'], 'openprocurement.auctions.geb.plugins')

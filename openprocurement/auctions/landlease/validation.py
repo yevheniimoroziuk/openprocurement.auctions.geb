@@ -9,7 +9,7 @@ from openprocurement.auctions.core.validation import (
 from openprocurement.auctions.core.utils import (
     get_now
 )
-from openprocurement.auctions.landlease.constants import (
+from openprocurement.auctions.geb.constants import (
     AUCTION_DOCUMENT_STATUSES,
     AUCTION_STATUS_FOR_ADDING_QUESTIONS,
     AUCTION_STATUS_FOR_CHANGING_QUESTIONS,

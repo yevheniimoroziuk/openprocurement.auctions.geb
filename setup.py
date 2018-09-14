@@ -5,10 +5,10 @@ version = '1.2.1'
 
 entry_points = {
     'openprocurement.auctions.core.plugins': [
-        'auctions.landlease = openprocurement.auctions.landlease.includeme:includeme',
+        'auctions.geb = openprocurement.auctions.geb.includeme:includeme',
     ],
-    'openprocurement.auctions.landlease.plugins': [
-        'landlease.migration = openprocurement.auctions.landlease.migration:migrate_data',
+    'openprocurement.auctions.geb.plugins': [
+        'geb.migration = openprocurement.auctions.geb.migration:migrate_data',
     ]
 }
 
@@ -24,7 +24,7 @@ docs_requires = requires + [
     'sphinxcontrib-httpdomain',
 ]
 
-setup(name='openprocurement.auctions.landlease',
+setup(name='openprocurement.auctions.geb',
       version=version,
       description="",
       long_description=open("README.rst").read() + "\n" + open(os.path.join("docs", "HISTORY.txt")).read(),
@@ -37,7 +37,7 @@ setup(name='openprocurement.auctions.landlease',
       author='Quintagroup, Ltd.',
       author_email='info@quintagroup.com',
       license='Apache License 2.0',
-      url='https://github.com/openprocurement/openprocurement.auctions.landlease',
+      url='https://github.com/openprocurement/openprocurement.auctions.geb',
       packages=find_packages(exclude=['ez_setup']),
       namespace_packages=['openprocurement', 'openprocurement.auctions'],
       include_package_data=True,

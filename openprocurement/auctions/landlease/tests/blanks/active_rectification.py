@@ -1,9 +1,9 @@
 from copy import deepcopy
 
-from openprocurement.auctions.landlease.tests.helpers import (
+from openprocurement.auctions.geb.tests.helpers import (
     get_expected_value
 )
-from openprocurement.auctions.landlease.tests.fixtures import (
+from openprocurement.auctions.geb.tests.fixtures import (
     test_item,
     test_procuringEntity,
     test_lotHolder,
@@ -14,7 +14,7 @@ from openprocurement.auctions.core.tests.base import (
     test_document_data
 )
 
-from openprocurement.auctions.landlease.tests.specifications import REQUIRED_SCHEME_DEFINITION
+from openprocurement.auctions.geb.tests.specifications import REQUIRED_SCHEME_DEFINITION
 
 
 def change_title(self):

@@ -1,5 +1,5 @@
 from copy import deepcopy
-from openprocurement.auctions.landlease.tests.helpers import (
+from openprocurement.auctions.geb.tests.helpers import (
     get_specification_fields,
     get_error_description,
     get_expected_value,
@@ -8,7 +8,7 @@ from openprocurement.auctions.landlease.tests.helpers import (
 )
 
 from collections import Mapping
-from openprocurement.auctions.landlease.tests.specifications import (
+from openprocurement.auctions.geb.tests.specifications import (
     REQUIRED_SCHEME_DEFINITION
 )
 

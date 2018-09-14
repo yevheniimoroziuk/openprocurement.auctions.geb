@@ -8,7 +8,7 @@ from openprocurement.auctions.core.views.mixins import AuctionBidResource
 from openprocurement.auctions.core.validation import (
     validate_patch_bid_data
 )
-from openprocurement.auctions.landlease.interfaces import (
+from openprocurement.auctions.geb.interfaces import (
     IBidManager,
     IBidChanger,
     IBidDeleter,
@@ -16,10 +16,10 @@ from openprocurement.auctions.landlease.interfaces import (
 )
 
 
-@opresource(name='landlease:Auction Bids',
+@opresource(name='geb:Auction Bids',
             collection_path='/auctions/{auction_id}/bids',
             path='/auctions/{auction_id}/bids/{bid_id}',
-            auctionsprocurementMethodType="landlease",
+            auctionsprocurementMethodType="geb",
             description="Auction bids")
 class AuctionBidResource(AuctionBidResource):
     pass

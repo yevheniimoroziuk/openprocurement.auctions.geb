@@ -3,19 +3,19 @@
 import unittest
 
 from openprocurement.auctions.core.tests.base import snitch
-from openprocurement.auctions.landlease.tests.base import (
+from openprocurement.auctions.geb.tests.base import (
     test_auction_data,
     BaseAuctionWebTest,
 )
 
-from openprocurement.auctions.landlease.tests.states import (
+from openprocurement.auctions.geb.tests.states import (
     Procedure
 )
 
-from openprocurement.auctions.landlease.tests.helpers import (
+from openprocurement.auctions.geb.tests.helpers import (
     get_procedure_state,
 )
-from openprocurement.auctions.landlease.tests.blanks.active_enquiry import (
+from openprocurement.auctions.geb.tests.blanks.active_enquiry import (
     add_document,
     add_question,
     answer_question,

@@ -3,13 +3,13 @@ import unittest
 
 from openprocurement.auctions.core.tests.base import snitch
 
-from openprocurement.auctions.landlease.tests.base import (
+from openprocurement.auctions.geb.tests.base import (
     test_auction_data,
     BaseWebTest,
     BaseAuctionWebTest,
 )
 
-from openprocurement.auctions.landlease.tests.blanks.procedure import (
+from openprocurement.auctions.geb.tests.blanks.procedure import (
     create_auction_common,
     create_auction,
     create_auction_invalid_required_fields,
@@ -24,7 +24,7 @@ from openprocurement.auctions.landlease.tests.blanks.procedure import (
     create_invalid_minNumberOfQualifiedBids
 )
 
-from openprocurement.auctions.landlease.tests.specifications import (
+from openprocurement.auctions.geb.tests.specifications import (
     REQUIRED_SCHEME_DEFINITION
 )
 
@@ -38,7 +38,7 @@ class CreateAuctionResourceTest(BaseWebTest):
 
 class CreateInvalidAuctionResourceTest(BaseWebTest):
     initial_data = test_auction_data
-    resource_name = 'landlease'
+    resource_name = 'geb'
 
     test_create_auction_invalid_required_fields = snitch(create_auction_invalid_required_fields)
     test_create_auction_invalid_unsupported_media_type = snitch(create_auction_invalid_unsupported_media_type)

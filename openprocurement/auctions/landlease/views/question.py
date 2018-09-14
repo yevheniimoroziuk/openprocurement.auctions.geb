@@ -17,17 +17,17 @@ from openprocurement.auctions.core.views.mixins import (
     AuctionQuestionResource
 )
 
-from openprocurement.auctions.landlease.interfaces import (
+from openprocurement.auctions.geb.interfaces import (
     IAuctionQuestioner,
     IQuestionManager,
     IQuestionChanger
 )
 
 
-@opresource(name='landlease:Auction Questions',
+@opresource(name='geb:Auction Questions',
             collection_path='/auctions/{auction_id}/questions',
             path='/auctions/{auction_id}/questions/{question_id}',
-            auctionsprocurementMethodType="landlease",
+            auctionsprocurementMethodType="geb",
             description="Auction questions")
 class AuctionQuestionResource(AuctionQuestionResource):
 

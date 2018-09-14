@@ -6,10 +6,10 @@ from datetime import timedelta, datetime
 
 from openprocurement.auctions.core.utils import get_now
 from openprocurement.auctions.core.tests.base import PrefixedRequestClass
-import openprocurement.auctions.landlease.tests.base as base_test
-from openprocurement.auctions.landlease.tests.base import test_auction_data as base_test_auction_data, test_bids
-from openprocurement.auctions.landlease.tests.base import test_auction_maximum_data
-from openprocurement.auctions.landlease.tests.tender import BaseAuctionWebTest
+import openprocurement.auctions.geb.tests.base as base_test
+from openprocurement.auctions.geb.tests.base import test_auction_data as base_test_auction_data, test_bids
+from openprocurement.auctions.geb.tests.base import test_auction_maximum_data
+from openprocurement.auctions.geb.tests.tender import BaseAuctionWebTest
 from webtest import TestApp
 
 now = datetime.now()

@@ -1,11 +1,11 @@
 
 from zope.interface import implementer
 
-from openprocurement.auctions.landlease.interfaces import (
+from openprocurement.auctions.geb.interfaces import (
     IAuctionQuestioner
 )
 
-from openprocurement.auctions.landlease.validation import (
+from openprocurement.auctions.geb.validation import (
     validate_question_adding_period
 )
 
