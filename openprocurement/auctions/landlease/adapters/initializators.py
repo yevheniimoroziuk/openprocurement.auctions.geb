@@ -33,7 +33,8 @@ class AuctionInitializator(object):
         start_date = self._now
         end_date = calculate_business_date(self._context.auctionPeriod.startDate,
                                            -timedelta(days=1),
-                                           self._context)
+                                           self._context,
+                                           specific_hour=20)
 
         period.startDate = start_date
         period.endDate = end_date
@@ -46,7 +47,8 @@ class AuctionInitializator(object):
         start_date = self._context.rectificationPeriod.endDate
         end_date = calculate_business_date(start_date,
                                            TENDER_PERIOD_DURATION,
-                                           self._context)
+                                           self._context,
+                                           working_days=True)
 
         period.startDate = start_date
         period.endDate = end_date

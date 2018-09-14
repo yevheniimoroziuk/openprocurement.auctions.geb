@@ -23,7 +23,8 @@ from openprocurement.auctions.landlease.tests.blanks.chronograph import (
     check_enquiry_period_end_unsuccessful,
     check_enquiry_period_end_active_auction,
     check_enquiry_period_end_active_qualification,
-    check_rectification_period_end
+    check_rectification_period_end,
+    check_enquiry_period_end_set_unsuccessful_bids
 )
 
 
@@ -75,6 +76,7 @@ class ChronographEnquiryTest(BaseAuctionWebTest):
     test_unsuccessful = snitch(check_enquiry_period_end_unsuccessful)
     test_active_auction = snitch(check_enquiry_period_end_active_auction)
     test_active_qualification = snitch(check_enquiry_period_end_active_qualification)
+    test_check_set_unsuccessful_bids = snitch(check_enquiry_period_end_set_unsuccessful_bids)
 
     def setUp(self):
         super(ChronographEnquiryTest, self).setUp()

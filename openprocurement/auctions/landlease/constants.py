@@ -78,7 +78,7 @@ BID_STATUSES = [
     'draft',
     'pending',
     'active',
-    'deleted'
+    'unsuccessful'
 ]
 
 BID_STATUSES_FOR_ADDING_DOCUMENTS = [
@@ -86,3 +86,26 @@ BID_STATUSES_FOR_ADDING_DOCUMENTS = [
     'active.enquiry',
     'active.qualification'
 ]
+
+
+CAV_PS_CODES = [
+    "06110000-6",
+    "06111000-3",
+    "06112000-0",
+    "06120000-9",
+    "06121000-6",
+    "06122000-3",
+    "06123000-0",
+    "06124000-7",
+    "06125000-4",
+    "06126000-1",
+    "06127000-8",
+    "06128000-5",
+    "06129000-2"
+]
+
+LANDLEASE_ITEM_ADDITIONAL_CLASSIFICATIONS = (
+    u'CPVS',
+    u'cadastralNumber',
+    u'kvtspz'
+)

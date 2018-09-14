@@ -1,4 +1,6 @@
 # -*- coding: utf-8 -*-
+from schematics.exceptions import ValidationError
+from schematics.types import BaseType
 from openprocurement.auctions.core.validation import (
     validate_json_data,
     validate_data
@@ -12,7 +14,8 @@ from openprocurement.auctions.landlease.constants import (
     AUCTION_STATUS_FOR_ADDING_QUESTIONS,
     AUCTION_STATUS_FOR_CHANGING_QUESTIONS,
     AUCTION_STATUS_FOR_DELETING_BIDS,
-    PROCEDURE_DOCUMENT_STATUSES
+    PROCEDURE_DOCUMENT_STATUSES,
+    CAV_PS_CODES
 )
 
 
@@ -133,3 +136,8 @@ def validate_question_changing_period(request):
         request.errors.status = 403
         return False
     return True
+
+
+def cav_ps_code_validator(data, code):
+    if code not in CAV_PS_CODES:
+        raise ValidationError(BaseType.MESSAGES['choices'].format(CAV_PS_CODES))

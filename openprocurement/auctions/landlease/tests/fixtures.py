@@ -41,10 +41,22 @@ test_lotHolder = test_organization.copy()
 test_item = {
     "description": u"Земля для військовослужбовців",
     "classification": {
-        "scheme": u"CPV",
-        "id": u"66113000-5",
+        "scheme": u"CAV-PS",
+        "id": "06110000-6",
         "description": u"Земельні ділянки"
     },
+    "additionalClassifications": [
+            {
+                "scheme": u"kvtspz",
+                "id": "01.04",
+                "description": "Test"
+            },
+            {
+                "scheme": "cadastralNumber",
+                "id": "42",
+                "description": "Test"
+            }
+    ],
     "unit": {
         "name": u"item",
         "code": u"44617100-9"
@@ -123,7 +135,7 @@ test_bid_data = {
     "data": {
         "status": "draft",
         "qualified": True,
-        "value":test_auction_value,
+        "value": test_auction_value,
         "tenderers": [test_organization]
     }
 }

@@ -20,19 +20,20 @@ from openprocurement.auctions.core.models import (
     Auction as BaseAuction,
     BankAccount,
     BaseOrganization,
+    Classification,
     Guarantee,
-    Question,
     IsoDateTimeType,
     IsoDurationType,
     ListType,
     Model,
     Period,
+    Question,
     Value,
     dgfCDB2Item,
     dgfCancellation,
     dgfDocument,
     get_auction,
-    validate_items_uniq,
+    validate_items_uniq
 )
 from openprocurement.auctions.core.plugins.awarding.v2_1.models import Award
 from openprocurement.auctions.core.plugins.contracting.v2_1.models import Contract
@@ -41,12 +42,17 @@ from openprocurement.auctions.core.utils import (
     TZ,
     get_now
 )
+from openprocurement.auctions.core.validation import (
+    cpvs_validator,
+    kvtspz_validator
+)
 
 from openprocurement.auctions.landlease.constants import (
     AUCTION_DOCUMENT_TYPES,
     AUCTION_STATUSES,
     BID_DOCUMENT_TYPES,
     BID_STATUSES,
+    LANDLEASE_ITEM_ADDITIONAL_CLASSIFICATIONS
 )
 
 from openprocurement.auctions.landlease.models.roles import (
@@ -66,6 +72,10 @@ from openprocurement.auctions.landlease.models.roles import (
     bid_edit_draft_role,
     bid_edit_active_role,
     bid_edit_pending_role
+)
+
+from openprocurement.auctions.landlease.validation import (
+    cav_ps_code_validator
 )
 
 
@@ -172,7 +182,7 @@ class LandLeaseBid(Model):
             'edit_pending': bid_edit_pending_role,
             'active': bid_active_role,
             'edit_active': bid_edit_active_role,
-
+            'unsuccessful': bid_view_role
         }
 
     tenderers = ListType(ModelType(BaseOrganization), required=True, min_size=1, max_size=1)
@@ -221,6 +231,33 @@ class LandLeaseBid(Model):
         return [
             (Allow, '{}_{}'.format(self.owner, self.owner_token), 'edit_bid')
         ]
+
+
+class LandLeaseClassification(Classification):
+    scheme = StringType(required=True, default='CAV-PS', choices=['CAV-PS'])
+    _id_field_validators = Classification._id_field_validators + (cav_ps_code_validator,)
+
+
+class LandLeaseAdditionalClassification(Classification):
+    scheme = StringType(required=True, choices=LANDLEASE_ITEM_ADDITIONAL_CLASSIFICATIONS)
+    _id_field_validators = Classification._id_field_validators + (cpvs_validator,
+                                                                  kvtspz_validator)
+
+
+class LandLeaseItem(dgfCDB2Item):
+
+    classification = ModelType(LandLeaseClassification,
+                               required=True)
+    additionalClassifications = ListType(ModelType(LandLeaseAdditionalClassification), required=True)
+
+    def validate_additionalClassifications(self, data, classificator):
+        classificators = data['additionalClassifications']
+        err_msg = 'At least must be two additional classifications (kvtspz, cadastralNumber)'
+        need_schemas = {'kvtspz', 'cadastralNumber'}
+        schemas = set([classificator.scheme for classificator in classificators])
+
+        if not need_schemas.issubset(schemas):
+            raise ValidationError(err_msg)
 
 
 @implementer(IAuction)
@@ -284,7 +321,7 @@ class Auction(BaseAuction):
 
     guarantee = ModelType(Guarantee, required=True)
 
-    items = ListType(ModelType(dgfCDB2Item),
+    items = ListType(ModelType(LandLeaseItem),
                      required=True,
                      min_size=1,
                      validators=[validate_items_uniq])

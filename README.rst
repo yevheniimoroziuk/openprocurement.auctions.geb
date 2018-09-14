@@ -11,7 +11,7 @@
 Introduction
 ============
 
-openprocurement.auctions.dgf repository contains code for Deposit Guarantee Fund auctions.
+openprocurement.auctions.landlease
 
-Documentation can be found here http://dgf.api-docs.openprocurement.org/uk/latest/
+Documentation will be ...
 

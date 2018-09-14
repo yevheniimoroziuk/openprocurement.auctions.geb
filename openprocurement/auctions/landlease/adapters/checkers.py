@@ -72,6 +72,11 @@ class AuctionChecker(object):
         if self._next_status:
             self._context.status = self._next_status
 
+    def _set_unseccessful_bids(self):
+        for bid in self._context['bids']:
+            if bid.status in ['draft', 'pending']:
+                bid.status = 'unsuccessful'
+
     def check(self):
         date = self._get_check_date()
         try:
@@ -83,6 +88,7 @@ class AuctionChecker(object):
                 self._next_status = 'active.enquiry'
             elif date == self._context.enquiryPeriod.endDate:
                 self._check_enquiry_minNumberOfQualifiedBids()
+                self._set_unseccessful_bids()
         except StopChecks:
             pass
         self._set_next_status()

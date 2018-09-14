@@ -133,3 +133,21 @@ def check_enquiry_period_end_active_auction(test_case):
     response = test_case.app.get(test_case.ENTRYPOINTS['auction'])
     test_case.assertEqual(response.status, '200 OK')
     test_case.assertEqual(response.json['data']["status"], 'active.auction')
+
+
+def check_enquiry_period_end_set_unsuccessful_bids(test_case):
+    request_data = {'data': {'id': test_case.auction_id}}
+
+    endDate = test_case.auction['enquiryPeriod']['endDate']
+    mock_time = iso8601.parse_date(endDate) + datetime.timedelta(minutes=5)
+
+    with patch('openprocurement.auctions.landlease.adapters.checkers.get_now',) as mock_get_now:
+        mock_get_now.return_value = mock_time
+        test_case.app.patch_json(test_case.ENTRYPOINTS['auction'], request_data)
+
+    db_auction = test_case.db.get(test_case.auction['id'])
+
+    for bid in db_auction['bids']:
+        if bid['status'] in ['draft', 'pending']:
+            err_msg = 'All bids with status draft and pendign after enquiryPeriod must be unseccessful'
+            raise AssertionError(err_msg)
