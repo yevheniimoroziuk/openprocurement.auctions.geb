@@ -2,7 +2,7 @@
 from zope.interface import implementer
 from datetime import timedelta
 
-from openprocurement.auctions.geb.interfaces import (
+from openprocurement.auctions.core.interfaces import (
     IAuctionInitializator,
     IBidInitializator
 )
@@ -23,8 +23,9 @@ from openprocurement.auctions.geb.constants import (
 class AuctionInitializator(object):
     name = 'Auction Initializator'
 
-    def __init__(self, context):
+    def __init__(self, request, context):
         self._now = get_now()
+        self._request = request
         self._context = context
 
     def _initialize_enquiryPeriod(self):
@@ -90,8 +91,9 @@ class AuctionInitializator(object):
 @implementer(IBidInitializator)
 class BidInitializator(object):
 
-    def __init__(self, context):
+    def __init__(self, request, context):
         self._now = get_now()
+        self._request = request
         self._context = context
 
     def _initialize_qualified(self):
@@ -101,5 +103,6 @@ class BidInitializator(object):
         self._context.date = self._now
 
     def initialize(self):
-        self._initialize_qualified()
-        self._initialize_date()
+        if self._request.validated['json_data'].get('status') == 'pending':
+            self._initialize_qualified()
+            self._initialize_date()

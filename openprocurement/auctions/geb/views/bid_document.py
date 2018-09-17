@@ -1,8 +1,17 @@
 # -*- coding: utf-8 -*-
-from openprocurement.auctions.core.utils import opresource
+from openprocurement.auctions.core.utils import (
+    opresource,
+    json_view,
+    context_unpack
+)
 from openprocurement.auctions.core.views.mixins import AuctionBidDocumentResource
+from openprocurement.auctions.core.validation import (
+    validate_file_upload
+)
 
-from openprocurement.auctions.geb.constants import BID_STATUSES_FOR_ADDING_DOCUMENTS
+from openprocurement.auctions.core.interfaces import (
+    IBidManager
+)
 
 
 @opresource(name='geb:Auction Bid Documents',
@@ -12,11 +21,27 @@ from openprocurement.auctions.geb.constants import BID_STATUSES_FOR_ADDING_DOCUM
             description="Auction bidder documents")
 class AuctionBidDocumentResource(AuctionBidDocumentResource):
 
-    def validate_bid_document(self, operation):
-        auction = self.request.validated['auction']
-        if auction.status not in BID_STATUSES_FOR_ADDING_DOCUMENTS:
-            err_msg = 'Can\'t {} document in current ({}) auction status'.format(operation, auction.status)
-            self.request.errors.add('body', 'data', err_msg)
-            self.request.errors.status = 403
-            return
-        return True
+    @json_view(validators=(validate_file_upload,), permission='edit_bid')
+    def collection_post(self):
+        """Auction Bid Document Upload
+        """
+        save = None
+
+        manager = self.request.registry.queryMultiAdapter((self.request, self.context), IBidManager)
+
+        document = manager.upload_document()
+
+        if document:
+            save = manager.save()
+
+        if save:
+            msg = 'Created auction bid document {}'.format(document.id)
+            extra = context_unpack(self.request, {'MESSAGE_ID': 'auction_bid_document_create'}, {'document_id': document['id']})
+            self.LOGGER.info(msg, extra=extra)
+
+            self.request.response.status = 201
+
+            route = self.request.matched_route.name.replace("collection_", "")
+            locations = self.request.current_route_url(_route_name=route, document_id=document.id, _query={})
+            self.request.response.headers['Location'] = locations
+            return {'data': document.serialize("view")}

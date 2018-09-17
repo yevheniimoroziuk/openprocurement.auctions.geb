@@ -1,6 +1,6 @@
 from zope.interface import implementer
 
-from openprocurement.auctions.geb.interfaces import (
+from openprocurement.auctions.core.interfaces import (
     IAuctionChecker
 )
 
@@ -17,8 +17,9 @@ class StopChecks(Exception):
 class AuctionChecker(object):
     name = 'Auction Checker'
 
-    def __init__(self, context):
+    def __init__(self, request, context):
         self._now = get_now()
+        self._request = request
         self._context = context
         self._next_status = None
 

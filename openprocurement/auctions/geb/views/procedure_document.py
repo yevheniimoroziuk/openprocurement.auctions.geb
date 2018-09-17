@@ -17,9 +17,6 @@ from openprocurement.auctions.core.interfaces import (
     IAuctionManager
 )
 
-from openprocurement.auctions.geb.interfaces import (
-    IAuctionDocumenter
-)
 from openprocurement.auctions.geb.utils import (
     upload_file, get_file, invalidate_bids_data
 )
@@ -38,9 +35,8 @@ class AuctionDocumentResource(AuctionDocumentResource):
         save = None
 
         manager = self.request.registry.queryMultiAdapter((self.request, self.context), IAuctionManager)
-        documenter = self.request.registry.queryMultiAdapter((self.request, self.context), IAuctionDocumenter)
 
-        document = manager.upload_document(documenter)
+        document = manager.upload_document()
 
         if document:
             save = manager.save()
@@ -59,7 +55,7 @@ class AuctionDocumentResource(AuctionDocumentResource):
 
     @json_view(permission='view_auction')
     def get(self):
-        """Auction Document Read"""
+        """Auction Document Read"""                                             # TODO rm black box
         document = self.request.validated['document']
         offline = bool(document.get('documentType') == 'x_dgfAssetFamiliarization')
         if self.request.params.get('download') and not offline:
@@ -75,7 +71,7 @@ class AuctionDocumentResource(AuctionDocumentResource):
 
     @json_view(permission='upload_auction_documents', validators=(validate_file_update,))
     def put(self):
-        """Auction Document Update"""
+        """Auction Document Update"""                                           # TODO rm black box
         if not self.validate_document_editing_period('update'):
             return
         document = upload_file(self.request)
@@ -89,7 +85,7 @@ class AuctionDocumentResource(AuctionDocumentResource):
 
     @json_view(content_type="application/json", permission='upload_auction_documents', validators=(validate_patch_document_data,))
     def patch(self):
-        """Auction Document Update"""
+        """Auction Document Update"""                                           # TODO rm black box
         if not self.validate_document_editing_period('update'):
             return
         apply_patch(self.request, save=False, src=self.request.context.serialize())

@@ -10,7 +10,7 @@ from openprocurement.auctions.core.views.mixins import AuctionCancellationResour
             description="Auction cancellations")
 class AuctionCancellationResource(AuctionCancellationResource):
 
-    def cancel_lot(self, cancellation=None):
+    def cancel_lot(self, cancellation=None):                                    # TODO check and implement
 
         if not cancellation:
             cancellation = self.context

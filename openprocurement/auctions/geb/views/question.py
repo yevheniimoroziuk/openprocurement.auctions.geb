@@ -2,7 +2,7 @@
 from openprocurement.auctions.core.utils import (
     json_view,
     context_unpack,
-    opresource,
+    opresource
 )
 from openprocurement.auctions.core.validation import (
     validate_question_data,
@@ -10,17 +10,12 @@ from openprocurement.auctions.core.validation import (
 )
 
 from openprocurement.auctions.core.interfaces import (
-    IAuctionManager
+    IAuctionManager,
+    IQuestionManager
 )
 
 from openprocurement.auctions.core.views.mixins import (
     AuctionQuestionResource
-)
-
-from openprocurement.auctions.geb.interfaces import (
-    IAuctionQuestioner,
-    IQuestionManager,
-    IQuestionChanger
 )
 
 
@@ -38,9 +33,8 @@ class AuctionQuestionResource(AuctionQuestionResource):
         save = None
 
         manager = self.request.registry.queryMultiAdapter((self.request, self.context), IAuctionManager)
-        questioner = self.request.registry.queryMultiAdapter((self.request, self.context), IAuctionQuestioner)
 
-        question = manager.add_question(questioner)
+        question = manager.add_question()
         if question:
             save = manager.save()
 
@@ -64,9 +58,8 @@ class AuctionQuestionResource(AuctionQuestionResource):
         question = self.request.context
 
         manager = self.request.registry.queryMultiAdapter((self.request, self.context), IQuestionManager)
-        changer = self.request.registry.queryMultiAdapter((self.request, self.context), IQuestionChanger)
 
-        if manager.change(changer):
+        if manager.change():
             save = manager.save()
 
         if save:
