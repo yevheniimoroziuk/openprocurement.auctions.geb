@@ -151,3 +151,11 @@ def check_enquiry_period_end_set_unsuccessful_bids(test_case):
         if bid['status'] in ['draft', 'pending']:
             err_msg = 'All bids with status draft and pendign after enquiryPeriod must be unseccessful'
             raise AssertionError(err_msg)
+
+def chronograph(test_case, auction):
+    auth = test_case.app.authorization
+    test_case.app.authorization = ('Basic', ('chronograph', ''))
+    request_data = {'data': {'id': auction['id']}}
+    entrypoint = '/auctions/{}'.format(auction['id'])
+    response = test_case.app.patch_json(entrypoint, request_data)
+    test_case.app.authorization = auth

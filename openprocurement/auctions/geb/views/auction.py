@@ -10,7 +10,7 @@ from openprocurement.auctions.core.utils import (
 from openprocurement.auctions.core.validation import (
     validate_auction_auction_data,
 )
-from openprocurement.auctions.core.views.mixins import AuctionAuctionResource
+from openprocurement.auctions.core.views.mixins import APIResource
 
 from openprocurement.auctions.geb.utils import (
     invalidate_bids_under_threshold
@@ -18,14 +18,13 @@ from openprocurement.auctions.geb.utils import (
 
 
 @opresource(name='geb:Auction Auction',
-            collection_path='/auctions/{auction_id}/auction',
-            path='/auctions/{auction_id}/auction/{auction_lot_id}',
+            path='/auctions/{auction_id}/auction',
             auctionsprocurementMethodType="geb",
             description="auction auction data")
-class AuctionAuctionResource(AuctionAuctionResource):
+class AuctionAuctionResource(APIResource):
 
     @json_view(content_type="application/json", permission='auction', validators=(validate_auction_auction_data))
-    def collection_post(self):
+    def post(self):
         apply_patch(self.request, save=False, src=self.request.validated['auction_src'])
         auction = self.request.validated['auction']
         invalidate_bids_under_threshold(auction)
@@ -37,19 +36,18 @@ class AuctionAuctionResource(AuctionAuctionResource):
             self.LOGGER.info('Report auction results', extra=context_unpack(self.request, {'MESSAGE_ID': 'auction_auction_post'}))
             return {'data': self.request.validated['auction'].serialize(self.request.validated['auction'].status)}
 
+    @json_view(permission='auction')
+    def get(self):
+        if self.request.validated['auction_status'] != 'active.auction':
+            self.request.errors.add('body', 'data', 'Can\'t get auction info in current ({}) auction status'.format(
+                self.request.validated['auction_status']))
+            self.request.errors.status = 403
+            return
+        return {'data': self.request.validated['auction'].serialize("auction_view")}
+
     @json_view(content_type="application/json", permission='auction', validators=(validate_auction_auction_data))
-    def post(self):
-        """Report auction results for lot.
-        """
-        apply_patch(self.request, save=False, src=self.request.validated['auction_src'])
-        auction = self.request.validated['auction']
-        if all([i.auctionPeriod and i.auctionPeriod.endDate for i in auction.lots if i.numberOfBids > 1 and i.status == 'active']):
-            cleanup_bids_for_cancelled_lots(auction)
-            invalidate_bids_under_threshold(auction)
-            if any([i.status == 'active' for i in auction.bids]):
-                self.request.content_configurator.start_awarding()
-            else:
-                auction.status = 'unsuccessful'
-        if save_auction(self.request):
-            self.LOGGER.info('Report auction results', extra=context_unpack(self.request, {'MESSAGE_ID': 'auction_lot_auction_post'}))
-            return {'data': self.request.validated['auction'].serialize(self.request.validated['auction'].status)}
+    def collection_patch(self):
+        if apply_patch(self.request, src=self.request.validated['auction_src']):
+            self.LOGGER.info('Updated auction urls',
+                             extra=context_unpack(self.request, {'MESSAGE_ID': 'auction_auction_patch'}))
+            return {'data': self.request.validated['auction'].serialize("auction_view")}

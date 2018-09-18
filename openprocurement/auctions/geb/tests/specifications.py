@@ -554,7 +554,7 @@ STATUS_CHANGES = {
     "active.tendering": {
         "next_status": ["active.enquiry"]
     },
-    "active.enquiryPeriod": {
-        "next_status": ["active.tendering"]
+    "active.enquiry": {
+        "next_status": ["active.auction"]
     }
 }
