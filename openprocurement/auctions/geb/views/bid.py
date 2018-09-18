@@ -8,11 +8,8 @@ from openprocurement.auctions.core.views.mixins import AuctionBidResource
 from openprocurement.auctions.core.validation import (
     validate_patch_bid_data
 )
-from openprocurement.auctions.geb.interfaces import (
-    IBidManager,
-    IBidChanger,
-    IBidDeleter,
-    IBidInitializator
+from openprocurement.auctions.core.interfaces import (
+    IBidManager
 )
 
 
@@ -22,18 +19,15 @@ from openprocurement.auctions.geb.interfaces import (
             auctionsprocurementMethodType="geb",
             description="Auction bids")
 class AuctionBidResource(AuctionBidResource):
-    pass
 
     @json_view(content_type="application/json", permission='edit_bid', validators=(validate_patch_bid_data,))
     def patch(self):
         save = None
 
         manager = self.request.registry.queryMultiAdapter((self.request, self.context), IBidManager)
-        changer = self.request.registry.queryMultiAdapter((self.request, self.context), IBidChanger)
-        initializator = self.request.registry.getAdapter(self.context, IBidInitializator)
 
-        if manager.change(changer):
-            manager.initialize(initializator)
+        if manager.change():
+            manager.initialize()
             save = manager.save()
 
         if save:
@@ -47,9 +41,8 @@ class AuctionBidResource(AuctionBidResource):
         save = None
 
         manager = self.request.registry.queryMultiAdapter((self.request, self.context), IBidManager)
-        deleter = self.request.registry.queryMultiAdapter((self.request, self.context), IBidDeleter)
 
-        bid = manager.delete(deleter)
+        bid = manager.delete()
         if bid:
             save = manager.save()
 

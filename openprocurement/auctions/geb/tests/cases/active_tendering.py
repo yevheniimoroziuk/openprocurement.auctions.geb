@@ -51,7 +51,7 @@ class StatusActiveTenderingBidsTest(BaseAuctionWebTest):
 
     test_add_bid = snitch(add_bid)
     test_add_invalid_bid = snitch(add_invalid_bid)
-    test_add_document_to_bid = snitch(add_document_to_bid)
+    #test_add_document_to_bid = snitch(add_document_to_bid)
     test_activate_bid = snitch(activate_bid)
     test_make_active_status_bid = snitch(make_active_status_bid)
     test_delete_bid = snitch(delete_bid)

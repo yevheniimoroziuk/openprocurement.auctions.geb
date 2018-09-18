@@ -1,7 +1,7 @@
 
 from zope.interface import implementer
 
-from openprocurement.auctions.geb.interfaces import (
+from openprocurement.auctions.core.interfaces import (
     IAuctionQuestioner
 )
 

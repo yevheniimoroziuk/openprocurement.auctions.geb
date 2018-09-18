@@ -4,7 +4,6 @@ from openprocurement.auctions.core.utils import (
     get_now,
     apply_data_patch
 )
-from openprocurement.auctions.core.tests.base import IsoDateTimeType
 
 from openprocurement.auctions.geb.tests.helpers import (
     get_next_status,
@@ -45,7 +44,6 @@ class ActiveEnquiry(State):
     def _context(self):
         context = {}
         now = get_now()
-        formater = IsoDateTimeType().to_primitive
         status = get_next_status(self.status)
         duration_rectification = get_period_duration(self._auction, 'rectificationPeriod')
         duration_tendering = get_period_duration(self._auction, 'tenderPeriod')
@@ -62,14 +60,14 @@ class ActiveEnquiry(State):
         start_date_tendering = start_tendering_and_enquiry
         start_date_enquiry = start_tendering_and_enquiry
 
-        tender_period = {"startDate": formater(start_date_tendering),
-                         "endDate": formater(end_date_tendering)}
+        tender_period = {"startDate": start_date_tendering.isoformat(),
+                         "endDate": end_date_tendering.isoformat()}
 
-        enquiry_period = {"startDate": formater(start_date_enquiry),
-                          "endDate": formater(end_date_enquiry)}
+        enquiry_period = {"startDate": start_date_enquiry.isoformat(),
+                          "endDate": end_date_enquiry.isoformat()}
 
-        rectification_period = {"startDate": formater(start_date_rectification),
-                                "endDate": formater(end_date_rectification)}
+        rectification_period = {"startDate": start_date_rectification.isoformat(),
+                                "endDate": end_date_rectification.isoformat()}
 
         context['status'] = status
         context['rectificationPeriod'] = rectification_period
@@ -101,7 +99,6 @@ class ActiveTendering(State):
     def _context(self):
         context = {}
         now = get_now()
-        formater = IsoDateTimeType().to_primitive
         status = get_next_status(self.status)
 
         shouldStartAfter = iso8601.parse_date(self._auction['auctionPeriod']['shouldStartAfter'])
@@ -122,20 +119,20 @@ class ActiveTendering(State):
         start_date_tendering = now
         start_date_enquiry = now
 
-        tender_period = {"startDate": formater(start_date_tendering),
-                         "endDate": formater(end_date_tendering)}
-        enquiry_period = {"startDate": formater(start_date_enquiry),
-                          "endDate": formater(end_date_enquiry)}
+        tender_period = {"startDate": start_date_tendering.isoformat(),
+                         "endDate": end_date_tendering.isoformat()}
+        enquiry_period = {"startDate": start_date_enquiry.isoformat(),
+                          "endDate": end_date_enquiry.isoformat()}
 
-        rectification_period = {"startDate": formater(start_date_rectification),
-                                "endDate": formater(end_date_rectification)}
+        rectification_period = {"startDate": start_date_rectification.isoformat(),
+                                "endDate": end_date_rectification.isoformat()}
 
         context['status'] = status
         context['rectificationPeriod'] = rectification_period
         context['tenderPeriod'] = tender_period
         context['enquiryPeriod'] = enquiry_period
         context['auctionPeriod'] = {}
-        context['auctionPeriod']['shouldStartAfter'] = formater(new_shoulfStartAfter)
+        context['auctionPeriod']['shouldStartAfter'] = new_shoulfStartAfter.isoformat()
         return context
 
     def _db_save(self, context):

@@ -52,7 +52,7 @@ from openprocurement.auctions.geb.constants import (
     AUCTION_STATUSES,
     BID_DOCUMENT_TYPES,
     BID_STATUSES,
-    LANDLEASE_ITEM_ADDITIONAL_CLASSIFICATIONS
+    GEB_ITEM_ADDITIONAL_CLASSIFICATIONS
 )
 
 from openprocurement.auctions.geb.models.roles import (
@@ -79,20 +79,20 @@ from openprocurement.auctions.geb.validation import (
 )
 
 
-class LandLeaseAuctionDocument(dgfDocument):
+class GebAuctionDocument(dgfDocument):
     documentOf = StringType(required=True, choices=['auction'], default='auction')
 
     documentType = StringType(choices=AUCTION_DOCUMENT_TYPES)
 
 
-class LandLeaseBidDocument(dgfDocument):
+class GebBidDocument(dgfDocument):
     documentOf = StringType(required=True, choices=['bid'], default='bid')
 
     documentType = StringType(choices=BID_DOCUMENT_TYPES)
 
 
 @implementer(IQuestion)
-class LandLeaseQuestion(Question):
+class GebQuestion(Question):
 
     class Options:
         roles = {
@@ -132,7 +132,7 @@ class AuctionParameters(Model):
 
 
 class Cancellation(dgfCancellation):
-    documents = ListType(ModelType(LandLeaseAuctionDocument), default=list())
+    documents = ListType(ModelType(GebAuctionDocument), default=list())
 
 
 def rounding_shouldStartAfter(start_after, auction, use_from=datetime(2016, 6, 1, tzinfo=TZ)):  # TODO rm black box
@@ -157,7 +157,7 @@ class AuctionAuctionPeriod(Period):
         return rounding_shouldStartAfter(start_after, auction).isoformat()
 
     def validate_startDate(self, data, startDate):
-        auction = get_auction(data['__parent__'])
+        auction = data['__parent__']
         if not auction.revisions and not startDate:
             raise ValidationError(u'This field is required.')
 
@@ -170,7 +170,7 @@ Administrator_role = (Administrator_role + whitelist('awards'))
 
 
 @implementer(IBid)
-class LandLeaseBid(Model):
+class GebBid(Model):
     class Options:
         roles = {
             'Administrator': Administrator_bid_role,
@@ -190,7 +190,7 @@ class LandLeaseBid(Model):
     id = MD5Type(required=True, default=lambda: uuid4().hex)
     status = StringType(choices=BID_STATUSES, default='draft')
     value = ModelType(Value)
-    documents = ListType(ModelType(LandLeaseBidDocument), default=list())
+    documents = ListType(ModelType(GebBidDocument), default=list())
     owner_token = StringType()
     owner = StringType()
     qualified = BooleanType()
@@ -233,22 +233,22 @@ class LandLeaseBid(Model):
         ]
 
 
-class LandLeaseClassification(Classification):
+class GebClassification(Classification):
     scheme = StringType(required=True, default='CAV-PS', choices=['CAV-PS'])
     _id_field_validators = Classification._id_field_validators + (cav_ps_code_validator,)
 
 
-class LandLeaseAdditionalClassification(Classification):
-    scheme = StringType(required=True, choices=LANDLEASE_ITEM_ADDITIONAL_CLASSIFICATIONS)
+class GebAdditionalClassification(Classification):
+    scheme = StringType(required=True, choices=GEB_ITEM_ADDITIONAL_CLASSIFICATIONS)
     _id_field_validators = Classification._id_field_validators + (cpvs_validator,
                                                                   kvtspz_validator)
 
 
-class LandLeaseItem(dgfCDB2Item):
+class GebItem(dgfCDB2Item):
 
-    classification = ModelType(LandLeaseClassification,
+    classification = ModelType(GebClassification,
                                required=True)
-    additionalClassifications = ListType(ModelType(LandLeaseAdditionalClassification), required=True)
+    additionalClassifications = ListType(ModelType(GebAdditionalClassification), required=True)
 
     def validate_additionalClassifications(self, data, classificator):
         classificators = data['additionalClassifications']
@@ -294,9 +294,9 @@ class Auction(BaseAuction):
 
     awards = ListType(ModelType(Award), default=list())
 
-    bids = ListType(ModelType(LandLeaseBid), default=list())
+    bids = ListType(ModelType(GebBid), default=list())
 
-    questions = ListType(ModelType(LandLeaseQuestion), default=list())
+    questions = ListType(ModelType(GebQuestion), default=list())
 
     bankAccount = ModelType(BankAccount)
 
@@ -315,13 +315,13 @@ class Auction(BaseAuction):
 
     description = StringType(required=True)
 
-    documents = ListType(ModelType(LandLeaseAuctionDocument), default=list())
+    documents = ListType(ModelType(GebAuctionDocument), default=list())
 
     enquiryPeriod = ModelType(Period)
 
     guarantee = ModelType(Guarantee, required=True)
 
-    items = ListType(ModelType(LandLeaseItem),
+    items = ListType(ModelType(GebItem),
                      required=True,
                      min_size=1,
                      validators=[validate_items_uniq])
@@ -354,11 +354,11 @@ class Auction(BaseAuction):
             (Allow, '{}_{}'.format(self.owner, self.owner_token), 'upload_auction_documents'),
         ]
 
-    def validate_tenderPeriod(self, data, period):
+    def validate_tenderPeriod(self, data, period):                              # TODO implement
         if not period:
             return
 
-    def validate_rectificationPeriod(self, data, period):
+    def validate_rectificationPeriod(self, data, period):                       # TODO implement
         if not period:
             return
 
@@ -377,7 +377,6 @@ class Auction(BaseAuction):
     @serializable(serialize_when_none=False)
     def next_check(self):
         check = None
-
         if self.status == 'active.rectification':
             check = self.rectificationPeriod.endDate.astimezone(TZ)
         elif self.status == 'active.tendering':
@@ -388,4 +387,4 @@ class Auction(BaseAuction):
         return check.isoformat() if check else None
 
 
-LandLease = Auction
+Geb = Auction

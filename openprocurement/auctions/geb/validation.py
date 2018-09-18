@@ -14,8 +14,9 @@ from openprocurement.auctions.geb.constants import (
     AUCTION_STATUS_FOR_ADDING_QUESTIONS,
     AUCTION_STATUS_FOR_CHANGING_QUESTIONS,
     AUCTION_STATUS_FOR_DELETING_BIDS,
-    PROCEDURE_DOCUMENT_STATUSES,
-    CAV_PS_CODES
+    BID_STATUSES_FOR_ADDING_DOCUMENTS,
+    CAV_PS_CODES,
+    PROCEDURE_DOCUMENT_STATUSES
 )
 
 
@@ -141,3 +142,24 @@ def validate_question_changing_period(request):
 def cav_ps_code_validator(data, code):
     if code not in CAV_PS_CODES:
         raise ValidationError(BaseType.MESSAGES['choices'].format(CAV_PS_CODES))
+
+
+def validate_first_auction_status(request):
+    status = request.json_body['data'].get('status')
+    if status and status != 'draft':
+        err_msg = "Auction status must be draft"
+        request.errors.add('body', 'data', err_msg)
+        request.errors.status = 403
+        return False
+    return True
+
+
+def validate_bid_document(request):
+    auction = request.context.__parent__
+
+    if auction.status not in BID_STATUSES_FOR_ADDING_DOCUMENTS:
+        err_msg = 'Can\'t document in current ({}) auction status'.format(auction.status)
+        request.errors.add('body', 'data', err_msg)
+        request.errors.status = 403
+        return
+    return True
