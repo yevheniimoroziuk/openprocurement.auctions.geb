@@ -62,11 +62,11 @@ class AuctionChecker(object):
         tender_period = self._context.tenderPeriod
         enquiry_period = self._context.enquiryPeriod
 
-        if status == 'active.rectification' and self._now > rectification_period.endDate:
+        if status == 'active.rectification' and self._now >= rectification_period.endDate:
             return rectification_period.endDate
-        elif status == 'active.tendering' and self._now > tender_period.endDate:
+        elif status == 'active.tendering' and self._now >= tender_period.endDate:
             return tender_period.endDate
-        elif status == 'active.enquiry' and self._now > enquiry_period.endDate:
+        elif status == 'active.enquiry' and self._now >= enquiry_period.endDate:
             return enquiry_period.endDate
 
     def _set_next_status(self):
