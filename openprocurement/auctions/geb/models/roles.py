@@ -280,3 +280,8 @@ bid_edit_draft_role = whitelist(
     'status',
     'tenderers'
 )
+bid_active_auction_role = whitelist()
+bid_active_awarded_role = whitelist()
+bid_active_enquiry_role = whitelist()
+bid_active_qualification_role = bid_view_role
+bid_active_tendering_role = whitelist()

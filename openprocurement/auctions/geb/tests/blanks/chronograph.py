@@ -3,7 +3,8 @@ import iso8601
 from mock import patch
 from openprocurement.auctions.geb.tests.helpers import (
     set_auction_period,
-    create_active_bid,
+    create_pending_bid,
+    create_bid,
     delete_bid
 )
 
@@ -25,12 +26,8 @@ def check_rectification_period_end(test_case):
 
 def check_tender_period_end_no_active_bids(test_case):
     request_data = {'data': {'id': test_case.auction_id}}
-    endDate = test_case.auction['tenderPeriod']['endDate']
-    mock_time = iso8601.parse_date(endDate) + datetime.timedelta(minutes=5)
 
-    with patch('openprocurement.auctions.geb.managers.checkers.get_now',) as mock_get_now:
-        mock_get_now.return_value = mock_time
-        response = test_case.app.patch_json(test_case.ENTRYPOINTS['auction'], request_data)
+    response = test_case.app.patch_json(test_case.ENTRYPOINTS['auction'], request_data)
 
     response = test_case.app.get(test_case.ENTRYPOINTS['auction'])
     test_case.assertEqual(response.status, '200 OK')
@@ -40,7 +37,7 @@ def check_tender_period_end_no_active_bids(test_case):
 def check_tender_period_end_no_minNumberOfQualifiedBids(test_case):
     request_data = {'data': {'id': test_case.auction_id}}
 
-    create_active_bid(test_case, test_case.auction)
+    create_pending_bid(test_case, test_case.auction)
 
     endDate = test_case.auction['tenderPeriod']['endDate']
     mock_time = iso8601.parse_date(endDate) + datetime.timedelta(minutes=5)
@@ -57,15 +54,10 @@ def check_tender_period_end_no_minNumberOfQualifiedBids(test_case):
 def check_tender_period_end_successful(test_case):
     request_data = {'data': {'id': test_case.auction_id}}
 
-    create_active_bid(test_case, test_case.auction)
-    create_active_bid(test_case, test_case.auction)
+    create_pending_bid(test_case, test_case.auction)
+    create_pending_bid(test_case, test_case.auction)
 
-    endDate = test_case.auction['tenderPeriod']['endDate']
-    mock_time = iso8601.parse_date(endDate) + datetime.timedelta(minutes=5)
-
-    with patch('openprocurement.auctions.geb.managers.checkers.get_now',) as mock_get_now:
-        mock_get_now.return_value = mock_time
-        response = test_case.app.patch_json(test_case.ENTRYPOINTS['auction'], request_data)
+    response = test_case.app.patch_json(test_case.ENTRYPOINTS['auction'], request_data)
 
     response = test_case.app.get(test_case.ENTRYPOINTS['auction'])
     test_case.assertEqual(response.status, '200 OK')
@@ -81,12 +73,8 @@ def check_enquiry_period_end_unsuccessful(test_case):
         delete_bid(test_case, test_case.auction, bid['data'], bid['access'])
 
     test_case.app.authorization = auth
-    endDate = test_case.auction['enquiryPeriod']['endDate']
-    mock_time = iso8601.parse_date(endDate) + datetime.timedelta(minutes=5)
 
-    with patch('openprocurement.auctions.geb.managers.checkers.get_now',) as mock_get_now:
-        mock_get_now.return_value = mock_time
-        response = test_case.app.patch_json(test_case.ENTRYPOINTS['auction'], request_data)
+    response = test_case.app.patch_json(test_case.ENTRYPOINTS['auction'], request_data)
 
     response = test_case.app.get(test_case.ENTRYPOINTS['auction'])
     test_case.assertEqual(response.status, '200 OK')
@@ -108,12 +96,8 @@ def check_enquiry_period_end_active_qualification(test_case):
     test_case.db.save(auction)
 
     test_case.app.authorization = auth
-    endDate = test_case.auction['enquiryPeriod']['endDate']
-    mock_time = iso8601.parse_date(endDate) + datetime.timedelta(minutes=5)
 
-    with patch('openprocurement.auctions.geb.managers.checkers.get_now',) as mock_get_now:
-        mock_get_now.return_value = mock_time
-        response = test_case.app.patch_json(test_case.ENTRYPOINTS['auction'], request_data)
+    response = test_case.app.patch_json(test_case.ENTRYPOINTS['auction'], request_data)
 
     response = test_case.app.get(test_case.ENTRYPOINTS['auction'])
     test_case.assertEqual(response.status, '200 OK')
@@ -123,12 +107,7 @@ def check_enquiry_period_end_active_qualification(test_case):
 def check_enquiry_period_end_active_auction(test_case):
     request_data = {'data': {'id': test_case.auction_id}}
 
-    endDate = test_case.auction['enquiryPeriod']['endDate']
-    mock_time = iso8601.parse_date(endDate) + datetime.timedelta(minutes=5)
-
-    with patch('openprocurement.auctions.geb.managers.checkers.get_now',) as mock_get_now:
-        mock_get_now.return_value = mock_time
-        response = test_case.app.patch_json(test_case.ENTRYPOINTS['auction'], request_data)
+    response = test_case.app.patch_json(test_case.ENTRYPOINTS['auction'], request_data)
 
     response = test_case.app.get(test_case.ENTRYPOINTS['auction'])
     test_case.assertEqual(response.status, '200 OK')
@@ -138,12 +117,7 @@ def check_enquiry_period_end_active_auction(test_case):
 def check_enquiry_period_end_set_unsuccessful_bids(test_case):
     request_data = {'data': {'id': test_case.auction_id}}
 
-    endDate = test_case.auction['enquiryPeriod']['endDate']
-    mock_time = iso8601.parse_date(endDate) + datetime.timedelta(minutes=5)
-
-    with patch('openprocurement.auctions.geb.managers.checkers.get_now',) as mock_get_now:
-        mock_get_now.return_value = mock_time
-        test_case.app.patch_json(test_case.ENTRYPOINTS['auction'], request_data)
+    test_case.app.patch_json(test_case.ENTRYPOINTS['auction'], request_data)
 
     db_auction = test_case.db.get(test_case.auction['id'])
 
@@ -151,3 +125,29 @@ def check_enquiry_period_end_set_unsuccessful_bids(test_case):
         if bid['status'] in ['draft', 'pending']:
             err_msg = 'All bids with status draft and pendign after enquiryPeriod must be unseccessful'
             raise AssertionError(err_msg)
+
+
+def chronograph(test_case, auction):
+    auth = test_case.app.authorization
+    test_case.app.authorization = ('Basic', ('chronograph', ''))
+    request_data = {'data': {'id': auction['id']}}
+    entrypoint = '/auctions/{}'.format(auction['id'])
+    test_case.app.patch_json(entrypoint, request_data)
+    test_case.app.authorization = auth
+
+
+def check_tender_period_end_delete_draft_bids(test_case):
+    auth = test_case.app.authorization
+    bid_owner = ('Basic', ('broker', ''))
+    test_case.app.authorization = bid_owner
+    bid = create_bid(test_case, test_case.auction)
+    create_pending_bid(test_case, test_case.auction)
+    create_pending_bid(test_case, test_case.auction)
+    test_case.app.authorization = auth
+
+    request_data = {'data': {'id': test_case.auction_id}}
+    test_case.app.patch_json(test_case.ENTRYPOINTS['auction'], request_data)
+    entrypoint = '/auctions/{}/bids/{}?acc_token={}'.format(test_case.auction['id'],
+                                                            bid['data']['id'],
+                                                            bid['access']['token'])
+    test_case.app.get(entrypoint, status=404)

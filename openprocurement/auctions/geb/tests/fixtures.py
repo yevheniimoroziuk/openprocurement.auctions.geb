@@ -139,3 +139,13 @@ test_bid_data = {
         "tenderers": [test_organization]
     }
 }
+#test_auction_auction_data = {
+#    'auctionUrl': u'http://auction-sandbox.openprocurement.org/auctions/{}'.format(self.auction_id),
+#    'bids': [
+#        {
+#            "id": self.initial_bids[1]['id'],
+#            "participationUrl": u'http://auction-sandbox.openprocurement.org/auctions/{}?key_for_bid={}'.format( self.auction_id, self.initial_bids[1]['id'])
+#        }
+#    ]
+#}
+#
