@@ -47,33 +47,33 @@ class AuctionResource(AuctionResource):
             return {'data': self.context.serialize(self.context.status)}
 
 
-@opresource(name='Auctions', path='/auctions')
-class AuctionsResource(AuctionsResource):
-
-    @json_view(content_type="application/json", permission='create_auction', validators=(validate_auction_data,))
-    def post(self):
-        manager = self.request.registry.queryMultiAdapter((self.request, self.request.validated['auction']), IAuctionManager)
-
-        auction = manager.create()
-        if not auction:
-            return
-        manager.initialize()
-        acc = set_ownership(auction, self.request)                              #
-        save = manager.save()
-
-        self.request.validated['auction'] = auction                             # TODO make more verbose
-        self.request.validated['auction_src'] = {}                              #
-
-        if save:
-            extra = context_unpack(self.request,
-                                   {'MESSAGE_ID': 'auction_create'},
-                                   {'auction_id': auction['id'],
-                                    'auctionID': auction.auctionID})
-
-            log = 'Created auction {} ({})'.format(auction['id'], auction.auctionID)
-            self.LOGGER.info(log, extra=extra)
-            self.request.response.status = 201
-            route = get_auction_route_name(self.request, auction)
-            location = self.request.route_url(route_name=route, auction_id=auction['id'])
-            self.request.response.headers['Location'] = location
-            return {'data': auction.serialize(auction.status), 'access': acc}
+#@opresource(name='Auctions', path='/auctions')
+#class AuctionsResource(AuctionsResource):
+#
+#    @json_view(content_type="application/json", permission='create_auction', validators=(validate_auction_data,))
+#    def post(self):
+#        manager = self.request.registry.queryMultiAdapter((self.request, self.request.validated['auction']), IAuctionManager)
+#
+#        auction = manager.create()
+#        if not auction:
+#            return
+#        manager.initialize()
+#        acc = set_ownership(auction, self.request)                              #
+#        save = manager.save()
+#
+#        self.request.validated['auction'] = auction                             # TODO make more verbose
+#        self.request.validated['auction_src'] = {}                              #
+#
+#        if save:
+#            extra = context_unpack(self.request,
+#                                   {'MESSAGE_ID': 'auction_create'},
+#                                   {'auction_id': auction['id'],
+#                                    'auctionID': auction.auctionID})
+#
+#            log = 'Created auction {} ({})'.format(auction['id'], auction.auctionID)
+#            self.LOGGER.info(log, extra=extra)
+#            self.request.response.status = 201
+#            route = get_auction_route_name(self.request, auction)
+#            location = self.request.route_url(route_name=route, auction_id=auction['id'])
+#            self.request.response.headers['Location'] = location
+#            return {'data': auction.serialize(auction.status), 'access': acc}

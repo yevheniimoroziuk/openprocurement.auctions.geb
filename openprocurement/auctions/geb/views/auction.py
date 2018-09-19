@@ -45,10 +45,11 @@ class AuctionAuctionResource(APIResource):
             return
         return {'data': self.request.validated['auction'].serialize("auction_view")}
 
-    @json_view(content_type="application/json", permission='auction', validators=(validate_auction_auction_data))
-    def patch(self):
-        import ipdb; ipdb.set_trace()  # XXX BREAKPOINT
-        if apply_patch(self.request, src=self.request.validated['auction_src']):
-            self.LOGGER.info('Updated auction urls',
-                             extra=context_unpack(self.request, {'MESSAGE_ID': 'auction_auction_patch'}))
-            return {'data': self.request.validated['auction'].serialize("auction_view")}
+   # @json_view(content_type="application/json",
+   #            permission='auction',
+   #            validators=(validate_status_in_which_can_use_auction_of_procedure, ))
+   # def patch(self):
+   #     if apply_patch(self.request, src=self.request.validated['auction_src']):
+   #         self.LOGGER.info('Updated auction urls',
+   #                          extra=context_unpack(self.request, {'MESSAGE_ID': 'auction_auction_patch'}))
+   #         return {'data': self.request.validated['auction'].serialize("auction_view")}
