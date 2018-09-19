@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 import unittest
-
+import os
 from openprocurement.auctions.core.tests.base import snitch
 from openprocurement.auctions.geb.tests.base import (
     test_auction_data,
@@ -23,8 +23,8 @@ from openprocurement.auctions.geb.tests.blanks.active_auction import (
 class StatusActiveAuctionTest(BaseAuctionWebTest):
     initial_data = test_auction_data
     docservice = True
-    test_get_auction = snitch(get_auction)
-    test_patch_auction = snitch(patch_auction)
+    #test_get_auction = snitch(get_auction)
+    #test_patch_auction = snitch(patch_auction)
 
     def setUp(self):
         super(StatusActiveAuctionTest, self).setUp()
@@ -37,6 +37,9 @@ class StatusActiveAuctionTest(BaseAuctionWebTest):
         self.extra = state.extra
         self.app.authorization = ('Basic', ('auction', ''))
         self.entrypoint = '/auctions/{}/auction'.format(self.auction['id'])
+
+    def tearDown(self):
+        os.environ.pop('FAKE_NOW')
 
 
 def suite():

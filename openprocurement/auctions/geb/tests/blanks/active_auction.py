@@ -6,9 +6,9 @@ def get_auction(test_case):
 
 
 def patch_auction(test_case):
-    import ipdb; ipdb.set_trace()  # XXX BREAKPOINT
-    request_data = get_auction_urls(test_case.auction, test_case.extra['bids'])
+    urls = get_auction_urls(test_case.auction, test_case.extra['bids'])
 
+    request_data = {'data': urls}
     import ipdb; ipdb.set_trace()  # XXX BREAKPOINT
-    test_case.app.patch(test_case.entrypoint, request_data)
+    test_case.app.patch_json(test_case.entrypoint, request_data)
     import ipdb; ipdb.set_trace()  # XXX BREAKPOINT

@@ -1,5 +1,6 @@
 
 # -*- coding: utf-8 -*-
+import os
 import unittest
 
 from openprocurement.auctions.core.tests.base import snitch
@@ -21,7 +22,7 @@ from openprocurement.auctions.geb.tests.blanks.active_enquiry import (
     answer_question,
     add_bid,
     add_invalid_bid,
-    add_document_to_bid,
+    # add_document_to_bid,
     make_active_status_bid,
     delete_bid
 )
@@ -32,6 +33,7 @@ class StatusActiveEnquiryQuestionsTest(BaseAuctionWebTest):
 
     test_add_question = snitch(add_question)
     test_answer_question = snitch(answer_question)
+    # get_auction_question
 
     def setUp(self):
         super(StatusActiveEnquiryQuestionsTest, self).setUp()
@@ -43,6 +45,9 @@ class StatusActiveEnquiryQuestionsTest(BaseAuctionWebTest):
         self.auction = state.auction
         self.entrypoint = '/auctions/{}/questions'.format(self.auction_id)
 
+    def tearDown(self):
+        os.environ.pop('FAKE_NOW')
+
 
 class StatusActiveEnquiryBidsTest(BaseAuctionWebTest):
     initial_data = test_auction_data
@@ -50,7 +55,8 @@ class StatusActiveEnquiryBidsTest(BaseAuctionWebTest):
 
     test_add_bid = snitch(add_bid)
     test_add_invalid_bid = snitch(add_invalid_bid)
-    #test_add_document_to_bid = snitch(add_document_to_bid)
+    # test_add_document_to_bid = snitch(add_document_to_bid)
+    # get_auction_bidder
     test_make_active_status_bid = snitch(make_active_status_bid)
     test_delete_bid = snitch(delete_bid)
 
@@ -85,6 +91,9 @@ class StatusActiveEnquiryBidsTest(BaseAuctionWebTest):
         entrypoints['bid'] = edit_bid
         self.ENTRYPOINTS = entrypoints
 
+    def tearDown(self):
+        os.environ.pop('FAKE_NOW')
+
 
 class StatusActiveEnquiryDocumentsTest(BaseAuctionWebTest):
     initial_data = test_auction_data
@@ -102,6 +111,9 @@ class StatusActiveEnquiryDocumentsTest(BaseAuctionWebTest):
         self.auction = state.auction
         self.entrypoint = '/auctions/{}/documents/?acc_token={}'.format(self.auction_id,
                                                                         self.auction_token)
+
+    def tearDown(self):
+        os.environ.pop('FAKE_NOW')
 
 
 def suite():

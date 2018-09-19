@@ -194,14 +194,15 @@ def set_auction_period(test_case, auction):
 
 def get_auction_urls(auction, bids):
     patch_data = {'auctionUrl': u'http://auction-sandbox.openprocurement.org/auctions/{}'.format(auction['id'])}
-    bids = []
+    bids_urls = []
 
     for bid in bids:
-        if bid['status'] == 'active':
-            bids.append(
+        if bid['data']['status'] == 'active':
+            bids_urls.append(
                 {
                     'id': bid['data']['id'],
                     'participationUrl': u'http://auction-sandbox.openprocurement.org/auctions/{}?key_for_bid={}'.format(auction['id'], bid['data']['id'])
                 }
             )
+    patch_data['bids'] = bids_urls
     return patch_data

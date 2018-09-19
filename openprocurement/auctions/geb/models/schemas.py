@@ -4,7 +4,7 @@ from uuid import uuid4
 
 from schematics.exceptions import ValidationError
 from schematics.transforms import whitelist
-from schematics.types import StringType, IntType, MD5Type, BooleanType
+from schematics.types import StringType, IntType, MD5Type, BooleanType, URLType
 from schematics.types.compound import ModelType
 from schematics.types.serializable import serializable
 from pyramid.security import Allow
@@ -195,16 +195,17 @@ class GebBid(Model):
             'view': bid_view_role,
         }
 
-    tenderers = ListType(ModelType(BaseOrganization), required=True, min_size=1, max_size=1)
-    date = IsoDateTimeType()
-    id = MD5Type(required=True, default=lambda: uuid4().hex)
-    status = StringType(choices=BID_STATUSES, default='draft')
-    value = ModelType(Value)
-    documents = ListType(ModelType(GebBidDocument), default=list())
-    owner_token = StringType()
-    owner = StringType()
-    qualified = BooleanType()
     bidNumber = IntType()
+    date = IsoDateTimeType()
+    documents = ListType(ModelType(GebBidDocument), default=list())
+    id = MD5Type(required=True, default=lambda: uuid4().hex)
+    owner = StringType()
+    owner_token = StringType()
+    participationUrl = URLType()
+    qualified = BooleanType()
+    status = StringType(choices=BID_STATUSES, default='draft')
+    tenderers = ListType(ModelType(BaseOrganization), required=True, min_size=1, max_size=1)
+    value = ModelType(Value)
 
     def get_role(self):
         auction = self.__parent__

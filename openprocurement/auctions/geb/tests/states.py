@@ -44,15 +44,22 @@ class State(object):
         self._test.app.authorization = auth
 
     def _update_extra(self):
+        bids = []
         for bid in self.extra.get('bids'):
             prev_auth = self._test.app.authorization
             self._test.authorization = bid['owner']
             entrypoint = '/auctions/{}/bids/{}?acc_token={}'.format(self._auction['id'],
                                                                     bid['data']['id'],
                                                                     bid['access']['token'])
-            response = self._test.app.get(entrypoint)
+            try:
+                response = self._test.app.get(entrypoint)
+            except Exception:
+                continue
+
             bid['data'] = response.json['data']
+            bids.append(bid)
             self._test.authorization = prev_auth
+        self.extra['bids'] = bids
 
 
 class ActiveAuction(State):
@@ -105,6 +112,7 @@ class ActiveEnquiry(State):
         self._prev_state_workflow()
         self._fake_now()
         self._chronograph()
+        self._update_extra()
         self._update_auction()
 
     def _next(self):
