@@ -1,5 +1,11 @@
+from copy import deepcopy
 import iso8601
 from collections import Mapping, Sequence
+
+from openprocurement.auctions.core.tests.base import (
+    test_document_data
+)
+
 from openprocurement.auctions.geb.tests.specifications import STATUS_CHANGES
 from openprocurement.auctions.geb.tests.fixtures import (
     test_question_data,
@@ -99,7 +105,7 @@ def create_question(test_case, auction):
     return response.json['data']
 
 
-def create_active_bid(test_case, auction):
+def create_pending_bid(test_case, auction):
     auth = test_case.app.authorization
 
     bid_owner = ('Basic', ('broker', ''))
@@ -118,6 +124,39 @@ def create_active_bid(test_case, auction):
 
     test_case.app.authorization = auth
     return {'data': response.json['data'], 'access': access, 'owner': bid_owner}
+
+
+def activate_bid(test_case, auction, bid, bid_number):
+    auth = test_case.app.authorization
+    bid_owner = bid['owner']
+
+    test_case.app.authorization = bid_owner
+
+    document = deepcopy(test_document_data)
+    document['documentType'] = 'eligibilityDocuments'
+    url = test_case.generate_docservice_url(),
+    document['url'] = url[0]
+    request_data = {'data': document}
+    entrypoint = '/auctions/{}/bids/{}/documents?acc_token={}'.format(auction['id'],
+                                                                      bid['data']['id'],
+                                                                      bid['access']['token'])
+    test_case.app.post_json(entrypoint, request_data)
+
+    request_data = {"data": {"qualified": True}}
+    entrypoint = '/auctions/{}/bids/{}?acc_token={}'.format(auction['id'],
+                                                            bid['data']['id'],
+                                                            bid['access']['token'])
+    response = test_case.app.patch_json(entrypoint, request_data)
+
+    request_data = {"data": {"bidNumber": bid_number}}
+    response = test_case.app.patch_json(entrypoint, request_data)
+
+    request_data = {"data": {"status": 'active'}}
+    response = test_case.app.patch_json(entrypoint, request_data)
+
+    test_case.app.authorization = auth
+
+    bid['data'] = response.json['data']
 
 
 def create_bid(test_case, auction):
@@ -151,3 +190,18 @@ def set_auction_period(test_case, auction):
     test_case.app.patch_json(entrypoint, request_data)
 
     test_case.app.authorization = auth
+
+
+def get_auction_urls(auction, bids):
+    patch_data = {'auctionUrl': u'http://auction-sandbox.openprocurement.org/auctions/{}'.format(auction['id'])}
+    bids = []
+
+    for bid in bids:
+        if bid['status'] == 'active':
+            bids.append(
+                {
+                    'id': bid['data']['id'],
+                    'participationUrl': u'http://auction-sandbox.openprocurement.org/auctions/{}?key_for_bid={}'.format(auction['id'], bid['data']['id'])
+                }
+            )
+    return patch_data

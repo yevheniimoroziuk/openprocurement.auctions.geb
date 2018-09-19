@@ -5,7 +5,8 @@ from openprocurement.auctions.core.interfaces import (
 )
 
 from openprocurement.auctions.core.utils import (
-    get_now
+    get_now,
+    remove_bid
 )
 
 
@@ -78,6 +79,11 @@ class AuctionChecker(object):
             if bid.status in ['draft', 'pending']:
                 bid.status = 'unsuccessful'
 
+    def _end_tendering_delete_bids(self):
+        for bid in self._context['bids']:
+            if bid.status == 'draft':
+                remove_bid(self._request, self._context, bid)
+
     def check(self):
         date = self._get_check_date()
         try:
@@ -86,6 +92,7 @@ class AuctionChecker(object):
             elif date == self._context.tenderPeriod.endDate:
                 self._check_bids()
                 self._check_tendering_minNumberOfQualifiedBids()
+                self._end_tendering_delete_bids()
                 self._next_status = 'active.enquiry'
             elif date == self._context.enquiryPeriod.endDate:
                 self._check_enquiry_minNumberOfQualifiedBids()

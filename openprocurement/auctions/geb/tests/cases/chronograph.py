@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+import os
 import unittest
 
 from openprocurement.auctions.core.tests.base import snitch
@@ -17,14 +18,15 @@ from openprocurement.auctions.geb.tests.helpers import (
 
 
 from openprocurement.auctions.geb.tests.blanks.chronograph import (
+    check_enquiry_period_end_active_auction,
+    check_enquiry_period_end_active_qualification,
+    check_enquiry_period_end_set_unsuccessful_bids,
+    check_enquiry_period_end_unsuccessful,
+    check_rectification_period_end,
+    check_tender_period_end_delete_draft_bids,
     check_tender_period_end_no_active_bids,
     check_tender_period_end_no_minNumberOfQualifiedBids,
     check_tender_period_end_successful,
-    check_enquiry_period_end_unsuccessful,
-    check_enquiry_period_end_active_auction,
-    check_enquiry_period_end_active_qualification,
-    check_rectification_period_end,
-    check_enquiry_period_end_set_unsuccessful_bids
 )
 
 
@@ -53,6 +55,7 @@ class ChronographTenderingTest(BaseAuctionWebTest):
 
     test_no_active_bids = snitch(check_tender_period_end_no_active_bids)
     test_no_minNumberOfQualifiedBids = snitch(check_tender_period_end_no_minNumberOfQualifiedBids)
+    test_delete_draft_bids = snitch(check_tender_period_end_delete_draft_bids)
     test_successful = snitch(check_tender_period_end_successful)
 
     def setUp(self):
@@ -62,12 +65,18 @@ class ChronographTenderingTest(BaseAuctionWebTest):
                               {"token": self.auction_token},
                               self)
         state = get_procedure_state(procedure, 'active.tendering')
+
         entrypoints = {}
         self.auction = state.auction
         self.app.authorization = ('Basic', ('chronograph', ''))
 
         entrypoints['auction'] = '/auctions/{}'.format(self.auction_id)
         self.ENTRYPOINTS = entrypoints
+        destination = self.auction['tenderPeriod']['endDate']
+        os.environ['FAKE_NOW'] = destination
+
+    def tearDown(self):
+        os.environ.pop('FAKE_NOW')
 
 
 class ChronographEnquiryTest(BaseAuctionWebTest):
@@ -92,6 +101,11 @@ class ChronographEnquiryTest(BaseAuctionWebTest):
 
         entrypoints['auction'] = '/auctions/{}'.format(self.auction_id)
         self.ENTRYPOINTS = entrypoints
+        destination = self.auction['enquiryPeriod']['endDate']
+        os.environ['FAKE_NOW'] = destination
+
+    def tearDown(self):
+        os.environ.pop('FAKE_NOW')
 
 
 def suite():

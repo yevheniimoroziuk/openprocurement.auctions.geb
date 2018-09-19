@@ -65,13 +65,18 @@ from openprocurement.auctions.geb.models.roles import (
     auction_edit_enquiry_role,
     auction_contractTerms_create_role,
     question_enquiry_role,
-    bid_view_role,
-    bid_create_role,
-    bid_pending_role,
+    bid_active_auction_role,
+    bid_active_awarded_role,
+    bid_active_enquiry_role,
+    bid_active_qualification_role,
     bid_active_role,
-    bid_edit_draft_role,
+    bid_active_tendering_role,
+    bid_create_role,
     bid_edit_active_role,
-    bid_edit_pending_role
+    bid_edit_draft_role,
+    bid_edit_pending_role,
+    bid_pending_role,
+    bid_view_role
 )
 
 from openprocurement.auctions.geb.validation import (
@@ -174,15 +179,20 @@ class GebBid(Model):
     class Options:
         roles = {
             'Administrator': Administrator_bid_role,
-            'view': bid_view_role,
+            'active': bid_active_role,
+            'active.auction': bid_active_auction_role,
+            'active.awarded': bid_active_awarded_role,
+            'active.enquiry': bid_active_enquiry_role,
+            'active.qualification': bid_active_qualification_role,
+            'active.tendering': bid_active_tendering_role,
             'create': bid_create_role,
             'draft': bid_view_role,
-            'edit_draft': bid_edit_draft_role,
-            'pending': bid_pending_role,
-            'edit_pending': bid_edit_pending_role,
-            'active': bid_active_role,
             'edit_active': bid_edit_active_role,
-            'unsuccessful': bid_view_role
+            'edit_draft': bid_edit_draft_role,
+            'edit_pending': bid_edit_pending_role,
+            'pending': bid_pending_role,
+            'unsuccessful': bid_view_role,
+            'view': bid_view_role,
         }
 
     tenderers = ListType(ModelType(BaseOrganization), required=True, min_size=1, max_size=1)

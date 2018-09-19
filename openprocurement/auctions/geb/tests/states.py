@@ -1,7 +1,8 @@
 import os
 from openprocurement.auctions.geb.tests.helpers import (
     get_next_status,
-    create_active_bid,
+    create_pending_bid,
+    activate_bid,
     create_bid
 )
 
@@ -42,15 +43,30 @@ class State(object):
         self._test.app.patch_json(entrypoint, request_data)
         self._test.app.authorization = auth
 
+    def _update_extra(self):
+        for bid in self.extra.get('bids'):
+            prev_auth = self._test.app.authorization
+            self._test.authorization = bid['owner']
+            entrypoint = '/auctions/{}/bids/{}?acc_token={}'.format(self._auction['id'],
+                                                                    bid['data']['id'],
+                                                                    bid['access']['token'])
+            response = self._test.app.get(entrypoint)
+            bid['data'] = response.json['data']
+            self._test.authorization = prev_auth
+
 
 class ActiveAuction(State):
 
-    def __init__(self, auction, access, test):
+    def __init__(self, auction, access, test, extra):
         self._auction = auction
         self._access = access
-        self.extra = {}
+        self.extra = extra
         self._test = test
         self._dispose()
+
+    def _prev_state_workflow(self):
+        for bid_number, bid in enumerate(self.extra['bids'], 1):
+            activate_bid(self._test, self._auction, bid, bid_number)
 
     def _fake_now(self):
         destination = self._auction['enquiryPeriod']['endDate']
@@ -60,23 +76,24 @@ class ActiveAuction(State):
         self._prev_state_workflow()
         self._fake_now()
         self._chronograph()
+        self._update_extra()
         self._update_auction()
 
 
 class ActiveEnquiry(State):
 
-    def __init__(self, auction, access, test):
+    def __init__(self, auction, access, test, extra):
         self._auction = auction
         self._access = access
-        self.extra = {}
         self._test = test
+        self.extra = extra
         self._dispose()
 
     def _prev_state_workflow(self):
         bids = []
 
-        bids.append(create_active_bid(self._test, self._auction))
-        bids.append(create_active_bid(self._test, self._auction))
+        bids.append(create_pending_bid(self._test, self._auction))
+        bids.append(create_pending_bid(self._test, self._auction))
         bids.append(create_bid(self._test, self._auction))
         self.extra['bids'] = bids
 
@@ -91,15 +108,16 @@ class ActiveEnquiry(State):
         self._update_auction()
 
     def _next(self):
-        return ActiveAuction(self._auction, self._access, self._test)
+        return ActiveAuction(self._auction, self._access, self._test, self.extra)
 
 
 class ActiveTendering(State):
 
-    def __init__(self, auction, access, test):
+    def __init__(self, auction, access, test, extra):
         self._auction = auction
         self._access = access
         self._test = test
+        self.extra = extra
         self._dispose()
 
     def _fake_now(self):
@@ -113,15 +131,16 @@ class ActiveTendering(State):
         self._update_auction()
 
     def _next(self):
-        return ActiveEnquiry(self._auction, self._access, self._test)
+        return ActiveEnquiry(self._auction, self._access, self._test, self.extra)
 
 
 class ActiveRetification(State):
 
-    def __init__(self, auction, access, test):
+    def __init__(self, auction, access, test, extra):
         self._auction = auction
         self._access = access
         self._test = test
+        self.extra = extra
         self._dispose()
 
     def _dispose(self):
@@ -130,36 +149,39 @@ class ActiveRetification(State):
         self._update_auction()
 
     def _next(self):
-        return ActiveTendering(self._auction, self._access, self._test)
+        return ActiveTendering(self._auction, self._access, self._test, self.extra)
 
 
 class Draft(State):
 
-    def __init__(self, auction, access, test):
+    def __init__(self, auction, access, test, extra):
         self._auction = auction
         self._access = access
         self._test = test
+        self.extra = extra
         self._dispose()
 
     def _next(self):
-        return ActiveRetification(self._auction, self._access, self._test)
+        return ActiveRetification(self._auction, self._access, self._test, self.extra)
 
 
 class Create(State):
-    def __init__(self, auction, access, test):
+    def __init__(self, auction, access, test, extra):
         self._auction = auction
         self._access = access
         self._test = test
+        self.extra = extra
 
     def _next(self):
-        return Draft(self._auction, self._access, self._test)
+        return Draft(self._auction, self._access, self._test, self.extra)
 
 
 class Procedure(object):
 
     def __init__(self, auction, access, test):
         self._auction = auction
-        self.state = Create(self._auction, access, test)
+        self.extra = {}
+        self.state = Create(self._auction, access, test, self.extra)
 
     def _next(self):
         self.state = self.state._next()
