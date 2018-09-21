@@ -2,13 +2,9 @@ from copy import deepcopy
 from openprocurement.auctions.core.tests.base import (
     test_document_data,
 )
-from openprocurement.auctions.geb.tests.fixtures import (
+from openprocurement.auctions.geb.tests.fixtures.common import (
     test_question_data,
     test_bid_data
-)
-from openprocurement.auctions.geb.tests.helpers import (
-    create_question,
-    get_errors_names
 )
 
 
@@ -34,10 +30,9 @@ def add_question(test_case):
 def answer_question(test_case):
     expected_http_status = '200 OK'
 
-    question = create_question(test_case, test_case.auction)
-    entrypoint = '/auctions/{}/questions/{}?acc_token={}'.format(test_case.auction['id'],
-                                                                 question['id'],
-                                                                 test_case.auction_token)
+    entrypoint = '/auctions/{}/questions/{}?acc_token={}'.format(test_case.auction['data']['id'],
+                                                                 test_case.questions[0]['data']['id'],
+                                                                 test_case.auction['access']['token'])
 
     request_data = {"data": {"answer": "Test answer"}}
     response = test_case.app.patch_json(entrypoint, request_data)
@@ -60,25 +55,19 @@ def add_invalid_bid(test_case):
     invalid_bid['data']['value']['amount'] = 42
     request_data = invalid_bid
     response = test_case.app.post_json(test_case.ENTRYPOINTS['create_bid'], request_data, status=422)
-    errors = get_errors_names(response)
     test_case.assertEqual(response.status, expected_http_status)
-    test_case.assertIn(expected_error, errors)
 
     invalid_bid = deepcopy(test_bid_data)
     invalid_bid['data']['value']['currency'] = 'BTC'
     request_data = invalid_bid
     response = test_case.app.post_json(test_case.ENTRYPOINTS['create_bid'], request_data, status=422)
-    errors = get_errors_names(response)
     test_case.assertEqual(response.status, expected_http_status)
-    test_case.assertIn(expected_error, errors)
 
     invalid_bid = deepcopy(test_bid_data)
     invalid_bid['data']['value']['valueAddedTaxIncluded'] = False
     request_data = invalid_bid
     response = test_case.app.post_json(test_case.ENTRYPOINTS['create_bid'], request_data, status=422)
-    errors = get_errors_names(response)
     test_case.assertEqual(response.status, expected_http_status)
-    test_case.assertIn(expected_error, errors)
 
 
 def add_document_to_bid(test_case):

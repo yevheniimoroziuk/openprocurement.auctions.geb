@@ -1,202 +1,187 @@
-import os
-from openprocurement.auctions.geb.tests.helpers import (
-    get_next_status,
-    create_pending_bid,
-    activate_bid,
-    create_bid
+from openprocurement.auctions.geb.tests.fixtures.create import (
+    CREATE_AUCTION_DEFAULT_FIXTURE
+)
+from openprocurement.auctions.geb.tests.fixtures.draft import (
+    DRAFT_AUCTION_DEFAULT_FIXTURE
+)
+from openprocurement.auctions.geb.tests.fixtures.active_rectification import (
+    ACTIVE_RECTIFICATION_AUCTION_DEFAULT_FIXTURE,
+    END_ACTIVE_RECTIFICATION_AUCTION_DEFAULT_FIXTURE
+)
+from openprocurement.auctions.geb.tests.fixtures.active_tendering import (
+    ACTIVE_TENDERING_AUCTION_DEFAULT_FIXTURE,
+    END_ACTIVE_TENDERING_AUCTION_DEFAULT_FIXTURE
+)
+from openprocurement.auctions.geb.tests.fixtures.active_enquiry import (
+    ACTIVE_ENQUIRY_AUCTION_DEFAULT_FIXTURE,
+    END_ACTIVE_ENQUIRY_AUCTION_DEFAULT_FIXTURE
+)
+from openprocurement.auctions.geb.tests.fixtures.active_auction import (
+    ACTIVE_AUCTION_DEFAULT_FIXTURE,
+    END_AUCTION_AUCTION_DEFAULT_FIXTURE
 )
 
 
 class State(object):
+    pass
 
-    @property
-    def auction(self):
-        return self._auction
+# Auction States
 
-    @property
-    def status(self):
-        return self._auction['status']
 
-    def _dispose(self):
-        pass
-
-    def _prev_state_workflow(self):
-        pass
-
-    def _update_auction(self):
-        response = self._test.app.get('/auctions/{}'.format(self.auction['id']))
-        self._auction = response.json['data']
-
-    def _solely(self):
-        next_status = get_next_status(self.status)
-        request_data = {"data": {"status": next_status}}
-        entrypoint = '/auctions/{}?acc_token={}'.format(self._auction['id'],
-                                                        self._access['token'])
-        self._test.app.patch_json(entrypoint, request_data)
-
-    def _chronograph(self):
-        auth = self._test.app.authorization
-        self._test.app.authorization = ('Basic', ('chronograph', ''))
-
-        request_data = {'data': {'id': self._auction['id']}}
-        entrypoint = '/auctions/{}'.format(self._auction['id'])
-        self._test.app.patch_json(entrypoint, request_data)
-        self._test.app.authorization = auth
-
-    def _update_extra(self):
-        bids = []
-        for bid in self.extra.get('bids'):
-            prev_auth = self._test.app.authorization
-            self._test.authorization = bid['owner']
-            entrypoint = '/auctions/{}/bids/{}?acc_token={}'.format(self._auction['id'],
-                                                                    bid['data']['id'],
-                                                                    bid['access']['token'])
-            try:
-                response = self._test.app.get(entrypoint)
-            except Exception:
-                continue
-
-            bid['data'] = response.json['data']
-            bids.append(bid)
-            self._test.authorization = prev_auth
-        self.extra['bids'] = bids
+class EndActiveAuction(State):
+    fixture = END_AUCTION_AUCTION_DEFAULT_FIXTURE
+    status = 'active.auction'
 
 
 class ActiveAuction(State):
+    fixture = ACTIVE_AUCTION_DEFAULT_FIXTURE
+    status = 'active.auction'
 
-    def __init__(self, auction, access, test, extra):
-        self._auction = auction
-        self._access = access
-        self.extra = extra
-        self._test = test
-        self._dispose()
 
-    def _prev_state_workflow(self):
-        for bid_number, bid in enumerate(self.extra['bids'], 1):
-            activate_bid(self._test, self._auction, bid, bid_number)
+# Enquiry States
 
-    def _fake_now(self):
-        destination = self._auction['enquiryPeriod']['endDate']
-        os.environ['FAKE_NOW'] = destination
 
-    def _dispose(self):
-        self._prev_state_workflow()
-        self._fake_now()
-        self._chronograph()
-        self._update_extra()
-        self._update_auction()
+class EndActiveEnquiry(State):
+    fixture = END_ACTIVE_ENQUIRY_AUCTION_DEFAULT_FIXTURE
+    status = 'active.enquiry'
 
 
 class ActiveEnquiry(State):
+    fixture = ACTIVE_ENQUIRY_AUCTION_DEFAULT_FIXTURE
+    status = 'active.enquiry'
 
-    def __init__(self, auction, access, test, extra):
-        self._auction = auction
-        self._access = access
-        self._test = test
-        self.extra = extra
-        self._dispose()
+    def _next(self, end=False):
+        return ActiveAuction() if not end else EndActiveAuction()
 
-    def _prev_state_workflow(self):
-        bids = []
+# Tendering States
 
-        bids.append(create_pending_bid(self._test, self._auction))
-        bids.append(create_pending_bid(self._test, self._auction))
-        bids.append(create_bid(self._test, self._auction))
-        self.extra['bids'] = bids
 
-    def _fake_now(self):
-        destination = self._auction['tenderPeriod']['endDate']
-        os.environ['FAKE_NOW'] = destination
-
-    def _dispose(self):
-        self._prev_state_workflow()
-        self._fake_now()
-        self._chronograph()
-        self._update_extra()
-        self._update_auction()
-
-    def _next(self):
-        return ActiveAuction(self._auction, self._access, self._test, self.extra)
+class EndActiveTendering(State):
+    fixture = END_ACTIVE_TENDERING_AUCTION_DEFAULT_FIXTURE
+    status = 'active.tendering'
 
 
 class ActiveTendering(State):
+    fixture = ACTIVE_TENDERING_AUCTION_DEFAULT_FIXTURE
+    status = 'active.tendering'
 
-    def __init__(self, auction, access, test, extra):
-        self._auction = auction
-        self._access = access
-        self._test = test
-        self.extra = extra
-        self._dispose()
+    def context(self, fixture):
+        context = {}
+        context['auction'] = {}
+        context['auction']['data'] = {'id': fixture['_id']}
+        context['auction']['access'] = {'owner': fixture['owner'],
+                                        'token': fixture['owner_token']}
+        context['questions'] = []
+        questions = fixture.get('questions', None)
+        if questions:
+            question = {'data': {'id': questions[0]['id']}}
+            context['questions'].append(question)
+        return context
 
-    def _fake_now(self):
-        destination = self._auction['rectificationPeriod']['endDate']
-        os.environ['FAKE_NOW'] = destination
+    def _next(self, end=False):
+        return ActiveEnquiry() if not end else EndActiveTendering()
 
-    def _dispose(self):
-        self._prev_state_workflow()
-        self._fake_now()
-        self._chronograph()
-        self._update_auction()
+# Rectification States
 
-    def _next(self):
-        return ActiveEnquiry(self._auction, self._access, self._test, self.extra)
+
+class EndActiveRectification(State):
+    fixture = END_ACTIVE_RECTIFICATION_AUCTION_DEFAULT_FIXTURE
+    status = 'active.rectification'
+
+    def context(self, fixture):
+        context = {}
+        context['auction'] = {}
+        context['auction']['data'] = {'id': fixture['_id']}
+        context['auction']['access'] = {'owner': fixture['owner'],
+                                        'token': fixture['owner_token']}
+        return context
 
 
 class ActiveRetification(State):
+    fixture = ACTIVE_RECTIFICATION_AUCTION_DEFAULT_FIXTURE
+    status = 'active.rectification'
 
-    def __init__(self, auction, access, test, extra):
-        self._auction = auction
-        self._access = access
-        self._test = test
-        self.extra = extra
-        self._dispose()
+    def context(self, fixture):
+        context = {}
+        context['auction'] = {}
+        context['auction']['data'] = {'id': fixture['_id']}
+        context['auction']['access'] = {'owner': fixture['owner'],
+                                        'token': fixture['owner_token']}
+        return context
 
-    def _dispose(self):
-        self._prev_state_workflow()
-        self._solely()
-        self._update_auction()
+    def _next(self, end=False):
+        return ActiveTendering() if not end else EndActiveRectification()
 
-    def _next(self):
-        return ActiveTendering(self._auction, self._access, self._test, self.extra)
+# Draft States
 
 
 class Draft(State):
+    fixture = DRAFT_AUCTION_DEFAULT_FIXTURE
+    status = 'draft'
 
-    def __init__(self, auction, access, test, extra):
-        self._auction = auction
-        self._access = access
-        self._test = test
-        self.extra = extra
-        self._dispose()
+    def context(self, fixture):
+        context = {}
+        context['auction'] = {}
+        context['auction']['data'] = {'id': fixture['_id']}
+        context['auction']['access'] = {'owner': fixture['owner'],
+                                        'token': fixture['owner_token']}
+        return context
 
-    def _next(self):
-        return ActiveRetification(self._auction, self._access, self._test, self.extra)
+    def _next(self, end=False):
+        return ActiveRetification()
 
 
 class Create(State):
-    def __init__(self, auction, access, test, extra):
-        self._auction = auction
-        self._access = access
-        self._test = test
-        self.extra = extra
+    fixture = CREATE_AUCTION_DEFAULT_FIXTURE
+    status = 'create'
 
-    def _next(self):
-        return Draft(self._auction, self._access, self._test, self.extra)
+    def context(self, fixture):
+        context = {}
+        context['auction'] = {}
+        context['auction']['data'] = fixture
+        return context
+
+    def _next(self, end=False):
+        return Draft()
+
+# Machine
 
 
-class Procedure(object):
+class ProcedureMachine(object):
 
-    def __init__(self, auction, access, test):
-        self._auction = auction
-        self.extra = {}
-        self.state = Create(self._auction, access, test, self.extra)
-
-    def _next(self):
-        self.state = self.state._next()
+    def __init__(self):
+        self.state = Create()
 
     def __iter__(self):
         return self
 
-    def next(self):
-        self._next()
+    def _snapshot(self, dump, fixture):
+        if dump:
+            self._db.save(fixture)
+        return self.state.context(fixture)
+
+    def _next(self, end=False):
+        self.state = self.state._next(end=end)
+
+    def snapshot(self, dump=True, fixture=False):
+        fixture = self.state.fixture if not fixture else fixture
+        return self._snapshot(dump, fixture)
+
+    def set_db_connector(self, db):
+        self._db = db
+
+    def next(self, end=False):
+        try:
+            self._next(end=end)
+        except AttributeError:
+            raise StopIteration
         return self.state
+
+    def toggle(self, status, end=False):
+        if self.state.status == status:
+            return
+        for state in self:
+            if state.status == status:
+                break
+        if end:
+            self.next(end=True)

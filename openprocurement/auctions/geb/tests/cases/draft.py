@@ -3,40 +3,35 @@ import unittest
 
 from openprocurement.auctions.core.tests.base import snitch
 from openprocurement.auctions.geb.tests.base import (
-    test_auction_data,
-    BaseAuctionWebTest,
-)
-
-from openprocurement.auctions.geb.tests.states import (
-    Procedure
-)
-
-from openprocurement.auctions.geb.tests.helpers import (
-   get_procedure_state
+    BaseWebTest,
 )
 from openprocurement.auctions.geb.tests.blanks.draft import (
     phase_commit,
-    change_forbidden_field_in_draft
+    invalid_phase_commit
+)
+
+from openprocurement.auctions.geb.tests.helpers import (
+    change_machine_state
+)
+from openprocurement.auctions.geb.tests.states import (
+    ProcedureMachine
 )
 
 
-class StatusDraftTest(BaseAuctionWebTest):
-    initial_data = test_auction_data
+class StatusDraftTest(BaseWebTest):
 
     test_phase_commit = snitch(phase_commit)
-    test_change_forbidden_field_in_draft = snitch(change_forbidden_field_in_draft)
-    # TODO owners test
+    test_invalid_phase_commit = snitch(invalid_phase_commit)
 
     def setUp(self):
         super(StatusDraftTest, self).setUp()
-
-        procedure = Procedure(self.auction,
-                              {"token": self.auction_token},
-                              self)
-        state = get_procedure_state(procedure, 'draft')
-        self.auction = state.auction
-        self.entrypoint = '/auctions/{}?acc_token={}'.format(self.auction_id,
-                                                             self.auction_token)
+        procedure = ProcedureMachine()
+        procedure.set_db_connector(self.db)
+        change_machine_state(procedure, 'draft')
+        context = procedure.snapshot()
+        self.auction = context['auction']
+        self.ENTRYPOINT = '/auctions/{}?acc_token={}'.format(self.auction['data']['id'],
+                                                             self.auction['access']['token'])
 
 
 def suite():

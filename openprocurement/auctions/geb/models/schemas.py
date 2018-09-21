@@ -161,11 +161,6 @@ class AuctionAuctionPeriod(Period):
         start_after = auction.enquiryPeriod.endDate
         return rounding_shouldStartAfter(start_after, auction).isoformat()
 
-    def validate_startDate(self, data, startDate):
-        auction = data['__parent__']
-        if not auction.revisions and not startDate:
-            raise ValidationError(u'This field is required.')
-
 
 class RectificationPeriod(Period):
     invalidationDate = IsoDateTimeType()
@@ -297,6 +292,7 @@ class Auction(BaseAuction):
         return roles
 
     _internal_type = "geb"
+    modified = False
 
     auctionPeriod = ModelType(AuctionAuctionPeriod, required=True, default={})
     auctionParameters = ModelType(AuctionParameters)
@@ -325,6 +321,8 @@ class Auction(BaseAuction):
     lotHolder = ModelType(BaseOrganization, required=True)
 
     description = StringType(required=True)
+
+    dateModified = IsoDateTimeType()
 
     documents = ListType(ModelType(GebAuctionDocument), default=list())
 
@@ -388,12 +386,12 @@ class Auction(BaseAuction):
     @serializable(serialize_when_none=False)
     def next_check(self):
         check = None
-        if self.status == 'active.rectification':
+        if self.status == 'active.rectification' and self.rectificationPeriod:
             check = self.rectificationPeriod.endDate.astimezone(TZ)
-        elif self.status == 'active.tendering':
+        elif self.status == 'active.tendering' and self.tenderPeriod:
             check = self.tenderPeriod.endDate.astimezone(TZ)
-        elif self.status == 'active.enquiry':
-            check = self.tenderPeriod.endDate.astimezone(TZ)
+        elif self.status == 'active.enquiry' and self.enquiryPeriod:
+            check = self.enquiryPeriod.endDate.astimezone(TZ)
 
         return check.isoformat() if check else None
 

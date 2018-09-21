@@ -22,11 +22,18 @@ from openprocurement.auctions.geb.constants import (
 @implementer(IAuctionInitializator)
 class AuctionInitializator(object):
     name = 'Auction Initializator'
+    validators = []
 
     def __init__(self, request, context):
         self._now = get_now()
         self._request = request
         self._context = context
+
+    def validate(self):
+        for validator in self.validators:
+            if not validator(self._request):
+                return
+        return True
 
     def _initialize_enquiryPeriod(self):
         period = self._context.__class__.enquiryPeriod.model_class()
@@ -80,12 +87,13 @@ class AuctionInitializator(object):
         self._context.auctionPeriod.endDate = None
 
     def initialize(self):
-        self._initialize_rectificationPeriod()
-        self._initialize_tenderPeriod()
-        self._initialize_enquiryPeriod()
-        self._initialize_auctionParameters()
-        self._initialize_date()
-        self._clean_auctionPeriod()
+        if self.validate():
+            self._initialize_rectificationPeriod()
+            self._initialize_tenderPeriod()
+            self._initialize_enquiryPeriod()
+            self._initialize_auctionParameters()
+            self._initialize_date()
+            self._clean_auctionPeriod()
 
 
 @implementer(IBidInitializator)

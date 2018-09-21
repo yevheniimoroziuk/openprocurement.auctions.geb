@@ -8,12 +8,10 @@ from openprocurement.auctions.core.tests.base import (
 from openprocurement.auctions.core.tests.base import MOCK_CONFIG as BASE_MOCK_CONFIG
 from openprocurement.auctions.core.utils import connection_mock_config
 
-from openprocurement.auctions.geb.tests.fixtures import (
-    PARTIAL_MOCK_CONFIG,
-    test_auction_data
+from openprocurement.auctions.geb.tests.constants import (
+    PARTIAL_MOCK_CONFIG
 )
 
-from openprocurement.auctions.geb.tests.helpers import get_next_status
 
 MOCK_CONFIG = connection_mock_config(PARTIAL_MOCK_CONFIG,
                                      base=BASE_MOCK_CONFIG,
@@ -34,5 +32,4 @@ class BaseWebTest(CoreBaseWebTest):
 
 class BaseAuctionWebTest(CoreBaseAuctionWebTest):
     relative_to = os.path.dirname(__file__)
-    initial_data = test_auction_data
     mock_config = MOCK_CONFIG

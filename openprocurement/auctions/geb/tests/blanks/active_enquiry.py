@@ -3,13 +3,9 @@ from copy import deepcopy
 from openprocurement.auctions.core.tests.base import (
     test_document_data,
 )
-from openprocurement.auctions.geb.tests.fixtures import (
+from openprocurement.auctions.geb.tests.fixtures.common import (
     test_question_data,
     test_bid_data
-)
-from openprocurement.auctions.geb.tests.helpers import (
-    create_question,
-    get_errors_names
 )
 
 
@@ -38,16 +34,17 @@ def add_question(test_case):
 
 
 def answer_question(test_case):
-    expected_http_status = '200 OK'
+    pass
+    ##expected_http_status = '200 OK'
 
-    question = create_question(test_case, test_case.auction)
-    entrypoint = '/auctions/{}/questions/{}?acc_token={}'.format(test_case.auction['id'],
-                                                                 question['id'],
-                                                                 test_case.auction_token)
+    ##question = create_question(test_case, test_case.auction)
+    ##entrypoint = '/auctions/{}/questions/{}?acc_token={}'.format(test_case.auction['id'],
+    ##                                                             question['id'],
+    ##                                                             test_case.auction_token)
 
-    request_data = {"data": {"answer": "Test answer"}}
-    response = test_case.app.patch_json(entrypoint, request_data)
-    test_case.assertEqual(response.status, expected_http_status)
+    ##request_data = {"data": {"answer": "Test answer"}}
+    ##response = test_case.app.patch_json(entrypoint, request_data)
+    ##test_case.assertEqual(response.status, expected_http_status)
 
 
 def add_bid(test_case):

@@ -4,13 +4,14 @@ import unittest
 from openprocurement.auctions.core.tests.base import snitch
 
 from openprocurement.auctions.geb.tests.base import (
-    test_auction_data,
-    BaseAuctionWebTest
+    BaseWebTest
 )
 
-from openprocurement.auctions.geb.tests.states import (Procedure)
 from openprocurement.auctions.geb.tests.helpers import (
-   get_procedure_state
+    change_machine_state
+)
+from openprocurement.auctions.geb.tests.states import (
+    ProcedureMachine
 )
 
 from openprocurement.auctions.geb.tests.blanks.active_rectification import (
@@ -22,7 +23,6 @@ from openprocurement.auctions.geb.tests.blanks.active_rectification import (
     change_minimalStep,
     change_guarantee,
     change_items,
-    change_invalid_tenderAttempts,
     change_budgetSpent,
     change_registrationFee,
     change_procuringEntity,
@@ -33,8 +33,7 @@ from openprocurement.auctions.geb.tests.blanks.active_rectification import (
 )
 
 
-class StatusActiveRectificationChangeFieldTest(BaseAuctionWebTest):
-    initial_data = test_auction_data
+class StatusActiveRectificationChangeFieldTest(BaseWebTest):
 
     test_change_title = snitch(change_title)
     test_change_description = snitch(change_desctiption)
@@ -44,7 +43,6 @@ class StatusActiveRectificationChangeFieldTest(BaseAuctionWebTest):
     test_change_minimalStep = snitch(change_minimalStep)
     test_change_guarantee = snitch(change_guarantee)
     test_change_items = snitch(change_items)
-    test_change_invalid_tenderAttempts = snitch(change_invalid_tenderAttempts)
     test_change_budgetSpent = snitch(change_budgetSpent)
     test_change_registrationFee = snitch(change_registrationFee)
     test_change_procuringEntity = snitch(change_procuringEntity)
@@ -55,27 +53,27 @@ class StatusActiveRectificationChangeFieldTest(BaseAuctionWebTest):
     def setUp(self):
         super(StatusActiveRectificationChangeFieldTest, self).setUp()
 
-        procedure = Procedure(self.auction,
-                              {"token": self.auction_token},
-                              self)
-        state = get_procedure_state(procedure, 'active.rectification')
-        self.auction = state.auction
-        self.entrypoint = '/auctions/{}?acc_token={}'.format(self.auction_id,
-                                                             self.auction_token)
+        procedure = ProcedureMachine()
+        procedure.set_db_connector(self.db)
+        change_machine_state(procedure, 'active.rectification')
+        context = procedure.snapshot()
+        self.auction = context['auction']
+        self.ENTRYPOINT = '/auctions/{}?acc_token={}'.format(self.auction['data']['id'],
+                                                             self.auction['access']['token'])
 
 
-class StatusActiveRectificationDocumentTest(BaseAuctionWebTest):
+class StatusActiveRectificationDocumentTest(BaseWebTest):
     docservice = True
 
     def setUp(self):
         super(StatusActiveRectificationDocumentTest, self).setUp()
-        procedure = Procedure(self.auction,
-                              {"token": self.auction_token},
-                              self)
-        state = get_procedure_state(procedure, 'active.rectification')
-        self.auction = state.auction
-        self.entrypoint = '/auctions/{}/documents/?acc_token={}'.format(self.auction_id,
-                                                                        self.auction_token)
+
+        procedure = ProcedureMachine()
+        procedure.set_db_connector(self.db)
+        change_machine_state(procedure, 'active.rectification')
+        context = procedure.snapshot()
+        self.auction = context['auction']
+        self.ENTRYPOINT = '/auctions/{}/documents?acc_token={}'.format(self.auction['data']['id'], self.auction['access']['token'])
 
     test_add_document = snitch(add_document)
 

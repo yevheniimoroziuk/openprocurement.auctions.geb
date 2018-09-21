@@ -29,7 +29,7 @@ auction_create_role = whitelist(
 )
 
 
-auction_contractTerms_create_role = whitelist('leaseTerms')
+auction_contractTerms_create_role = whitelist('leaseTerms', 'type')
 
 auction_rectification_role = whitelist(
     'auctionID',
