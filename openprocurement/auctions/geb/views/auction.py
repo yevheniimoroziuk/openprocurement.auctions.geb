@@ -5,12 +5,12 @@ from openprocurement.auctions.core.utils import (
     save_auction,
     apply_patch,
     opresource,
-    cleanup_bids_for_cancelled_lots
 )
 from openprocurement.auctions.core.validation import (
     validate_auction_auction_data,
 )
 from openprocurement.auctions.core.views.mixins import APIResource
+from openprocurement.auctions.core.interfaces import IAuctionManager
 
 from openprocurement.auctions.geb.utils import (
     invalidate_bids_under_threshold
@@ -27,11 +27,12 @@ class AuctionAuctionResource(APIResource):
     def post(self):
         apply_patch(self.request, save=False, src=self.request.validated['auction_src'])
         auction = self.request.validated['auction']
+        adapter = self.request.registry.getAdapter(auction, IAuctionManager)
         invalidate_bids_under_threshold(auction)
         if any([i.status == 'active' for i in auction.bids]):
             self.request.content_configurator.start_awarding()
         else:
-            auction.status = 'unsuccessful'
+            adapter.pendify_auction_status('unsuccessful')
         if save_auction(self.request):
             self.LOGGER.info('Report auction results', extra=context_unpack(self.request, {'MESSAGE_ID': 'auction_auction_post'}))
             return {'data': self.request.validated['auction'].serialize(self.request.validated['auction'].status)}
