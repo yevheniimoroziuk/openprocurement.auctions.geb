@@ -175,3 +175,10 @@ def validate_phase_commit(request):
         request.errors.status = 403
         return False
     return True
+
+
+def validate_bid_initialization(request):
+    new_status = request.validated['json_data'].get('status')
+    if new_status != 'pending':
+        return False
+    return True

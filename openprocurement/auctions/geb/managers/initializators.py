@@ -17,6 +17,9 @@ from openprocurement.auctions.geb.constants import (
     TENDER_PERIOD_DURATION,
     AUCTION_PARAMETERS_TYPE
 )
+from openprocurement.auctions.geb.validation import (
+    validate_bid_initialization
+)
 
 
 @implementer(IAuctionInitializator)
@@ -98,6 +101,7 @@ class AuctionInitializator(object):
 
 @implementer(IBidInitializator)
 class BidInitializator(object):
+    validators = [validate_bid_initialization]
 
     def __init__(self, request, context):
         self._now = get_now()
@@ -110,7 +114,13 @@ class BidInitializator(object):
     def _initialize_date(self):
         self._context.date = self._now
 
+    def validate(self):
+        for validator in self.validators:
+            if not validator(self._request):
+                return
+        return True
+
     def initialize(self):
-        if self._request.validated['json_data'].get('status') == 'pending':
+        if self._context.modified and self.validate():
             self._initialize_qualified()
             self._initialize_date()

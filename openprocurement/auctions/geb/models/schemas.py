@@ -194,6 +194,7 @@ class GebBid(Model):
     date = IsoDateTimeType()
     documents = ListType(ModelType(GebBidDocument), default=list())
     id = MD5Type(required=True, default=lambda: uuid4().hex)
+    modified = False
     owner = StringType()
     owner_token = StringType()
     participationUrl = URLType()
