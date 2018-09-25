@@ -163,7 +163,7 @@ class AuctionPeriod(Period):
         elif instance.period == 'auctionDate':
                 self._shouldStartAfter = ccbd(instance.auctionDate.date, timedelta(days=14))
         elif instance.period == 'enquiryPeriod':
-                self._shouldStartAfter = ccbd(instance.enquiryPeriod.endDate, timedelta(days=1))
+                self._shouldStartAfter = ccbd(instance.time, timedelta(days=14))
         return self
 
     @property

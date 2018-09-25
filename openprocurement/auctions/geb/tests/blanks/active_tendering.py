@@ -26,6 +26,15 @@ def add_question(test_case):
     response = test_case.app.post_json(test_case.ENTRYPOINTS['questions'], request_data)
     test_case.assertEqual(response.status, expected_http_status)
 
+    question = response.json['data']
+
+    question_url_pattern = '/auctions/{auction}/questions/{question}'
+    question_url = question_url_pattern.format(auction=test_case.auction['data']['id'],
+                                               question=question['id'])
+
+    response = test_case.app.get(question_url)
+    test_case.assertEqual(response.status, '200 OK')
+
 
 def answer_question(test_case):
     expected_http_status = '200 OK'

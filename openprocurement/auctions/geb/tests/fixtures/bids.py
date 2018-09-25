@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+from uuid import uuid4
 from copy import deepcopy
 
 from openprocurement.auctions.core.utils import get_now
@@ -19,10 +20,55 @@ TEST_DRAFT_BID = {
         "amount": 100,
         "valueAddedTaxIncluded": True
     },
-    "owner_token": "eda1899ff5d246d9893b6bf2bf5b29cf",
+    "owner_token": uuid4().hex,
     "tenderers": [
         deepcopy(test_procuringEntity)
     ],
     "owner": "broker",
-    "id": "c59e79cd06cd4163a2f2999d6a5cf1dc"
+    "id": uuid4().hex
+}
+
+TEST_ACTIVE_BID_FIRST = {
+    "status": "active",
+    "value": {
+        "currency": "UAH",
+        "amount": 100,
+        "valueAddedTaxIncluded": True
+    },
+    "owner_token": uuid4().hex,
+    "tenderers": [
+        deepcopy(test_procuringEntity)
+    ],
+    "owner": "broker",
+    "id": uuid4().hex
+}
+
+TEST_ACTIVE_BID_SECOND = {
+    "status": "active",
+    "value": {
+        "currency": "UAH",
+        "amount": 100,
+        "valueAddedTaxIncluded": True
+    },
+    "owner_token": uuid4().hex,
+    "tenderers": [
+        deepcopy(test_procuringEntity)
+    ],
+    "owner": "broker",
+    "id": uuid4().hex
+}
+
+TEST_PENDING_BID = {
+    "status": "pending",
+    "value": {
+        "currency": "UAH",
+        "amount": 100,
+        "valueAddedTaxIncluded": True
+    },
+    "owner_token": uuid4().hex,
+    "tenderers": [
+        deepcopy(test_procuringEntity)
+    ],
+    "owner": "broker",
+    "id": uuid4().hex
 }

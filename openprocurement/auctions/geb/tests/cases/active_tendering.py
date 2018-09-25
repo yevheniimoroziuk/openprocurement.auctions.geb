@@ -10,7 +10,6 @@ from openprocurement.auctions.geb.tests.states import (
     ProcedureMachine
 )
 from openprocurement.auctions.geb.tests.fixtures.active_tendering import (
-    ACTIVE_TENDERING_AUCTION_DEFAULT_FIXTURE,
     ACTIVE_TENDERING_AUCTION_DEFAULT_FIXTURE_WITH_BIDS,
     ACTIVE_TENDERING_AUCTION_DEFAULT_FIXTURE_WITH_QUESTION
 )
@@ -102,7 +101,7 @@ class StatusActiveTenderingDocumentsTest(BaseWebTest):
         procedure = ProcedureMachine()
         procedure.set_db_connector(self.db)
         procedure.toggle('active.tendering')
-        context = procedure.snapshot(fixture=ACTIVE_TENDERING_AUCTION_DEFAULT_FIXTURE)
+        context = procedure.snapshot()
 
         self.auction = context['auction']
 

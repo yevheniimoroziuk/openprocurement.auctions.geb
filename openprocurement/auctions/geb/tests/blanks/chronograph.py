@@ -1,6 +1,9 @@
-import datetime
-import iso8601
-from mock import patch
+
+from openprocurement.auctions.geb.tests.fixtures.active_tendering import (
+    END_ACTIVE_TENDERING_AUCTION_DEFAULT_FIXTURE_WITH_ONE_BID,
+    END_ACTIVE_TENDERING_AUCTION_DEFAULT_FIXTURE_WITH_TWO_BIDS,
+    END_ACTIVE_TENDERING_AUCTION_DEFAULT_FIXTURE_WITH_TWO_BIDS_AND_ONE_DRAFT
+)
 
 
 def check_rectification_period_end(test_case):
@@ -14,36 +17,43 @@ def check_rectification_period_end(test_case):
 
 
 def check_tender_period_end_no_active_bids(test_case):
-    request_data = {'data': {'id': test_case.auction_id}}
+    context = test_case.procedure.snapshot()
+    auction = context['auction']
 
-    response = test_case.app.patch_json(test_case.ENTRYPOINTS['auction'], request_data)
+    request_data = {'data': {'id': auction['data']['id']}}
 
-    response = test_case.app.get(test_case.ENTRYPOINTS['auction'])
+    entrypoint = '/auctions/{}'.format(auction['data']['id'])
+    response = test_case.app.patch_json(entrypoint, request_data)
+
+    response = test_case.app.get(entrypoint)
     test_case.assertEqual(response.status, '200 OK')
     test_case.assertEqual(response.json['data']["status"], 'unsuccessful')
 
 
 def check_tender_period_end_no_minNumberOfQualifiedBids(test_case):
-    request_data = {'data': {'id': test_case.auction_id}}
+    context = test_case.procedure.snapshot(fixture=END_ACTIVE_TENDERING_AUCTION_DEFAULT_FIXTURE_WITH_ONE_BID)
+    auction = context['auction']
 
-    endDate = test_case.auction['tenderPeriod']['endDate']
-    mock_time = iso8601.parse_date(endDate) + datetime.timedelta(minutes=5)
+    request_data = {'data': {'id': auction['data']['id']}}
 
-    with patch('openprocurement.auctions.geb.managers.checkers.get_now',) as mock_get_now:
-        mock_get_now.return_value = mock_time
-        response = test_case.app.patch_json(test_case.ENTRYPOINTS['auction'], request_data)
+    entrypoint = '/auctions/{}'.format(auction['data']['id'])
+    response = test_case.app.patch_json(entrypoint, request_data)
 
-    response = test_case.app.get(test_case.ENTRYPOINTS['auction'])
+    response = test_case.app.get(entrypoint)
     test_case.assertEqual(response.status, '200 OK')
     test_case.assertEqual(response.json['data']["status"], 'unsuccessful')
 
 
 def check_tender_period_end_successful(test_case):
-    request_data = {'data': {'id': test_case.auction_id}}
+    context = test_case.procedure.snapshot(fixture=END_ACTIVE_TENDERING_AUCTION_DEFAULT_FIXTURE_WITH_TWO_BIDS)
+    auction = context['auction']
 
-    response = test_case.app.patch_json(test_case.ENTRYPOINTS['auction'], request_data)
+    request_data = {'data': {'id': auction['data']['id']}}
 
-    response = test_case.app.get(test_case.ENTRYPOINTS['auction'])
+    entrypoint = '/auctions/{}'.format(auction['data']['id'])
+    response = test_case.app.patch_json(entrypoint, request_data)
+
+    response = test_case.app.get(entrypoint)
     test_case.assertEqual(response.status, '200 OK')
     test_case.assertEqual(response.json['data']["status"], 'active.enquiry')
 
@@ -119,10 +129,29 @@ def chronograph(test_case, auction):
 
 
 def check_tender_period_end_delete_draft_bids(test_case):
+    context = test_case.procedure.snapshot(fixture=END_ACTIVE_TENDERING_AUCTION_DEFAULT_FIXTURE_WITH_TWO_BIDS_AND_ONE_DRAFT)
+    auction = context['auction']
+    bids = context['bids']
+    draft_bid = [bid for bid in bids if bid['data']['status'] == 'draft'][0]
+
+    bid_url_pattern = '/auctions/{auction}/bids/{bid}?acc_token={token}'
+    bid_url = bid_url_pattern.format(auction=auction['data']['id'],
+                                     bid=draft_bid['data']['id'],
+                                     token=draft_bid['access']['token'])
+
     auth = test_case.app.authorization
-    bid_owner = ('Basic', ('broker', ''))
-    test_case.app.authorization = bid_owner
+    test_case.app.authorization = ('Basic', ('{}'.format(draft_bid['access']['owner']), ''))
+    test_case.app.get(bid_url)
     test_case.app.authorization = auth
 
-    request_data = {'data': {'id': test_case.auction_id}}
-    test_case.app.patch_json(test_case.ENTRYPOINTS['auction'], request_data)
+    request_data = {'data': {'id': auction['data']['id']}}
+    entrypoint = '/auctions/{}'.format(auction['data']['id'])
+    response = test_case.app.patch_json(entrypoint, request_data)
+
+    response = test_case.app.get(entrypoint)
+    test_case.assertEqual(response.status, '200 OK')
+    test_case.assertEqual(response.json['data']["status"], 'active.enquiry')
+
+    test_case.app.authorization = ('Basic', ('{}'.format(draft_bid['access']['owner']), ''))
+    test_case.app.get(bid_url, status=404)
+    test_case.app.authorization = auth
