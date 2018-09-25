@@ -60,37 +60,29 @@ class ChronographTenderingTest(BaseWebTest):
         self.app.authorization = ('Basic', ('chronograph', ''))
 
 
-
 #class ChronographEnquiryTest(BaseWebTest):
 #
-#    test_unsuccessful = snitch(check_enquiry_period_end_unsuccessful)
-#    test_active_auction = snitch(check_enquiry_period_end_active_auction)
-#    test_active_qualification = snitch(check_enquiry_period_end_active_qualification)
-#    test_check_set_unsuccessful_bids = snitch(check_enquiry_period_end_set_unsuccessful_bids)
+#    test_check_enquiry_period_end_unsuccessful = snitch(check_enquiry_period_end_unsuccessful)
+#    test_active_check_enquiry_period_end_active_auction = snitch(check_enquiry_period_end_active_auction)
+#    test_active_check_enquiry_period_end_active_qualification = snitch(check_enquiry_period_end_active_qualification)
+#    test_check_enquiry_period_end_set_unsuccessful_bids = snitch(check_enquiry_period_end_set_unsuccessful_bids)
 #
 #    def setUp(self):
 #        super(ChronographEnquiryTest, self).setUp()
 #
-#        procedure = Procedure(self.auction,
-#                              {"token": self.auction_token},
-#                              self)
-#        state = get_procedure_state(procedure, 'active.enquiry')
-#        entrypoints = {}
-#        self.auction = state.auction
-#        self.extra = state.extra
+#        procedure = ProcedureMachine()
+#        procedure.set_db_connector(self.db)
+#        procedure.toggle('active.enquiry', end=True)
+#
+#        self.procedure = procedure
 #        self.app.authorization = ('Basic', ('chronograph', ''))
 #
-#        entrypoints['auction'] = '/auctions/{}'.format(self.auction_id)
-#        self.ENTRYPOINTS = entrypoints
-#        destination = self.auction['enquiryPeriod']['endDate']
-#        os.environ['FAKE_NOW'] = destination
-
 
 def suite():
     suite = unittest.TestSuite()
     suite.addTest(unittest.makeSuite(ChronographRectificationTest))
     suite.addTest(unittest.makeSuite(ChronographTenderingTest))
-    # suite.addTest(unittest.makeSuite(ChronographEnquiryTest))
+     # suite.addTest(unittest.makeSuite(ChronographEnquiryTest))
     return suite
 
 

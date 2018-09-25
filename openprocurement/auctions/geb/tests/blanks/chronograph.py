@@ -4,6 +4,9 @@ from openprocurement.auctions.geb.tests.fixtures.active_tendering import (
     END_ACTIVE_TENDERING_AUCTION_DEFAULT_FIXTURE_WITH_TWO_BIDS,
     END_ACTIVE_TENDERING_AUCTION_DEFAULT_FIXTURE_WITH_TWO_BIDS_AND_ONE_DRAFT
 )
+from openprocurement.auctions.geb.tests.fixtures.active_enquiry import (
+    END_ACTIVE_ENQUIRY_UNSUCCESSFUL_NO_ACTIVE_BIDS
+)
 
 
 def check_rectification_period_end(test_case):
@@ -59,17 +62,17 @@ def check_tender_period_end_successful(test_case):
 
 
 def check_enquiry_period_end_unsuccessful(test_case):
-    request_data = {'data': {'id': test_case.auction_id}}
 
-    auth = test_case.app.authorization
-    for bid in test_case.extra['bids']:
-        test_case.app.authorization = bid['owner']
+    context = test_case.procedure.snapshot(fixture=END_ACTIVE_ENQUIRY_UNSUCCESSFUL_NO_ACTIVE_BIDS)
 
-    test_case.app.authorization = auth
+    auction = context['auction']
 
-    response = test_case.app.patch_json(test_case.ENTRYPOINTS['auction'], request_data)
+    request_data = {'data': {'id': auction['data']['id']}}
 
-    response = test_case.app.get(test_case.ENTRYPOINTS['auction'])
+    entrypoint = '/auctions/{}'.format(auction['data']['id'])
+    response = test_case.app.patch_json(entrypoint, request_data)
+
+    response = test_case.app.get(entrypoint)
     test_case.assertEqual(response.status, '200 OK')
     test_case.assertEqual(response.json['data']["status"], 'unsuccessful')
 

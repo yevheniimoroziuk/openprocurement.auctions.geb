@@ -58,7 +58,22 @@ TEST_ACTIVE_BID_SECOND = {
     "id": uuid4().hex
 }
 
-TEST_PENDING_BID = {
+TEST_PENDING_BID_FIRST = {
+    "status": "pending",
+    "value": {
+        "currency": "UAH",
+        "amount": 100,
+        "valueAddedTaxIncluded": True
+    },
+    "owner_token": uuid4().hex,
+    "tenderers": [
+        deepcopy(test_procuringEntity)
+    ],
+    "owner": "broker",
+    "id": uuid4().hex
+}
+
+TEST_PENDING_BID_SECOND = {
     "status": "pending",
     "value": {
         "currency": "UAH",

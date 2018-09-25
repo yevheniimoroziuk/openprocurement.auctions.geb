@@ -123,7 +123,7 @@ class EnquiryPeriod(Period):
                 self._endDate = ccbd(instance.auctionPeriod.shouldStartAfter, -timedelta(days=1))
             elif instance.state == 'end':
                 self._endDate = instance.time
-                self._startDate = instance.tender.Period.startDate
+                self._startDate = ccbd(instance.time, -timedelta(days=10))
 
         elif instance.period == 'rectificationPeriod':
                 self._startDate = instance.tenderPeriod.startDate

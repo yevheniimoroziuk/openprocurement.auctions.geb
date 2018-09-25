@@ -37,7 +37,7 @@ ACTIVE_TENDERING_AUCTION_DEFAULT_FIXTURE["enquiryPeriod"] = {
 ACTIVE_TENDERING_AUCTION_DEFAULT_FIXTURE["auctionPeriod"] = {
     "shouldStartAfter": calculator.auctionPeriod.shouldStartAfter.isoformat()
 }
-ACTIVE_TENDERING_AUCTION_DEFAULT_FIXTURE["next_check"] = calculator.rectificationPeriod.endDate.isoformat()
+ACTIVE_TENDERING_AUCTION_DEFAULT_FIXTURE["next_check"] = calculator.tenderPeriod.endDate.isoformat()
 ACTIVE_TENDERING_AUCTION_DEFAULT_FIXTURE["date"] = calculator.auctionDate.date.isoformat()
 
 # auction with questions fixture
@@ -72,7 +72,7 @@ END_ACTIVE_TENDERING_AUCTION_DEFAULT_FIXTURE["enquiryPeriod"] = {
 END_ACTIVE_TENDERING_AUCTION_DEFAULT_FIXTURE["auctionPeriod"] = {
     "shouldStartAfter": calculator.auctionPeriod.shouldStartAfter.isoformat()
 }
-END_ACTIVE_TENDERING_AUCTION_DEFAULT_FIXTURE["next_check"] = calculator.rectificationPeriod.endDate.isoformat()
+END_ACTIVE_TENDERING_AUCTION_DEFAULT_FIXTURE["next_check"] = calculator.enquiryPeriod.endDate.isoformat()
 END_ACTIVE_TENDERING_AUCTION_DEFAULT_FIXTURE["date"] = calculator.auctionDate.date.isoformat()
 
 
