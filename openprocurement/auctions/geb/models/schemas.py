@@ -4,7 +4,7 @@ from uuid import uuid4
 
 from schematics.exceptions import ValidationError
 from schematics.transforms import whitelist
-from schematics.types import StringType, IntType, MD5Type, BooleanType
+from schematics.types import StringType, IntType, MD5Type, BooleanType, URLType
 from schematics.types.compound import ModelType
 from schematics.types.serializable import serializable
 from pyramid.security import Allow
@@ -65,13 +65,18 @@ from openprocurement.auctions.geb.models.roles import (
     auction_edit_enquiry_role,
     auction_contractTerms_create_role,
     question_enquiry_role,
-    bid_view_role,
-    bid_create_role,
-    bid_pending_role,
+    bid_active_auction_role,
+    bid_active_awarded_role,
+    bid_active_enquiry_role,
+    bid_active_qualification_role,
     bid_active_role,
-    bid_edit_draft_role,
+    bid_active_tendering_role,
+    bid_create_role,
     bid_edit_active_role,
-    bid_edit_pending_role
+    bid_edit_draft_role,
+    bid_edit_pending_role,
+    bid_pending_role,
+    bid_view_role
 )
 
 from openprocurement.auctions.geb.validation import (
@@ -156,11 +161,6 @@ class AuctionAuctionPeriod(Period):
         start_after = auction.enquiryPeriod.endDate
         return rounding_shouldStartAfter(start_after, auction).isoformat()
 
-    def validate_startDate(self, data, startDate):
-        auction = data['__parent__']
-        if not auction.revisions and not startDate:
-            raise ValidationError(u'This field is required.')
-
 
 class RectificationPeriod(Period):
     invalidationDate = IsoDateTimeType()
@@ -174,27 +174,34 @@ class GebBid(Model):
     class Options:
         roles = {
             'Administrator': Administrator_bid_role,
-            'view': bid_view_role,
+            'active': bid_active_role,
+            'active.auction': bid_active_auction_role,
+            'active.awarded': bid_active_awarded_role,
+            'active.enquiry': bid_active_enquiry_role,
+            'active.qualification': bid_active_qualification_role,
+            'active.tendering': bid_active_tendering_role,
             'create': bid_create_role,
             'draft': bid_view_role,
-            'edit_draft': bid_edit_draft_role,
-            'pending': bid_pending_role,
-            'edit_pending': bid_edit_pending_role,
-            'active': bid_active_role,
             'edit_active': bid_edit_active_role,
-            'unsuccessful': bid_view_role
+            'edit_draft': bid_edit_draft_role,
+            'edit_pending': bid_edit_pending_role,
+            'pending': bid_pending_role,
+            'unsuccessful': bid_view_role,
+            'view': bid_view_role,
         }
 
-    tenderers = ListType(ModelType(BaseOrganization), required=True, min_size=1, max_size=1)
-    date = IsoDateTimeType()
-    id = MD5Type(required=True, default=lambda: uuid4().hex)
-    status = StringType(choices=BID_STATUSES, default='draft')
-    value = ModelType(Value)
-    documents = ListType(ModelType(GebBidDocument), default=list())
-    owner_token = StringType()
-    owner = StringType()
-    qualified = BooleanType()
     bidNumber = IntType()
+    date = IsoDateTimeType()
+    documents = ListType(ModelType(GebBidDocument), default=list())
+    id = MD5Type(required=True, default=lambda: uuid4().hex)
+    modified = False
+    owner = StringType()
+    owner_token = StringType()
+    participationUrl = URLType()
+    qualified = BooleanType()
+    status = StringType(choices=BID_STATUSES, default='draft')
+    tenderers = ListType(ModelType(BaseOrganization), required=True, min_size=1, max_size=1)
+    value = ModelType(Value)
 
     def get_role(self):
         auction = self.__parent__
@@ -286,6 +293,7 @@ class Auction(BaseAuction):
         return roles
 
     _internal_type = "geb"
+    modified = False
 
     auctionPeriod = ModelType(AuctionAuctionPeriod, required=True, default={})
     auctionParameters = ModelType(AuctionParameters)
@@ -314,6 +322,8 @@ class Auction(BaseAuction):
     lotHolder = ModelType(BaseOrganization, required=True)
 
     description = StringType(required=True)
+
+    dateModified = IsoDateTimeType()
 
     documents = ListType(ModelType(GebAuctionDocument), default=list())
 
@@ -377,12 +387,12 @@ class Auction(BaseAuction):
     @serializable(serialize_when_none=False)
     def next_check(self):
         check = None
-        if self.status == 'active.rectification':
+        if self.status == 'active.rectification' and self.rectificationPeriod:
             check = self.rectificationPeriod.endDate.astimezone(TZ)
-        elif self.status == 'active.tendering':
+        elif self.status == 'active.tendering' and self.tenderPeriod:
             check = self.tenderPeriod.endDate.astimezone(TZ)
-        elif self.status == 'active.enquiry':
-            check = self.tenderPeriod.endDate.astimezone(TZ)
+        elif self.status == 'active.enquiry' and self.enquiryPeriod:
+            check = self.enquiryPeriod.endDate.astimezone(TZ)
 
         return check.isoformat() if check else None
 

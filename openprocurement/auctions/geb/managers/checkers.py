@@ -5,7 +5,8 @@ from openprocurement.auctions.core.interfaces import (
 )
 
 from openprocurement.auctions.core.utils import (
-    get_now
+    get_now,
+    remove_bid
 )
 
 
@@ -62,11 +63,11 @@ class AuctionChecker(object):
         tender_period = self._context.tenderPeriod
         enquiry_period = self._context.enquiryPeriod
 
-        if status == 'active.rectification' and self._now > rectification_period.endDate:
+        if status == 'active.rectification' and self._now >= rectification_period.endDate:
             return rectification_period.endDate
-        elif status == 'active.tendering' and self._now > tender_period.endDate:
+        elif status == 'active.tendering' and self._now >= tender_period.endDate:
             return tender_period.endDate
-        elif status == 'active.enquiry' and self._now > enquiry_period.endDate:
+        elif status == 'active.enquiry' and self._now >= enquiry_period.endDate:
             return enquiry_period.endDate
 
     def _set_next_status(self):
@@ -78,6 +79,11 @@ class AuctionChecker(object):
             if bid.status in ['draft', 'pending']:
                 bid.status = 'unsuccessful'
 
+    def _end_tendering_delete_bids(self):
+        for bid in self._context['bids']:
+            if bid.status == 'draft':
+                remove_bid(self._request, self._context, bid)
+
     def check(self):
         date = self._get_check_date()
         try:
@@ -86,6 +92,7 @@ class AuctionChecker(object):
             elif date == self._context.tenderPeriod.endDate:
                 self._check_bids()
                 self._check_tendering_minNumberOfQualifiedBids()
+                self._end_tendering_delete_bids()
                 self._next_status = 'active.enquiry'
             elif date == self._context.enquiryPeriod.endDate:
                 self._check_enquiry_minNumberOfQualifiedBids()
@@ -93,4 +100,5 @@ class AuctionChecker(object):
         except StopChecks:
             pass
         self._set_next_status()
+        self._context.modified = True
         return True

@@ -163,3 +163,22 @@ def validate_bid_document(request):
         request.errors.status = 403
         return
     return True
+
+
+def validate_phase_commit(request):
+    new_status = request.validated['json_data'].get('status')
+    status = request.context.status
+
+    if new_status != 'active.rectification' and status == 'draft':
+        err_msg = 'Can\'t switch to ({}) only to active.rectification'.format(new_status)
+        request.errors.add('body', 'data', err_msg)
+        request.errors.status = 403
+        return False
+    return True
+
+
+def validate_bid_initialization(request):
+    new_status = request.validated['json_data'].get('status')
+    if new_status != 'pending':
+        return False
+    return True

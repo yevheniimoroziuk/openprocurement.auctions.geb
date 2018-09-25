@@ -26,9 +26,9 @@ class AuctionBidResource(AuctionBidResource):
 
         manager = self.request.registry.queryMultiAdapter((self.request, self.context), IBidManager)
 
-        if manager.change():
-            manager.initialize()
-            save = manager.save()
+        manager.change()
+        manager.initialize()
+        save = manager.save()
 
         if save:
             extra = context_unpack(self.request, {'MESSAGE_ID': 'auction_bid_patch'})
@@ -43,8 +43,7 @@ class AuctionBidResource(AuctionBidResource):
         manager = self.request.registry.queryMultiAdapter((self.request, self.context), IBidManager)
 
         bid = manager.delete()
-        if bid:
-            save = manager.save()
+        save = manager.save()
 
         if save:
             extra = context_unpack(self.request, {'MESSAGE_ID': 'auction_bid_delete'})

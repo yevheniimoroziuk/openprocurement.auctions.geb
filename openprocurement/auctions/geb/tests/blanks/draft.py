@@ -1,26 +1,20 @@
+def phase_commit(test_case):
+    next_status = 'active.rectification'
+    request_data = {"data": {'status': next_status}}
+    auth = test_case.app.authorization
 
-from openprocurement.auctions.geb.tests.helpers import (
-    get_next_status,
-)
+    test_case.app.authorization = ('Basic', ('{}'.format(test_case.auction['access']['owner']), ''))
+    response = test_case.app.patch_json(test_case.ENTRYPOINT, request_data)
+    test_case.app.authorization = auth
 
-
-def phase_commit(self):
-    next_status = get_next_status(self.auction['status'])
-    field = 'status'
-
-    request_data = {"data": {field: next_status}}
-    response = self.app.patch_json(self.entrypoint, request_data)
-    self.assertEqual(next_status, response.json['data'][field])
+    test_case.assertEqual(next_status, response.json['data']['status'])
 
 
-def change_forbidden_field_in_draft(self):
-    new_title = 'Test Title'
-    field = 'title'
+def invalid_phase_commit(test_case):
+    next_status = 'active.tendering'
+    request_data = {"data": {'status': next_status}}
+    auth = test_case.app.authorization
 
-    request_data = {"data": {field: new_title}}
-    response = self.app.patch_json(self.entrypoint, request_data)
-
-    entrypoint = '/auctions/{}'.format(self.auction['id'])
-    response = self.app.get(entrypoint)
-
-    self.assertNotEqual(new_title, response.json['data'][field])
+    test_case.app.authorization = ('Basic', ('{}'.format(test_case.auction['access']['owner']), ''))
+    test_case.app.patch_json(test_case.ENTRYPOINT, request_data, status=403)
+    test_case.app.authorization = auth

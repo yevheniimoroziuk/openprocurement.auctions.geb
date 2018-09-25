@@ -39,4 +39,5 @@ class AuctionCreator(object):
             db = self._request.registry.db
             server_id = self._request.registry.server_id
             self._context.auctionID = generate_auction_id(get_now(), db, server_id)
+            self._context.modified = True
             return self._context

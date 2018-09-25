@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 from logging import getLogger
+from functools import partial
 
 from pkg_resources import get_distribution
 
@@ -93,3 +94,6 @@ def invalidate_bids_data(auction):
     for bid in auction.bids:
         setattr(bid, "status", "invalid")
     auction.rectificationPeriod.invalidationDate = get_now()
+
+
+calculate_certainly_business_date = partial(calculate_business_date, context=None)

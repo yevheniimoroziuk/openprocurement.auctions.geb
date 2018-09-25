@@ -1,9 +1,6 @@
 from copy import deepcopy
 
-from openprocurement.auctions.geb.tests.helpers import (
-    get_expected_value
-)
-from openprocurement.auctions.geb.tests.fixtures import (
+from openprocurement.auctions.geb.tests.fixtures.common import (
     test_item,
     test_procuringEntity,
     test_lotHolder,
@@ -14,15 +11,13 @@ from openprocurement.auctions.core.tests.base import (
     test_document_data
 )
 
-from openprocurement.auctions.geb.tests.specifications import REQUIRED_SCHEME_DEFINITION
-
 
 def change_title(self):
     new_title = 'Test'
     field = "title"
 
     request_data = {"data": {field: new_title}}
-    response = self.app.patch_json(self.entrypoint, request_data)
+    response = self.app.patch_json(self.ENTRYPOINT, request_data)
     self.assertEqual(new_title, response.json['data'][field])
 
 
@@ -31,32 +26,17 @@ def change_desctiption(self):
     field = "description"
 
     request_data = {"data": {field: new}}
-    response = self.app.patch_json(self.entrypoint, request_data)
+    response = self.app.patch_json(self.ENTRYPOINT, request_data)
     self.assertEqual(new, response.json['data'][field])
 
 
 def change_tenderAttempts(self):
-    new = get_expected_value(REQUIRED_SCHEME_DEFINITION, "tenderAttempts")
     field = "tenderAttempts"
+    value = 2
 
-    for value in new:
-        response = self.app.get('/auctions/{}'.format(self.auction['id']))
-        if response.json['data']['tenderAttempts'] == value:
-            continue
-
-        request_data = {"data": {field: value}}
-        response = self.app.patch_json(self.entrypoint, request_data)
-        self.assertEqual(value, response.json['data'][field])
-
-
-def change_invalid_tenderAttempts(self):
-    new = 42
-    expected_http_status = '422 Unprocessable Entity'
-    field = "tenderAttempts"
-
-    request_data = {"data": {field: new}}
-    response = self.app.patch_json(self.entrypoint, request_data, status=422)
-    self.assertEqual(response.status, expected_http_status)
+    request_data = {"data": {field: value}}
+    response = self.app.patch_json(self.ENTRYPOINT, request_data)
+    self.assertEqual(value, response.json['data'][field])
 
 
 def change_lotIdentifier(self):
@@ -64,7 +44,7 @@ def change_lotIdentifier(self):
     field = "lotIdentifier"
 
     request_data = {"data": {field: new}}
-    response = self.app.patch_json(self.entrypoint, request_data)
+    response = self.app.patch_json(self.ENTRYPOINT, request_data)
     self.assertEqual(new, response.json['data'][field])
 
 
@@ -73,7 +53,7 @@ def change_value(self):
     field = "value"
 
     request_data = {"data": {field: new}}
-    response = self.app.patch_json(self.entrypoint, request_data)
+    response = self.app.patch_json(self.ENTRYPOINT, request_data)
     self.assertEqual(new, response.json['data'][field])
 
 
@@ -82,7 +62,7 @@ def change_minimalStep(self):
     field = "minimalStep"
 
     request_data = {"data": {field: new}}
-    response = self.app.patch_json(self.entrypoint, request_data)
+    response = self.app.patch_json(self.ENTRYPOINT, request_data)
     self.assertEqual(new, response.json['data'][field])
 
 
@@ -91,7 +71,7 @@ def change_guarantee(self):
     field = "guarantee"
 
     request_data = {"data": {field: new}}
-    response = self.app.patch_json(self.entrypoint, request_data)
+    response = self.app.patch_json(self.ENTRYPOINT, request_data)
     self.assertEqual(new, response.json['data'][field])
 
 
@@ -102,7 +82,7 @@ def change_items(self):
     field = "items"
 
     request_data = {"data": {field: [new]}}
-    response = self.app.patch_json(self.entrypoint, request_data)
+    response = self.app.patch_json(self.ENTRYPOINT, request_data)
     self.assertEqual(response.json['data'][field][0]['quantity'], new['quantity'])
 
 
@@ -111,7 +91,7 @@ def change_budgetSpent(self):
     field = "budgetSpent"
 
     request_data = {"data": {field: new}}
-    response = self.app.patch_json(self.entrypoint, request_data)
+    response = self.app.patch_json(self.ENTRYPOINT, request_data)
     self.assertEqual(new, response.json['data'][field])
 
 
@@ -120,7 +100,7 @@ def change_registrationFee(self):
     field = "registrationFee"
 
     request_data = {"data": {field: new}}
-    response = self.app.patch_json(self.entrypoint, request_data)
+    response = self.app.patch_json(self.ENTRYPOINT, request_data)
     self.assertEqual(new, response.json['data'][field])
 
 
@@ -131,7 +111,7 @@ def change_procuringEntity(self):
     field = "procuringEntity"
 
     request_data = {"data": {field: new}}
-    response = self.app.patch_json(self.entrypoint, request_data)
+    response = self.app.patch_json(self.ENTRYPOINT, request_data)
     self.assertEqual(new, response.json['data'][field])
 
 
@@ -142,7 +122,7 @@ def change_lotHolder(self):
     field = "lotHolder"
 
     request_data = {"data": {field: new}}
-    response = self.app.patch_json(self.entrypoint, request_data)
+    response = self.app.patch_json(self.ENTRYPOINT, request_data)
     self.assertEqual(new, response.json['data'][field])
 
 
@@ -153,7 +133,7 @@ def change_bankAccount(self):
     field = "bankAccount"
 
     request_data = {"data": {field: new}}
-    response = self.app.patch_json(self.entrypoint, request_data)
+    response = self.app.patch_json(self.ENTRYPOINT, request_data)
     self.assertEqual(new, response.json['data'][field])
 
 
@@ -164,7 +144,7 @@ def change_contractTerms(self):
     field = "contractTerms"
 
     request_data = {"data": {field: new}}
-    response = self.app.patch_json(self.entrypoint, request_data)
+    response = self.app.patch_json(self.ENTRYPOINT, request_data)
     self.assertEqual(new, response.json['data'][field])
 
 
@@ -175,5 +155,5 @@ def add_document(self):
     expected_http_status = '201 Created'
 
     request_data = {'data': document}
-    response = self.app.post_json(self.entrypoint, request_data)
+    response = self.app.post_json(self.ENTRYPOINT, request_data)
     self.assertEqual(expected_http_status, response.status)
