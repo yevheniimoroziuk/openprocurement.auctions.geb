@@ -1,5 +1,5 @@
 from datetime import timedelta
-from openprocurement.api.utils import calculate_certainly_business_date as ccbd
+from openprocurement.auctions.geb.utils import calculate_certainly_business_date as ccbd
 
 
 class Period(object):
