@@ -5,7 +5,9 @@ from openprocurement.auctions.geb.tests.fixtures.active_tendering import (
     END_ACTIVE_TENDERING_AUCTION_DEFAULT_FIXTURE_WITH_TWO_BIDS_AND_ONE_DRAFT
 )
 from openprocurement.auctions.geb.tests.fixtures.active_enquiry import (
-    END_ACTIVE_ENQUIRY_UNSUCCESSFUL_NO_ACTIVE_BIDS
+    END_ACTIVE_ENQUIRY_UNSUCCESSFUL_NO_ACTIVE_BIDS,
+    END_ACTIVE_ENQUIRY_AUCTION_DEFAULT_FIXTURE,
+    END_ACTIVE_ENQUIRY_AUCTION_QUALIFICATION
 )
 
 
@@ -78,48 +80,56 @@ def check_enquiry_period_end_unsuccessful(test_case):
 
 
 def check_enquiry_period_end_active_qualification(test_case):
-    request_data = {'data': {'id': test_case.auction_id}}
+    context = test_case.procedure.snapshot(fixture=END_ACTIVE_ENQUIRY_AUCTION_QUALIFICATION)
 
-    auth = test_case.app.authorization
-    for bid in test_case.extra['bids']:
-        test_case.app.authorization = bid['owner']
-        break
+    auction = context['auction']
 
-    auction = test_case.db.get(test_case.auction['id'])
-    value = {'minNumberOfQualifiedBids': 1}
-    auction.update(value)
-    test_case.db.save(auction)
+    request_data = {'data': {'id': auction['data']['id']}}
 
-    test_case.app.authorization = auth
+    entrypoint = '/auctions/{}'.format(auction['data']['id'])
+    response = test_case.app.patch_json(entrypoint, request_data)
 
-    response = test_case.app.patch_json(test_case.ENTRYPOINTS['auction'], request_data)
-
-    response = test_case.app.get(test_case.ENTRYPOINTS['auction'])
+    response = test_case.app.get(entrypoint)
     test_case.assertEqual(response.status, '200 OK')
     test_case.assertEqual(response.json['data']["status"], 'active.qualification')
 
 
 def check_enquiry_period_end_active_auction(test_case):
-    request_data = {'data': {'id': test_case.auction_id}}
 
-    response = test_case.app.patch_json(test_case.ENTRYPOINTS['auction'], request_data)
+    context = test_case.procedure.snapshot(fixture=END_ACTIVE_ENQUIRY_AUCTION_DEFAULT_FIXTURE)
 
-    response = test_case.app.get(test_case.ENTRYPOINTS['auction'])
+    auction = context['auction']
+
+    request_data = {'data': {'id': auction['data']['id']}}
+
+    entrypoint = '/auctions/{}'.format(auction['data']['id'])
+    response = test_case.app.patch_json(entrypoint, request_data)
+
+    response = test_case.app.get(entrypoint)
     test_case.assertEqual(response.status, '200 OK')
     test_case.assertEqual(response.json['data']["status"], 'active.auction')
 
 
 def check_enquiry_period_end_set_unsuccessful_bids(test_case):
-    request_data = {'data': {'id': test_case.auction_id}}
+    context = test_case.procedure.snapshot(fixture=END_ACTIVE_ENQUIRY_UNSUCCESSFUL_NO_ACTIVE_BIDS)
 
-    test_case.app.patch_json(test_case.ENTRYPOINTS['auction'], request_data)
+    auction = context['auction']
+    bids = context['bids']
 
-    db_auction = test_case.db.get(test_case.auction['id'])
+    request_data = {'data': {'id': auction['data']['id']}}
 
-    for bid in db_auction['bids']:
-        if bid['status'] in ['draft', 'pending']:
-            err_msg = 'All bids with status draft and pendign after enquiryPeriod must be unseccessful'
-            raise AssertionError(err_msg)
+    entrypoint = '/auctions/{}'.format(auction['data']['id'])
+    response = test_case.app.patch_json(entrypoint, request_data)
+
+    bid_url_pattern = '/auctions/{auction}/bids/{bid}?acc_token={token}'
+
+    for bid in bids:
+        bid_url = bid_url_pattern.format(auction=auction['data']['id'],
+                                         bid=bid['data']['id'],
+                                         token=bid['access']['token'])
+        response = test_case.app.get(bid_url)
+        test_case.assertEqual(response.status, '200 OK')
+        test_case.assertEqual(response.json['data']["status"], 'unsuccessful')
 
 
 def chronograph(test_case, auction):

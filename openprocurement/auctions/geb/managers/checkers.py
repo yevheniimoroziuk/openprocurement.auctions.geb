@@ -41,7 +41,7 @@ class AuctionChecker(object):
 
     def _check_enquiry_minNumberOfQualifiedBids(self):
         min_number = self._context.minNumberOfQualifiedBids
-        bids = len([bid for bid in self._context.bids if bid.status in ('active', 'pending')])
+        bids = len([bid for bid in self._context.bids if bid.status in ('active',)])
         if min_number == 1:
             if bids == 0:
                 self._next_status = 'unsuccessful'
