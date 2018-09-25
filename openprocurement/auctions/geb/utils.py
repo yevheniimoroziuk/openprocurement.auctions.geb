@@ -18,6 +18,7 @@ from openprocurement.auctions.geb.constants import (
     DOCUMENT_TYPE_URL_ONLY,
     DOCUMENT_TYPE_OFFLINE
 )
+from openprocurement.auctions.core.interfaces import IAuctionManager
 
 
 PKG = get_distribution(__package__)
@@ -50,10 +51,11 @@ def get_file(request):
 
 def check_bids(request):
     auction = request.validated['auction']
+    adapter = request.registry.getAdapter(auction, IAuctionManager)
     if auction.auctionPeriod:
         if auction.numberOfBids < (auction.minNumberOfQualifiedBids or 2):
             auction.auctionPeriod.startDate = None
-            auction.status = 'unsuccessful'
+            adapter.pendify_auction_status('unsuccessful')
         elif auction.numberOfBids == 1:
             auction.auctionPeriod.startDate = None
             request.content_configurator.start_awarding()
