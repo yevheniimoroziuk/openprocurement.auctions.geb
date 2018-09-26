@@ -9,11 +9,7 @@ from schematics.types.compound import ModelType
 from schematics.types.serializable import serializable
 from pyramid.security import Allow
 from zope.interface import implementer
-from openprocurement.auctions.geb.interfaces import (
-    IAuction,
-    IBid,
-    IQuestion
-)
+
 from openprocurement.auctions.core.models import (
     Administrator_bid_role,
     Administrator_role,
@@ -40,6 +36,7 @@ from openprocurement.auctions.core.plugins.contracting.v2_1.models import Contra
 from openprocurement.auctions.core.utils import (
     SANDBOX_MODE,
     TZ,
+    calculate_business_date,
     get_now
 )
 from openprocurement.auctions.core.validation import (
@@ -47,12 +44,20 @@ from openprocurement.auctions.core.validation import (
     kvtspz_validator
 )
 
+from openprocurement.auctions.geb.interfaces import (
+    IAuction,
+    IBid,
+    IQuestion
+)
+
 from openprocurement.auctions.geb.constants import (
     AUCTION_DOCUMENT_TYPES,
     AUCTION_STATUSES,
     BID_DOCUMENT_TYPES,
     BID_STATUSES,
-    GEB_ITEM_ADDITIONAL_CLASSIFICATIONS
+    GEB_ITEM_ADDITIONAL_CLASSIFICATIONS,
+    RECTIFICATION_PERIOD_DURATION,
+    MIN_NUMBER_OF_DAYS_TENDERING
 )
 
 from openprocurement.auctions.geb.models.roles import (
@@ -160,6 +165,18 @@ class AuctionAuctionPeriod(Period):
             return
         start_after = auction.enquiryPeriod.endDate
         return rounding_shouldStartAfter(start_after, auction).isoformat()
+
+    def validate_startDate(self, data, value):
+        context = data['__parent__']
+        if not value:
+            return
+        now = get_now()
+        end_rectificationPeriod = calculate_business_date(now, RECTIFICATION_PERIOD_DURATION, context)
+        end_tenderPeriod = calculate_business_date(end_rectificationPeriod, MIN_NUMBER_OF_DAYS_TENDERING, context, working_days=True)
+        end_enquiry = calculate_business_date(end_tenderPeriod, timedelta(days=3), context, working_days=True)
+        if end_enquiry > value:
+            err_msg = "Not enough days for the procedure, change auctionPeriod startDate"
+            raise ValidationError(err_msg)
 
 
 class RectificationPeriod(Period):

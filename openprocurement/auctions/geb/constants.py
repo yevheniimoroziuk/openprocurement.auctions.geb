@@ -5,7 +5,7 @@ AUCTION_DOCUMENT_STATUSES = ['active.auction', 'active.qualification']
 
 # duration of periods
 RECTIFICATION_PERIOD_DURATION = timedelta(days=2)
-TENDER_PERIOD_DURATION = timedelta(days=3)                                      # TODO if need 20:00 time
+MIN_NUMBER_OF_DAYS_TENDERING = timedelta(days=1)
 
 
 # documets
@@ -109,3 +109,4 @@ GEB_ITEM_ADDITIONAL_CLASSIFICATIONS = (
     u'cadastralNumber',
     u'kvtspz'
 )
+MIN_NUMBER_OF_DAY_BEFORE_AUCTION = 6

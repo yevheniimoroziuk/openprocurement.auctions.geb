@@ -14,7 +14,6 @@ from openprocurement.auctions.core.utils import (
 
 from openprocurement.auctions.geb.constants import (
     RECTIFICATION_PERIOD_DURATION,
-    TENDER_PERIOD_DURATION,
     AUCTION_PARAMETERS_TYPE
 )
 from openprocurement.auctions.geb.validation import (
@@ -45,7 +44,8 @@ class AuctionInitializator(object):
         end_date = calculate_business_date(self._context.auctionPeriod.startDate,
                                            -timedelta(days=1),
                                            self._context,
-                                           specific_hour=20)
+                                           specific_hour=20,
+                                           working_days=True)
 
         period.startDate = start_date
         period.endDate = end_date
@@ -56,9 +56,10 @@ class AuctionInitializator(object):
         period = self._context.__class__.tenderPeriod.model_class()
 
         start_date = self._context.rectificationPeriod.endDate
-        end_date = calculate_business_date(start_date,
-                                           TENDER_PERIOD_DURATION,
+        end_date = calculate_business_date(self._context.auctionPeriod.startDate,
+                                           -timedelta(days=3),
                                            self._context,
+                                           specific_hour=20,
                                            working_days=True)
 
         period.startDate = start_date

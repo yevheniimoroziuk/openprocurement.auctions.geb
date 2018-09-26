@@ -8,6 +8,7 @@ from openprocurement.auctions.geb.tests.base import (
 
 from openprocurement.auctions.geb.tests.blanks.create import (
     create_auction,
+    create_auction_invalid_auctionPeriod
 )
 from openprocurement.auctions.geb.tests.helpers import (
     change_machine_state
@@ -20,6 +21,7 @@ from openprocurement.auctions.geb.tests.states import (
 class CreateAuctionResourceTest(BaseWebTest):
 
     test_create_auction = snitch(create_auction)
+    test_create_auction_invalid_auctionPeriod = snitch(create_auction_invalid_auctionPeriod)
 
     def setUp(self):
         super(CreateAuctionResourceTest, self).setUp()
