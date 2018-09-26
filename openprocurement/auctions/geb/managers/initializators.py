@@ -90,14 +90,24 @@ class AuctionInitializator(object):
         self._context.auctionPeriod.startDate = None
         self._context.auctionPeriod.endDate = None
 
-    def initialize(self):
-        if self.validate():
+    def _invalidate_bids(self):
+        context = self._context
+
+        value = context.value.amount
+        unsuccessful_bids = [bid for bid in context.bids if bid.value.amount == value]
+        for bid in unsuccessful_bids:
+            bid.status = 'unsuccessful'
+
+    def initialize(self, status):
+        if status == 'active.rectification':
             self._initialize_rectificationPeriod()
             self._initialize_tenderPeriod()
             self._initialize_enquiryPeriod()
             self._initialize_auctionParameters()
             self._initialize_date()
             self._clean_auctionPeriod()
+        elif status == 'active.auction':
+            self._invalidate_bids()
 
 
 @implementer(IBidInitializator)

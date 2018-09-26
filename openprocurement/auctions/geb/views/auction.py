@@ -2,39 +2,40 @@
 from openprocurement.auctions.core.utils import (
     json_view,
     context_unpack,
-    save_auction,
-    apply_patch,
-    opresource,
-    cleanup_bids_for_cancelled_lots
+    opresource
 )
-from openprocurement.auctions.core.validation import (
-    validate_auction_auction_data,
+# from openprocurement.auctions.core.validation import (
+#     validate_auction_auction_data,
+# )
+from openprocurement.auctions.core.views.mixins import (
+    APIResource
 )
-from openprocurement.auctions.core.views.mixins import APIResource
-
-from openprocurement.auctions.geb.utils import (
-    invalidate_bids_under_threshold
+from openprocurement.auctions.geb.validation import (
+    validate_patch_auction_data
+)
+from openprocurement.auctions.core.interfaces import (
+    IAuctionManager
 )
 
 
 @opresource(name='geb:Auction Auction',
             path='/auctions/{auction_id}/auction',
-            auctionsprocurementMethodType="geb",
-            description="auction auction data")
+            auctionsprocurementMethodType="geb")
 class AuctionAuctionResource(APIResource):
 
-    @json_view(content_type="application/json", permission='auction', validators=(validate_auction_auction_data))
+    @json_view(content_type="application/json", permission='auction', validators=(validate_patch_auction_data))
     def post(self):
-        apply_patch(self.request, save=False, src=self.request.validated['auction_src'])
-        auction = self.request.validated['auction']
-        invalidate_bids_under_threshold(auction)
-        if any([i.status == 'active' for i in auction.bids]):
-            self.request.content_configurator.start_awarding()
-        else:
-            auction.status = 'unsuccessful'
-        if save_auction(self.request):
-            self.LOGGER.info('Report auction results', extra=context_unpack(self.request, {'MESSAGE_ID': 'auction_auction_post'}))
-            return {'data': self.request.validated['auction'].serialize(self.request.validated['auction'].status)}
+        manager = self.request.registry.queryMultiAdapter((self.request, self.context), IAuctionManager)
+
+        manager.bring_auction_result()
+        manager.initialize(manager.context.status)
+        manager.decide_procedure()
+
+        save = manager.save()
+        if save:
+            extra = context_unpack(self.request, {'MESSAGE_ID': 'auction_auction_post'})
+            self.LOGGER.info('Report auction results', extra=extra)
+            return {'data': self.request.validated['auction'].serialize("auction_view")}
 
     @json_view(permission='auction')
     def get(self):
@@ -45,11 +46,15 @@ class AuctionAuctionResource(APIResource):
             return
         return {'data': self.request.validated['auction'].serialize("auction_view")}
 
-   # @json_view(content_type="application/json",
-   #            permission='auction',
-   #            validators=(validate_status_in_which_can_use_auction_of_procedure, ))
-   # def patch(self):
-   #     if apply_patch(self.request, src=self.request.validated['auction_src']):
-   #         self.LOGGER.info('Updated auction urls',
-   #                          extra=context_unpack(self.request, {'MESSAGE_ID': 'auction_auction_patch'}))
-   #         return {'data': self.request.validated['auction'].serialize("auction_view")}
+    @json_view(content_type="application/json", permission='auction', validators=(validate_patch_auction_data,))
+    def patch(self):
+        manager = self.request.registry.queryMultiAdapter((self.request, self.context), IAuctionManager)
+
+        manager.update_auction_urls()
+        save = manager.save()
+
+        if save:
+            extra = context_unpack(self.request, {'MESSAGE_ID': 'auction_auction_patch'})
+            self.LOGGER.info('Updated auction urls', extra=extra)
+            return {'data': self.request.validated['auction'].serialize("auction_view")}
+            # return manager.represent("auction_view")

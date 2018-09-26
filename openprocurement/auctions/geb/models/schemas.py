@@ -232,7 +232,7 @@ class GebBid(Model):
 
     def validate_value(self, data, value):
         auction = data['__parent__']
-        if auction.value.amount != value.amount:
+        if auction.value.amount != value.amount and auction.status in ('active.tendering', 'active.enquiry'):
             raise ValidationError("Bid value amount should be equal as Auction value amount")
         if value.currency and value.currency != auction.value.currency:
             raise ValidationError("Bid value currency should be equal as Auction value currency")
@@ -359,7 +359,7 @@ class Auction(BaseAuction):
 
     procurementMethod = StringType(choices=['open'], default='open')
 
-    procurementMethodType = StringType(required=True)
+    procurementMethodType = StringType(required=True, choices=['geb'])
 
     rectificationPeriod = ModelType(RectificationPeriod)
 
