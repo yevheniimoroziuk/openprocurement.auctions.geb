@@ -6,7 +6,8 @@ from openprocurement.auctions.core.interfaces import (
 )
 
 from openprocurement.auctions.geb.validation import (
-    validate_first_auction_status
+    validate_first_auction_status,
+    validate_auctionPeriod
 )
 from openprocurement.auctions.core.utils import (
     generate_auction_id,
@@ -17,7 +18,7 @@ from openprocurement.auctions.core.utils import (
 @implementer(IAuctionCreator)
 class AuctionCreator(object):
     name = 'Auction Changer'
-    validators = [validate_first_auction_status]
+    validators = [validate_first_auction_status, validate_auctionPeriod]
 
     def __init__(self, request, context):
         self._request = request
