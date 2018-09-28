@@ -34,6 +34,7 @@ class AuctionDocumenter(object):
         if self.validate():
             document = upload_file(self._request)
             self._context.documents.append(document)
+            self._context.modified = True
             return document
 
 
@@ -45,6 +46,7 @@ class BidDocumenter(object):
     def __init__(self, request, context):
         self._request = request
         self._context = context
+        self._auction = context.__parent__
 
     def validate(self):
         for validator in self.validators:
@@ -56,4 +58,5 @@ class BidDocumenter(object):
         if self.validate():
             document = upload_file(self._request)
             self._context.documents.append(document)
+            self._auction.modified = True
             return document

@@ -187,6 +187,9 @@ def validate_auctionPeriod(request):
     if not auction.get('auctionPeriod') or not auction['auctionPeriod'].get('startDate'):
         err_msg = 'You must set auctionPeriod start date'
         request.errors.add('body', 'data', err_msg)
+        request.errors.status = 422
+        return False
+    return True
 
 
 def validate_auction_auction_status(request):

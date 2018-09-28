@@ -118,6 +118,7 @@ class BidInitializator(object):
         self._now = get_now()
         self._request = request
         self._context = context
+        self._auction = context.__parent__
 
     def _initialize_qualified(self):
         self._context.qualified = False
@@ -132,6 +133,6 @@ class BidInitializator(object):
         return True
 
     def initialize(self):
-        if self._context.modified and self.validate():
+        if self._auction.modified and self.validate():
             self._initialize_qualified()
             self._initialize_date()

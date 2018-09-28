@@ -29,4 +29,5 @@ class AuctionQuestioner(object):
         if self.validate():
             question = self._request.validated['question']
             self._context.questions.append(question)
+            self._context.modified = True
             return question

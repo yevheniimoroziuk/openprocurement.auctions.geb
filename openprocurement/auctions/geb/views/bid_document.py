@@ -31,8 +31,7 @@ class AuctionBidDocumentResource(AuctionBidDocumentResource):
 
         document = manager.upload_document()
 
-        if document:
-            save = manager.save()
+        save = manager.save()
 
         if save:
             msg = 'Created auction bid document {}'.format(document.id)

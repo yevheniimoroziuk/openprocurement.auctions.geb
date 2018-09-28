@@ -145,6 +145,12 @@ class Create(State):
     fixture = CREATE_AUCTION_DEFAULT_FIXTURE
     status = 'create'
 
+    def context(self, fixture):
+        context = {}
+        context['auction'] = {}
+        context['auction']['data'] = fixture
+        return context
+
     def _next(self, end=False):
         return Draft()
 

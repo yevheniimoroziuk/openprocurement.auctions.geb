@@ -15,7 +15,8 @@ def get_auction_auction(test_case):
 
     test_case.assertEqual(response.status, expected_http_status)
 
-def bring_auction_result(test_case):
+
+def switch_to_qualification(test_case):
     expected_http_status = '200 OK'
     context = test_case.procedure.snapshot(fixture=ACTIVE_AUCTION_DEFAULT_FIXTURE_WITH_URLS)
     auction = context['auction']
@@ -43,8 +44,46 @@ def bring_auction_result(test_case):
         ]
     }
     response = test_case.app.post_json(auction_url, {'data': request_data})
-
     test_case.assertEqual(response.status, expected_http_status)
+
+    entrypoint = '/auctions/{}'.format(auction['data']['id'])
+    response = test_case.app.get(entrypoint)
+    test_case.assertEqual(response.json['data']['status'], 'active.qualification')
+
+
+def switch_to_unsuccessful(test_case):
+    expected_http_status = '200 OK'
+    context = test_case.procedure.snapshot(fixture=ACTIVE_AUCTION_DEFAULT_FIXTURE_WITH_URLS)
+    auction = context['auction']
+    bids = context['bids']
+    auction_url = '/auctions/{}/auction'.format(auction['data']['id'])
+
+    request_data = {
+        'bids': [
+            {
+                "id": bids[0]['data']['id'],
+                "value": {
+                    "amount": auction['data']['value']['amount'],
+                    "currency": "UAH",
+                    "valueAddedTaxIncluded": True
+                }
+            },
+            {
+                "id": bids[1]['data']['id'],
+                "value": {
+                    "amount": auction['data']['value']['amount'],
+                    "currency": "UAH",
+                    "valueAddedTaxIncluded": True
+                }
+            }
+        ]
+    }
+    response = test_case.app.post_json(auction_url, {'data': request_data})
+    test_case.assertEqual(response.status, expected_http_status)
+
+    entrypoint = '/auctions/{}'.format(auction['data']['id'])
+    response = test_case.app.get(entrypoint)
+    test_case.assertEqual(response.json['data']['status'], 'unsuccessful')
 
 
 def update_auction_urls(test_case):

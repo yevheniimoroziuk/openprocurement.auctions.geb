@@ -17,6 +17,7 @@ from openprocurement.auctions.geb.tests.fixtures.common import (
 )
 
 CREATE_AUCTION_DEFAULT_FIXTURE = {
+        "status": "draft",
         "auctionPeriod": test_auctionPeriod,
         "budgetSpent": test_auction_budgetSpent,
         "minNumberOfQualifiedBids":  2,

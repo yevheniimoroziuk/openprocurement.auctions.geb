@@ -57,4 +57,3 @@ class AuctionAuctionResource(APIResource):
             extra = context_unpack(self.request, {'MESSAGE_ID': 'auction_auction_patch'})
             self.LOGGER.info('Updated auction urls', extra=extra)
             return {'data': self.request.validated['auction'].serialize("auction_view")}
-            # return manager.represent("auction_view")
