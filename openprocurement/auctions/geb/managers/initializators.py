@@ -17,24 +17,36 @@ from openprocurement.auctions.geb.constants import (
     AUCTION_PARAMETERS_TYPE
 )
 from openprocurement.auctions.geb.validation import (
-    validate_bid_initialization
+    validate_bid_initialization,
+    validate_auctionPeriod_startDate
+)
+
+from openprocurement.auctions.geb.managers.utils import (
+    Validators
 )
 
 
 @implementer(IAuctionInitializator)
 class AuctionInitializator(object):
     name = 'Auction Initializator'
-    validators = []
+    validators = [
+        Validators(name='active.rectification', validators=(validate_auctionPeriod_startDate,))
+    ]
 
     def __init__(self, request, context):
         self._now = get_now()
         self._request = request
         self._context = context
 
-    def validate(self):
+    def _validate(self, status):
         for validator in self.validators:
+            if validator.name == status:
+                break
+        else:
+            return True
+        for validator in validator.validators:
             if not validator(self._request):
-                return
+                return False
         return True
 
     def _initialize_enquiryPeriod(self):
@@ -90,14 +102,40 @@ class AuctionInitializator(object):
         self._context.auctionPeriod.startDate = None
         self._context.auctionPeriod.endDate = None
 
-    def initialize(self):
-        if self.validate():
-            self._initialize_rectificationPeriod()
-            self._initialize_tenderPeriod()
-            self._initialize_enquiryPeriod()
-            self._initialize_auctionParameters()
-            self._initialize_date()
-            self._clean_auctionPeriod()
+    def _check_demand(self):
+        if self._context.status == 'draft':
+            return True
+
+        elif self._context.status == 'active.rectification':
+            if self._request.validated['json_data'].get('status') == 'active.rectification':
+                return True
+        elif self._context.status == 'active.auction':
+            return True
+        return False
+
+    def _invalidate_bids(self):
+        context = self._context
+
+        value = context.value.amount
+        unsuccessful_bids = [bid for bid in context.bids if bid.value.amount == value]
+        for bid in unsuccessful_bids:
+            bid.status = 'unsuccessful'
+
+    def initialize(self, status):
+        if self._check_demand():
+            if self._validate(status):
+                if status == 'draft':
+                    self._initialize_auctionParameters()
+                    self._initialize_date()
+                elif status == 'active.rectification':
+                    self._initialize_rectificationPeriod()
+                    self._initialize_tenderPeriod()
+                    self._initialize_enquiryPeriod()
+                    self._clean_auctionPeriod()
+                elif status == 'active.auction' and self._validate(status):
+                    self._invalidate_bids()
+            else:
+                self._context.modified = False
 
 
 @implementer(IBidInitializator)
@@ -108,6 +146,7 @@ class BidInitializator(object):
         self._now = get_now()
         self._request = request
         self._context = context
+        self._auction = context.__parent__
 
     def _initialize_qualified(self):
         self._context.qualified = False
@@ -122,6 +161,6 @@ class BidInitializator(object):
         return True
 
     def initialize(self):
-        if self._context.modified and self.validate():
+        if self._auction.modified and self.validate():
             self._initialize_qualified()
             self._initialize_date()

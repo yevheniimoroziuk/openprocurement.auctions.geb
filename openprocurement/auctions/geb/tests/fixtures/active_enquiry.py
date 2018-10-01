@@ -7,7 +7,8 @@ from openprocurement.auctions.geb.tests.fixtures.questions import (
 )
 from openprocurement.auctions.geb.tests.fixtures.bids import (
     TEST_PENDING_BID_FIRST,
-    TEST_PENDING_BID_SECOND
+    TEST_PENDING_BID_SECOND,
+    TEST_ACTIVE_BID_FIRST
 )
 from openprocurement.auctions.core.utils import get_now
 from openprocurement.auctions.geb.tests.fixtures.calculator import (
@@ -84,7 +85,15 @@ auction["date"] = calculator.auctionDate.date.isoformat()
 
 END_ACTIVE_ENQUIRY_AUCTION_DEFAULT_FIXTURE = auction
 
-auction = deepcopy(END_ACTIVE_TENDERING_AUCTION_DEFAULT_FIXTURE_WITH_TWO_BIDS)
+auction = deepcopy(END_ACTIVE_ENQUIRY_AUCTION_DEFAULT_FIXTURE)
+
 auction['bids'] = [TEST_PENDING_BID_FIRST, TEST_PENDING_BID_SECOND]
 
 END_ACTIVE_ENQUIRY_UNSUCCESSFUL_NO_ACTIVE_BIDS = auction
+
+auction = deepcopy(END_ACTIVE_ENQUIRY_AUCTION_DEFAULT_FIXTURE)
+auction['bids'] = [TEST_ACTIVE_BID_FIRST]
+auction['minNumberOfQualifiedBids'] = 1
+
+
+END_ACTIVE_ENQUIRY_AUCTION_QUALIFICATION = auction

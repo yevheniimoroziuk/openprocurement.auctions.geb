@@ -23,7 +23,33 @@ from openprocurement.auctions.geb.tests.fixtures.active_auction import (
 
 
 class State(object):
-    pass
+
+    def context(self, fixture):
+        context = {}
+        context['auction'] = {}
+        context['auction']['data'] = {'id': fixture['_id']}
+        context['auction']['access'] = {'owner': fixture['owner'],
+                                        'token': fixture['owner_token']}
+        context['questions'] = []
+        questions = fixture.get('questions', None)
+        if questions:
+            for question in questions:
+                info = {}
+                info['data'] = {'id': question['id']}
+                context['questions'].append(info)
+
+        context['bids'] = []
+        bids = fixture.get('bids', None)
+        if bids:
+            for bid in bids:
+                info = {}
+                info['data'] = {'id': bid['id'],
+                                'status': bid['status']}
+                info['access'] = {'token': bid['owner_token'],
+                                  'owner': bid['owner']}
+                context['bids'].append(info)
+
+        return context
 
 # Auction States
 
@@ -37,6 +63,27 @@ class ActiveAuction(State):
     fixture = ACTIVE_AUCTION_DEFAULT_FIXTURE
     status = 'active.auction'
 
+    def context(self, fixture):
+        context = {}
+        context['auction'] = {}
+        context['auction']['data'] = {'id': fixture['_id'],
+                                      'value': fixture['value'],
+                                      'minimalStep': fixture['value']}
+        context['auction']['access'] = {'owner': fixture['owner'],
+                                        'token': fixture['owner_token']}
+
+        context['bids'] = []
+        bids = fixture.get('bids', None)
+        if bids:
+            for bid in bids:
+                info = {}
+                info['data'] = {'id': bid['id'],
+                                'status': bid['status']}
+                info['access'] = {'token': bid['owner_token'],
+                                  'owner': bid['owner']}
+                context['bids'].append(info)
+
+        return context
 
 # Enquiry States
 
@@ -45,64 +92,10 @@ class EndActiveEnquiry(State):
     fixture = END_ACTIVE_ENQUIRY_AUCTION_DEFAULT_FIXTURE
     status = 'active.enquiry'
 
-    def context(self, fixture):
-        context = {}
-        context['auction'] = {}
-        context['auction']['data'] = {'id': fixture['_id']}
-        context['auction']['access'] = {'owner': fixture['owner'],
-                                        'token': fixture['owner_token']}
-        context['questions'] = []
-        questions = fixture.get('questions', None)
-        if questions:
-            for question in questions:
-                info = {}
-                info['data'] = {'id': question['id']}
-                context['questions'].append(info)
-
-        context['bids'] = []
-        bids = fixture.get('bids', None)
-        if bids:
-            for bid in bids:
-                info = {}
-                info['data'] = {'id': bid['id'],
-                                'status': bid['status']}
-                info['access'] = {'token': bid['owner_token'],
-                                  'owner': bid['owner']}
-                context['bids'].append(info)
-
-        return context
-
 
 class ActiveEnquiry(State):
     fixture = ACTIVE_ENQUIRY_AUCTION_DEFAULT_FIXTURE
     status = 'active.enquiry'
-
-    def context(self, fixture):
-        context = {}
-        context['auction'] = {}
-        context['auction']['data'] = {'id': fixture['_id']}
-        context['auction']['access'] = {'owner': fixture['owner'],
-                                        'token': fixture['owner_token']}
-        context['questions'] = []
-        questions = fixture.get('questions', None)
-        if questions:
-            for question in questions:
-                info = {}
-                info['data'] = {'id': question['id']}
-                context['questions'].append(info)
-
-        context['bids'] = []
-        bids = fixture.get('bids', None)
-        if bids:
-            for bid in bids:
-                info = {}
-                info['data'] = {'id': bid['id'],
-                                'status': bid['status']}
-                info['access'] = {'token': bid['owner_token'],
-                                  'owner': bid['owner']}
-                context['bids'].append(info)
-
-        return context
 
     def _next(self, end=False):
         return ActiveAuction() if not end else EndActiveEnquiry()
@@ -114,64 +107,10 @@ class EndActiveTendering(State):
     fixture = END_ACTIVE_TENDERING_AUCTION_DEFAULT_FIXTURE
     status = 'active.tendering'
 
-    def context(self, fixture):
-        context = {}
-        context['auction'] = {}
-        context['auction']['data'] = {'id': fixture['_id']}
-        context['auction']['access'] = {'owner': fixture['owner'],
-                                        'token': fixture['owner_token']}
-        context['questions'] = []
-        questions = fixture.get('questions', None)
-        if questions:
-            for question in questions:
-                info = {}
-                info['data'] = {'id': question['id']}
-                context['questions'].append(info)
-
-        context['bids'] = []
-        bids = fixture.get('bids', None)
-        if bids:
-            for bid in bids:
-                info = {}
-                info['data'] = {'id': bid['id'],
-                                'status': bid['status']}
-                info['access'] = {'token': bid['owner_token'],
-                                  'owner': bid['owner']}
-                context['bids'].append(info)
-
-        return context
-
 
 class ActiveTendering(State):
     fixture = ACTIVE_TENDERING_AUCTION_DEFAULT_FIXTURE
     status = 'active.tendering'
-
-    def context(self, fixture):
-        context = {}
-        context['auction'] = {}
-        context['auction']['data'] = {'id': fixture['_id']}
-        context['auction']['access'] = {'owner': fixture['owner'],
-                                        'token': fixture['owner_token']}
-        context['questions'] = []
-        questions = fixture.get('questions', None)
-        if questions:
-            for question in questions:
-                info = {}
-                info['data'] = {'id': question['id']}
-                context['questions'].append(info)
-
-        context['bids'] = []
-        bids = fixture.get('bids', None)
-        if bids:
-            for bid in bids:
-                info = {}
-                info['data'] = {'id': bid['id'],
-                                'status': bid['status']}
-                info['access'] = {'token': bid['owner_token'],
-                                  'owner': bid['owner']}
-                context['bids'].append(info)
-
-        return context
 
     def _next(self, end=False):
         return ActiveEnquiry() if not end else EndActiveTendering()
@@ -183,26 +122,10 @@ class EndActiveRectification(State):
     fixture = END_ACTIVE_RECTIFICATION_AUCTION_DEFAULT_FIXTURE
     status = 'active.rectification'
 
-    def context(self, fixture):
-        context = {}
-        context['auction'] = {}
-        context['auction']['data'] = {'id': fixture['_id']}
-        context['auction']['access'] = {'owner': fixture['owner'],
-                                        'token': fixture['owner_token']}
-        return context
-
 
 class ActiveRetification(State):
     fixture = ACTIVE_RECTIFICATION_AUCTION_DEFAULT_FIXTURE
     status = 'active.rectification'
-
-    def context(self, fixture):
-        context = {}
-        context['auction'] = {}
-        context['auction']['data'] = {'id': fixture['_id']}
-        context['auction']['access'] = {'owner': fixture['owner'],
-                                        'token': fixture['owner_token']}
-        return context
 
     def _next(self, end=False):
         return ActiveTendering() if not end else EndActiveRectification()
@@ -213,14 +136,6 @@ class ActiveRetification(State):
 class Draft(State):
     fixture = DRAFT_AUCTION_DEFAULT_FIXTURE
     status = 'draft'
-
-    def context(self, fixture):
-        context = {}
-        context['auction'] = {}
-        context['auction']['data'] = {'id': fixture['_id']}
-        context['auction']['access'] = {'owner': fixture['owner'],
-                                        'token': fixture['owner_token']}
-        return context
 
     def _next(self, end=False):
         return ActiveRetification()

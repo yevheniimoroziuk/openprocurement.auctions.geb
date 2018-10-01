@@ -60,29 +60,29 @@ class ChronographTenderingTest(BaseWebTest):
         self.app.authorization = ('Basic', ('chronograph', ''))
 
 
-#class ChronographEnquiryTest(BaseWebTest):
-#
-#    test_check_enquiry_period_end_unsuccessful = snitch(check_enquiry_period_end_unsuccessful)
-#    test_active_check_enquiry_period_end_active_auction = snitch(check_enquiry_period_end_active_auction)
-#    test_active_check_enquiry_period_end_active_qualification = snitch(check_enquiry_period_end_active_qualification)
-#    test_check_enquiry_period_end_set_unsuccessful_bids = snitch(check_enquiry_period_end_set_unsuccessful_bids)
-#
-#    def setUp(self):
-#        super(ChronographEnquiryTest, self).setUp()
-#
-#        procedure = ProcedureMachine()
-#        procedure.set_db_connector(self.db)
-#        procedure.toggle('active.enquiry', end=True)
-#
-#        self.procedure = procedure
-#        self.app.authorization = ('Basic', ('chronograph', ''))
-#
+class ChronographEnquiryTest(BaseWebTest):
+
+    test_check_enquiry_period_end_unsuccessful = snitch(check_enquiry_period_end_unsuccessful)
+    test_check_enquiry_period_end_active_auction = snitch(check_enquiry_period_end_active_auction)
+    test_check_enquiry_period_end_active_qualification = snitch(check_enquiry_period_end_active_qualification)
+    test_check_enquiry_period_end_set_unsuccessful_bids = snitch(check_enquiry_period_end_set_unsuccessful_bids)
+
+    def setUp(self):
+        super(ChronographEnquiryTest, self).setUp()
+
+        procedure = ProcedureMachine()
+        procedure.set_db_connector(self.db)
+        procedure.toggle('active.enquiry', end=True)
+
+        self.procedure = procedure
+        self.app.authorization = ('Basic', ('chronograph', ''))
+
 
 def suite():
     suite = unittest.TestSuite()
     suite.addTest(unittest.makeSuite(ChronographRectificationTest))
     suite.addTest(unittest.makeSuite(ChronographTenderingTest))
-     # suite.addTest(unittest.makeSuite(ChronographEnquiryTest))
+    suite.addTest(unittest.makeSuite(ChronographEnquiryTest))
     return suite
 
 

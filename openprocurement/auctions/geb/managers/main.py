@@ -26,6 +26,9 @@ from openprocurement.auctions.geb.managers.checkers import (
 from openprocurement.auctions.geb.managers.creators import (
     AuctionCreator
 )
+from openprocurement.auctions.geb.managers.auctioneers import (
+    Auctioneer
+)
 
 from openprocurement.auctions.geb.managers.deleters import (
     BidDeleter
@@ -33,6 +36,7 @@ from openprocurement.auctions.geb.managers.deleters import (
 
 
 class AuctionManager(AuctionManager):
+    Auctioneer = Auctioneer
     Changer = AuctionChanger
     Checker = AuctionChecker
     Creator = AuctionCreator

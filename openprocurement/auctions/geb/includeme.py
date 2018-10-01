@@ -16,13 +16,17 @@ from openprocurement.auctions.geb.constants import (
     DEFAULT_PROCUREMENT_METHOD_TYPE,
 )
 from openprocurement.auctions.geb.models.schemas import (
-    Geb
+    Auction
 )
 
 from openprocurement.auctions.core.interfaces import (
     IAuctionManager,
     IQuestionManager,
+    IContentConfigurator,
     IBidManager
+)
+from openprocurement.auctions.geb.adapters import (
+    AuctionConfigurator
 )
 from openprocurement.auctions.geb.interfaces import (
     IAuction,
@@ -40,7 +44,7 @@ def includeme(config, plugin_map):
     if plugin_map.get('use_default', False):
         procurement_method_types.append(DEFAULT_PROCUREMENT_METHOD_TYPE)
     for procurementMethodType in procurement_method_types:
-        config.add_auction_procurementMethodType(Geb, procurementMethodType)
+        config.add_auction_procurementMethodType(Auction, procurementMethodType)
 
     # add views
     config.scan("openprocurement.auctions.geb.views")
@@ -49,15 +53,16 @@ def includeme(config, plugin_map):
     config.registry.registerAdapter(AuctionManager, (IRequest, IAuction), IAuctionManager)
     config.registry.registerAdapter(BidManager, (IRequest, IBid), IBidManager)
     config.registry.registerAdapter(QuestionManager, (IRequest, IQuestion), IQuestionManager)
+    config.registry.registerAdapter(AuctionConfigurator, (IAuction, IRequest), IContentConfigurator)
 
     LOGGER.info("Included openprocurement.auctions.geb plugin",
                 extra={'MESSAGE_ID': 'included_plugin'})
 
     # add accreditation level
     if not plugin_map.get('accreditation'):
-        config.registry.accreditation['auction'][Geb._internal_type] = DEFAULT_LEVEL_OF_ACCREDITATION
+        config.registry.accreditation['auction'][Auction._internal_type] = DEFAULT_LEVEL_OF_ACCREDITATION
     else:
-        config.registry.accreditation['auction'][Geb._internal_type] = plugin_map['accreditation']
+        config.registry.accreditation['auction'][Auction._internal_type] = plugin_map['accreditation']
 
     # migrate data
     if plugin_map['migration'] and not os.environ.get('MIGRATION_SKIP'):

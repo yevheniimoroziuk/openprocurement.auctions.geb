@@ -18,7 +18,7 @@ from openprocurement.auctions.core.interfaces import (
 )
 
 from openprocurement.auctions.geb.utils import (
-    upload_file, get_file, invalidate_bids_data
+    upload_file, get_file
 )
 
 
@@ -76,7 +76,8 @@ class AuctionDocumentResource(AuctionDocumentResource):
             return
         document = upload_file(self.request)
         if self.request.authenticated_role != "auction":
-            invalidate_bids_data(self.request.auction)
+            pass
+            # invalidate_bids_data(self.request.auction)
         self.request.validated['auction'].documents.append(document)
         if save_auction(self.request):
             self.LOGGER.info('Updated auction document {}'.format(self.request.context.id),
@@ -90,7 +91,8 @@ class AuctionDocumentResource(AuctionDocumentResource):
             return
         apply_patch(self.request, save=False, src=self.request.context.serialize())
         if self.request.authenticated_role != "auction":
-            invalidate_bids_data(self.request.auction)
+            pass
+            # invalidate_bids_data(self.request.auction)
         if save_auction(self.request):
             self.LOGGER.info('Updated auction document {}'.format(self.request.context.id),
                              extra=context_unpack(self.request, {'MESSAGE_ID': 'auction_document_patch'}))

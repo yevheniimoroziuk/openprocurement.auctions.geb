@@ -1,13 +1,14 @@
 # -*- coding: utf-8 -*-
+from datetime import timedelta
 from schematics.exceptions import ValidationError
 from schematics.types import BaseType
 from openprocurement.auctions.core.validation import (
-    validate_json_data,
     validate_data
 )
 
 from openprocurement.auctions.core.utils import (
-    get_now
+    get_now,
+    calculate_business_date
 )
 from openprocurement.auctions.geb.constants import (
     AUCTION_DOCUMENT_STATUSES,
@@ -16,7 +17,9 @@ from openprocurement.auctions.geb.constants import (
     AUCTION_STATUS_FOR_DELETING_BIDS,
     BID_STATUSES_FOR_ADDING_DOCUMENTS,
     CAV_PS_CODES,
-    PROCEDURE_DOCUMENT_STATUSES
+    PROCEDURE_DOCUMENT_STATUSES,
+    RECTIFICATION_PERIOD_DURATION,
+    MIN_NUMBER_OF_DAYS_TENDERING
 )
 
 
@@ -84,8 +87,7 @@ def validate_make_active_status_bid(request):
 
 
 def validate_patch_auction_data(request, **kwargs):
-    data = validate_json_data(request)
-    validate_data(request, request.auction.__class__, data=data)
+    validate_data(request, request.auction.__class__)
 
 
 def check_auction_status_for_deleting_bids(request):
@@ -188,6 +190,58 @@ def validate_auctionPeriod(request):
     auction = request.validated['json_data']
     if not auction.get('auctionPeriod') or not auction['auctionPeriod'].get('startDate'):
         err_msg = 'You must set auctionPeriod start date'
+        request.errors.add('body', 'data', err_msg)
+        request.errors.status = 422
+        return False
+    return True
+
+
+def validate_auction_auction_status(request):
+    auction = request.context
+
+    if auction.status != 'active.auction':
+        msg = 'Not valid auction status'
+        request.errors.add('body', 'data', msg)
+        request.errors.status = 403
+        return False
+    return True
+
+
+def validate_auction_number_of_bids(request):
+    auction = request.context
+    bids = request.validated['data'].get('bids', [])
+
+    if len(bids) != len(auction.bids):
+        err_msg = "Number of auction results did not match the number of auction bids"
+        request.errors.add('body', 'bids', err_msg)
+        request.errors.status = 422
+        return False
+    return True
+
+
+def validate_auction_identity_of_bids(request):
+    auction = request.context
+    bids = request.validated['data'].get('bids', [])
+
+    if set([bid['id'] for bid in bids]) != set([bid.id for bid in auction.bids]):
+        request.errors.add('body', 'bids', "Auction bids should be identical to the auction bids")
+        request.errors.status = 422
+        return False
+    return True
+
+
+def validate_auctionPeriod_startDate(request):
+    auction = request.context
+
+    value = auction.auctionPeriod.startDate
+    if not value:
+        return
+    now = get_now()
+    end_rectificationPeriod = calculate_business_date(now, RECTIFICATION_PERIOD_DURATION, auction)
+    end_tenderPeriod = calculate_business_date(end_rectificationPeriod, MIN_NUMBER_OF_DAYS_TENDERING, auction, working_days=True)
+    end_enquiry = calculate_business_date(end_tenderPeriod, timedelta(days=3), auction, working_days=True)
+    if end_enquiry > value:
+        err_msg = "Not enough days for the procedure, change auctionPeriod startDate"
         request.errors.add('body', 'data', err_msg)
         request.errors.status = 422
         return False

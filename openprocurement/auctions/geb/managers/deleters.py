@@ -27,4 +27,5 @@ class BidDeleter(object):
 
     def delete(self):
         self._auction.bids.remove(self._context)
+        self._auction.modified = True
         return self._context

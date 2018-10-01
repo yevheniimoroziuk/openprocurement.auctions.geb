@@ -49,6 +49,7 @@ class BidChanger(object):
     def __init__(self, request, context):
         self._request = request
         self._context = context
+        self._auction = context.__parent__
 
     def validate(self):
         for validator in self.validators:
@@ -58,7 +59,7 @@ class BidChanger(object):
 
     def change(self):
         if self.validate():
-            self._context.modified = apply_patch(self._request, save=False, src=self._context.serialize())
+            self._auction.modified = apply_patch(self._request, save=False, src=self._context.serialize())
 
 
 @implementer(IQuestionChanger)
@@ -69,6 +70,7 @@ class QuestionChanger(object):
     def __init__(self, request, context):
         self._request = request
         self._context = context
+        self._auction = context.__parent__
 
     def validate(self):
         for validator in self.validators:
@@ -78,4 +80,4 @@ class QuestionChanger(object):
 
     def change(self):
         if self.validate():
-            self._context.modified = apply_patch(self._request, save=False, src=self._context.serialize())
+            self._auction.modified = apply_patch(self._request, save=False, src=self._context.serialize())
