@@ -20,7 +20,6 @@ CREATE_AUCTION_DEFAULT_FIXTURE = {
         "status": "draft",
         "auctionPeriod": test_auctionPeriod,
         "budgetSpent": test_auction_budgetSpent,
-        "minNumberOfQualifiedBids":  2,
         "description": "test procuredure",
         "tenderAttempts": 1,
         "guarantee": test_auction_guarantee,

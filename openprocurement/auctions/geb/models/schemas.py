@@ -36,7 +36,6 @@ from openprocurement.auctions.core.plugins.contracting.v2_1.models import Contra
 from openprocurement.auctions.core.utils import (
     SANDBOX_MODE,
     TZ,
-    calculate_business_date,
     get_now
 )
 from openprocurement.auctions.core.validation import (
@@ -55,12 +54,11 @@ from openprocurement.auctions.geb.constants import (
     AUCTION_STATUSES,
     BID_DOCUMENT_TYPES,
     BID_STATUSES,
-    GEB_ITEM_ADDITIONAL_CLASSIFICATIONS,
-    RECTIFICATION_PERIOD_DURATION,
-    MIN_NUMBER_OF_DAYS_TENDERING
+    GEB_ITEM_ADDITIONAL_CLASSIFICATIONS
 )
 
 from openprocurement.auctions.geb.models.roles import (
+    auction_draft_role,
     auction_create_role,
     auction_rectification_role,
     auction_edit_rectification_role,
@@ -165,18 +163,6 @@ class AuctionAuctionPeriod(Period):
             return
         start_after = auction.enquiryPeriod.endDate
         return rounding_shouldStartAfter(start_after, auction).isoformat()
-
-    def validate_startDate(self, data, value):
-        context = data['__parent__']
-        if not value:
-            return
-        now = get_now()
-        end_rectificationPeriod = calculate_business_date(now, RECTIFICATION_PERIOD_DURATION, context)
-        end_tenderPeriod = calculate_business_date(end_rectificationPeriod, MIN_NUMBER_OF_DAYS_TENDERING, context, working_days=True)
-        end_enquiry = calculate_business_date(end_tenderPeriod, timedelta(days=3), context, working_days=True)
-        if end_enquiry > value:
-            err_msg = "Not enough days for the procedure, change auctionPeriod startDate"
-            raise ValidationError(err_msg)
 
 
 class RectificationPeriod(Period):
@@ -290,7 +276,7 @@ class Auction(BaseAuction):
     class Options:
         roles = {
             'create': auction_create_role,
-
+            'draft': auction_draft_role,
             'active.rectification': auction_rectification_role,
             'edit_active.rectification': auction_edit_rectification_role,
 
@@ -353,7 +339,7 @@ class Auction(BaseAuction):
                      min_size=1,
                      validators=[validate_items_uniq])
 
-    minNumberOfQualifiedBids = IntType(choices=[1, 2], required=True)
+    minNumberOfQualifiedBids = IntType(choices=[1, 2], default=2)
 
     mode = StringType()
 

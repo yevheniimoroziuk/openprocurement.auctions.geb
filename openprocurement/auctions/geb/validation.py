@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+from datetime import timedelta
 from schematics.exceptions import ValidationError
 from schematics.types import BaseType
 from openprocurement.auctions.core.validation import (
@@ -6,7 +7,8 @@ from openprocurement.auctions.core.validation import (
 )
 
 from openprocurement.auctions.core.utils import (
-    get_now
+    get_now,
+    calculate_business_date
 )
 from openprocurement.auctions.geb.constants import (
     AUCTION_DOCUMENT_STATUSES,
@@ -15,7 +17,9 @@ from openprocurement.auctions.geb.constants import (
     AUCTION_STATUS_FOR_DELETING_BIDS,
     BID_STATUSES_FOR_ADDING_DOCUMENTS,
     CAV_PS_CODES,
-    PROCEDURE_DOCUMENT_STATUSES
+    PROCEDURE_DOCUMENT_STATUSES,
+    RECTIFICATION_PERIOD_DURATION,
+    MIN_NUMBER_OF_DAYS_TENDERING
 )
 
 
@@ -221,6 +225,24 @@ def validate_auction_identity_of_bids(request):
 
     if set([bid['id'] for bid in bids]) != set([bid.id for bid in auction.bids]):
         request.errors.add('body', 'bids', "Auction bids should be identical to the auction bids")
+        request.errors.status = 422
+        return False
+    return True
+
+
+def validate_auctionPeriod_startDate(request):
+    auction = request.context
+
+    value = auction.auctionPeriod.startDate
+    if not value:
+        return
+    now = get_now()
+    end_rectificationPeriod = calculate_business_date(now, RECTIFICATION_PERIOD_DURATION, auction)
+    end_tenderPeriod = calculate_business_date(end_rectificationPeriod, MIN_NUMBER_OF_DAYS_TENDERING, auction, working_days=True)
+    end_enquiry = calculate_business_date(end_tenderPeriod, timedelta(days=3), auction, working_days=True)
+    if end_enquiry > value:
+        err_msg = "Not enough days for the procedure, change auctionPeriod startDate"
+        request.errors.add('body', 'data', err_msg)
         request.errors.status = 422
         return False
     return True

@@ -29,6 +29,7 @@ class AuctionResource(AuctionResource):
             manager.check()
         else:
             manager.change()
+            manager.initialize(manager.context.status)
 
         save = manager.save()
 

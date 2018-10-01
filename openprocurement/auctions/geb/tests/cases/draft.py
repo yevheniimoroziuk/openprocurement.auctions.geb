@@ -7,7 +7,8 @@ from openprocurement.auctions.geb.tests.base import (
 )
 from openprocurement.auctions.geb.tests.blanks.draft import (
     phase_commit,
-    invalid_phase_commit
+    invalid_phase_commit,
+    phase_commit_invalid_auctionPeriod
 )
 
 from openprocurement.auctions.geb.tests.helpers import (
@@ -22,16 +23,14 @@ class StatusDraftTest(BaseWebTest):
 
     test_phase_commit = snitch(phase_commit)
     test_invalid_phase_commit = snitch(invalid_phase_commit)
+    test_phase_commit_invalid_auctionPeriod = snitch(phase_commit_invalid_auctionPeriod)
 
     def setUp(self):
         super(StatusDraftTest, self).setUp()
         procedure = ProcedureMachine()
         procedure.set_db_connector(self.db)
         change_machine_state(procedure, 'draft')
-        context = procedure.snapshot()
-        self.auction = context['auction']
-        self.ENTRYPOINT = '/auctions/{}?acc_token={}'.format(self.auction['data']['id'],
-                                                             self.auction['access']['token'])
+        self.procedure = procedure
 
 
 def suite():
