@@ -4,9 +4,6 @@ from openprocurement.auctions.core.utils import (
     context_unpack,
     opresource
 )
-# from openprocurement.auctions.core.validation import (
-#     validate_auction_auction_data,
-# )
 from openprocurement.auctions.core.views.mixins import (
     APIResource
 )

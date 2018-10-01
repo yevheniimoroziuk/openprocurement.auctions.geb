@@ -2,7 +2,6 @@
 from functools import partial
 
 from openprocurement.auctions.core.utils import (
-    # remove_draft_bids,
     upload_file as base_upload_file,
     get_file as base_get_file,
     API_DOCUMENT_BLACKLISTED_FIELDS as DOCUMENT_BLACKLISTED_FIELDS,
