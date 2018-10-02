@@ -9,7 +9,7 @@ auction_draft_role = whitelist(
     'submissionMethod',
     'procuringEntity',
     'owner',
-    'id',
+    'doc_id',
     'guarantee',
     'title',
     'tenderAttempts',
