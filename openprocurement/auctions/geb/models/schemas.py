@@ -345,7 +345,7 @@ class Auction(BaseAuction):
 
     procurementMethod = StringType(choices=['open'], default='open')
 
-    procurementMethodType = StringType(required=True, choices=['geb'])
+    procurementMethodType = StringType(required=True)
 
     rectificationPeriod = ModelType(RectificationPeriod)
 
