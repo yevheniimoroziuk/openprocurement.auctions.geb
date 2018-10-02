@@ -3,40 +3,14 @@
 Tutorial
 ========
 
-Exploring basic rules
----------------------
+create
+------
 
-Let's try exploring the `/auctions` endpoint:
+Let's create some auction:
 
-.. include:: tutorial/auction-listing.http
-   :code:
+.. include:: tutorial/create_auction.http
+    :code:
 
-Just invoking it reveals empty set.
-
-Now let's attempt creating some auction:
-
-.. include:: tutorial/auction-post-attempt.http
-   :code:
-
-Error states that the only accepted Content-Type is `application/json`.
-
-Let's satisfy the Content-type requirement:
-
-.. include:: tutorial/auction-post-attempt-json.http
-   :code:
-
-Error states that no `data` has been found in JSON body.
-
-
-.. index:: Auction
-
-Creating auction
-----------------
-
-Let's create auction with the minimal data set (only required properties):
-
-.. include:: tutorial/auction-post-attempt-json-data.http
-   :code:
 
 Success! Now we can see that new object has been created. Response code is `201`
 and `Location` response header reports the location of the created object.  The
@@ -44,410 +18,209 @@ body of response reveals the information about the created auction: its internal
 `id` (that matches the `Location` segment), its official `auctionID` and
 `dateModified` datestamp stating the moment in time when auction has been last
 modified. Pay attention to the `procurementMethodType`. Note that auction is
-created with `active.tendering` status.
+created with `draft` status.
 
-Keep in mind that `tenderPeriod` must be at least 7 calendar days.
+draft
+-----
 
-When `auctionPeriod.startDate` has an incorrect date, 422 Unprocessable Entity 
-error is raised and "tenderPeriod should be greater than 6 days" message is 
-returned in JSON response.
+get
+^^^
 
-Let's set `auctionPeriod.startDate` to `now + timedelta(days=6)` and ValidationError
-will be returned:
+After the creation of the auction we can get it
 
-.. include:: tutorial/tenderperiod-validation-error.http
-   :code:
+.. include:: tutorial/get_draft_auction.http
+    :code:
 
-Organizer can set *enquiryPeriod.endDate*. The difference between the given date and *tenderPeriod.endDate* should not be less than 5 working days.
+two-phase commit
+^^^^^^^^^^^^^^^^
 
-If the duration between *enquiryPeriod.endDate* provided by Organizer and *tenderPeriod.endDate* is less than 5 days `422 Unprocessable Entity` response will be returned with the error message '*enquiryPeriod.endDate* should come at least 5 working days earlier than tenderPeriod.endDate.'
+In order to activate the auction, we must make a two-phase commit
 
-If Organizer does not set *enquiryPeriod.endDate* it will be calculated automatically as *tenderPeriod.endDate* minus 5 working days.
+.. include:: tutorial/phase_commit.http
+    :code:
 
-Let's access the URL of the created object (the `Location` header of the response):
+We can see what new fields were generated in auction:
 
-.. include:: tutorial/blank-auction-view.http
-   :code:
+rectificationPeriod
+        it lasts 2 working days (non-working days).
+        During this period, you can change some fields
+tenderPeriod
+        this period ends at 8:00 pm 3 business days before the auction starts.
+        During this period, it is allowed to add documents, work with bids, work with questions
+enquiryPeriod
+        this period ends at 8:00 pm 1 business days before the auction starts.
+        During this period, it is allowed to add documents, work with bids, work with questions
 
-We can see the same response we got after creating auction.
+active.rectification
+--------------------
 
-Let's see what listing of auctions reveals us:
+auctions
+^^^^^^^^
 
-.. include:: tutorial/initial-auction-listing.http
-   :code:
+change fields
+"""""""""""""
 
-We do see the auction's internal `id` (that can be used to construct full URL by prepending `https://api-sandbox.ea.openprocurement.org/api/0/auctions/`) and its `dateModified` datestamp.
+After the auction is activated, the auction goes into `active.rectification` status
+In this period we can change next fields:
 
-The previous auction contained only required fields. Let's try creating auction with more data
-(auction has status `created`):
+- title
+- description
+- tenderAttempts
+- lotIdentifier
+- value
+- minimalStep
+- guarantee
+- items
+- budgetSpent
+- registrationFee
+- procuringEntity
+- lotHolder
+- bankAccount
+- contractTerms
 
-.. include:: tutorial/create-auction-procuringEntity.http
-   :code:
+Example:
 
-And again we have `201 Created` response code, `Location` header and body with extra `id`, `auctionID`, and `dateModified` properties.
+.. include:: tutorial/active_rectification_change_title.http
+    :code:
 
-Let's check what auction registry contains:
+auction documents
 
-.. include:: tutorial/auction-listing-after-procuringEntity.http
-   :code:
+.. _adding auction documents:
 
-And indeed we have 2 auctions now.
+auctions documents
+^^^^^^^^^^^^^^^^^^
 
+add
+"""
 
-Modifying auction
------------------
+Example:
 
-Let's update auction by supplementing it with all other essential properties:
+.. include:: tutorial/active_rectification_add_document.http
+    :code:
 
-.. include:: tutorial/patch-items-value-periods.http
-   :code:
 
-.. XXX body is empty for some reason (printf fails)
-
-We see the added properies have merged with existing auction data. Additionally, the `dateModified` property was updated to reflect the last modification datestamp.
-
-Checking the listing again reflects the new modification date:
-
-.. include:: tutorial/auction-listing-after-patch.http
-   :code:
-
-Keep in mind, that every time Organizer edits the auction all bids will be switched to `invalid` status.
-
-Bidders can reactivate their bids.
-
-Organizer can edit procedure only during *enquiryPeriod*.
-
-When this period ends 403 error will be returned on editing attempt:
-
-.. include:: tutorial/out-of-enquiryperiod-editing-denied.http
-   :code:
-
-
-.. index:: Document
-
-Uploading documentation
------------------------
-
-Organizer can upload PDF files into the created auction. Uploading should
-follow the :ref:`upload` rules.
-
-.. include:: tutorial/upload-auction-notice.http
-   :code:
-
-`201 Created` response code and `Location` header confirm document creation.
-We can additionally query the `documents` collection API endpoint to confirm the
-action:
-
-.. include:: tutorial/auction-documents.http
-   :code:
-
-The single array element describes the uploaded document. We can upload more documents:
-
-.. include:: tutorial/upload-award-criteria.http
-   :code:
-
-And again we can confirm that there are two documents uploaded.
-
-.. include:: tutorial/auction-documents-2.http
-   :code:
-
-In case we made an error, we can reupload the document over the older version:
-
-.. include:: tutorial/update-award-criteria.http
-   :code:
-
-And we can see that it is overriding the original version:
-
-.. include:: tutorial/auction-documents-3.http
-   :code:
-
-
-.. index:: Enquiries, Question, Answer
-
-Uploading illustration
------------------------
-
-Organizer can upload illustration files into the created auction. Uploading should
-follow the :ref:`upload` rules.
-
-In order to specify illustration display order, `index` field can be used (for details see :ref:`document`). Since this illustration should be displayed first, it has ``"index": 1``.
-
-.. include:: tutorial/upload-first-auction-illustration.http
-   :code:
-
-We can check whether illustration is uploaded.
-
-.. include:: tutorial/auction-documents-4.http
-   :code:
-
-Organizer can upload second illustration. This illustration should be displayed second, so it has ``"index": 2``.
-
-.. include:: tutorial/upload-second-auction-illustration.http
-   :code:
-
-Add third illustration:
-
-.. include:: tutorial/upload-third-auction-illustration.http
-   :code:
-
-Note that `index` of the third illustration is the same as for the second illustration: ``"index": 2``. In such cases firstly will be displayed illustration that was uploaded earlier.
-
-We can check that there are three uploaded illustrations.
-
-.. include:: tutorial/auction-documents-5.http
-   :code:
-
-Add Asset Familiarization
--------------------------
-
-Organizer can upload asset familiarization document into the created auction.
-
-.. include:: tutorial/add-asset-familiarization-document.http
-  :code:
-
-We can check whether asset familiarization document is added.
-
-.. include:: tutorial/auction-documents-6.http
-  :code:
-
-Enquiries
----------
-
-When auction is in `active.tendering` status, interested parties can ask questions:
-
-.. include:: tutorial/ask-question.http
-   :code:
-
-Organizer can answer them:
-
-.. include:: tutorial/answer-question.http
-   :code:
-
-And one can retrieve the question list:
-
-.. include:: tutorial/list-question.http
-   :code:
-
-Or an individual answer:
-
-.. include:: tutorial/get-answer.http
-   :code:
-
-
-.. index:: Bidding
-
-Registering bid
----------------
-
-Bidder can register a bid in `draft` status:
-
-.. include:: tutorial/register-bidder.http
-   :code:
-
-And activate a bid:
-
-.. include:: tutorial/activate-bidder.http
-   :code:
-
-And upload proposal document:
-
-.. include:: tutorial/upload-bid-proposal.http
-   :code:
-
-It is possible to check the uploaded documents:
-
-.. include:: tutorial/bidder-documents.http
-   :code:
-
-For the best effect (biggest economy) auction should have multiple bidders registered:
-
-.. include:: tutorial/register-2nd-bidder.http
-   :code:
-
-
-.. index:: Awarding, Qualification
-
-Auction
--------
-
-After auction is scheduled anybody can visit it to watch. The auction can be reached at `Auction.auctionUrl`:
-
-.. include:: tutorial/auction-url.http
-   :code:
-
-And bidders can find out their participation URLs via their bids:
-
-.. include:: tutorial/bidder-participation-url.http
-   :code:
-
-See the `Bid.participationUrl` in the response. Similar, but different, URL can be retrieved for other participants:
-
-.. include:: tutorial/bidder2-participation-url.http
-   :code:
-
-.. _Qualification:
-
-Qualification
--------------
-After the competitive auction `awards` are created:
- * for the first candidate (a participant that has submitted the highest bid at the auction) - initially has a `pending.verification` status and awaits auction protocol to be uploaded by the organizer;
- * for the rest of the candidates.
-
-
-.. include:: tutorial/get-awards.http
-  :code:
-
-
-.. _Confirming_qualification:
-
-
-Confirming qualification
-~~~~~~~~~~~~~~~~~~~~~~~~
-
-The organizer **must** upload and confirm the auction protocol `auctionProtocol` and add it to the award within **6 business days after the start of the qualification procedure**. The candidate still has a possibility to upload the protocol, but it is neither mandatory, nor sufficient to move to the next status. In order to switch `award` to the next status, Organizer should come and change its status manually.
-
-
-.. include:: tutorial/bidder-auction-protocol.http
-  :code:
-
-.. include:: tutorial/owner-auction-protocol.http
-  :code:
-
-
-
-It is the Organizer's duty to upload and confirm the protocol, although the award will not be switched to the status 'pending.payment' automatically.
-
-
-.. include:: tutorial/verify-protocol.http
- :code:
-
-
-Within **20 business days after becoming a candidate** he/she must provide payment and Organizer has the same time to confirm the payment. After the payment was received, Organizer can optionally switch the award's status to `active`.
-
-
-.. include:: tutorial/confirm-qualification.http
-  :code:
-
-.. _Candidate_disqualification:
-
-Disqualification of a candidate
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-In case of manual disqualification, the organizer has to upload file with cancellation reason:
-
-
-.. include:: qualification/award-active-unsuccessful-upload.http
-  :code:
-
-
-And disqualify candidate:
-
-
-.. include:: qualification/award-active-disqualify.http
-  :code:
-
-
-Within 20 business days since becoming candidate a new candidate must confirm qualification with steps described above (:ref:`Qualification`).
-
-.. _Waiting_refusal:
-
-Refusal of waiting by another participant
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-The rest of the candidates can refuse to wait for the disqualification of the first candidate:
-
-
-.. include:: qualification/award-waiting-cancel.http
-  :code:
-
-Signing contract
+active.tendering
 ----------------
 
-The candidate has **20 business days after becoming a candidate** to conclude a contract with the bank based on the results of electronic auction. When the organizer confirms that the payment has been received, the `award` may be switched to the `active` status, while the procedure moves to the status `signingPeriod`. Within this stage the organizer should upload and activate the contract in the system.
+In active.tendering we can:
 
-Uploading contract documentation
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+- adding :ref:`adding auction documents`
+- work with questions
+- work with bids
 
-You can upload contract documents. Let's upload contract document:
+.. _work with questions:
 
-.. include:: tutorial/auction-contract-upload-document.http
-   :code:
+work with questions
+^^^^^^^^^^^^^^^^^^^
 
-`201 Created` response code and `Location` header confirm that document has been added.
+ask
+"""
 
-Let's see the list of contract documents:
+After the auction has passed to the `active.tendering` status, we can ask questions:
 
-.. include:: tutorial/auction-contract-get-documents.http
-   :code:
+.. include:: tutorial/active_tendering_add_question.http
+    :code:
 
-We can add another contract document:
+answer
+""""""
 
-.. include:: tutorial/auction-contract-upload-second-document.http
-   :code:
+if we have any `questions` we can answer them:
 
-`201 Created` response code and `Location` header confirm that the second document has been uploaded.
+.. include:: tutorial/active_tendering_answer_question.http
+    :code:
 
-Let's see the list of all added contract documents:
+We can see the `answer` field appeared
 
-.. include:: tutorial/auction-contract-get-documents-again.http
-   :code:
+.. _work with bids:
 
-Contract registration
-~~~~~~~~~~~~~~~~~~~~~
+work with bids
+^^^^^^^^^^^^^^
 
-There is a possibility to set custom contract signature date.
-If the date is not set it will be generated on contract registration.
-You can register contract:
+add
+"""
 
-.. include:: tutorial/auction-contract-sign.http
-   :code:
+In `active.tendering` status, we can add bids:
 
-Cancelling auction
-------------------
+.. include:: tutorial/active_tendering_add_bid.http
+    :code:
 
-Organizer can cancel auction anytime (except when auction has terminal status e.g. `unsuccesfull`, `canceled`, `complete`).
+get
+"""
 
-The following steps should be applied:
+Get the bid:
 
-1. Prepare cancellation request.
-2. Fill it with the protocol describing the cancellation reasons.
-3. Cancel the auction with the reasons prepared.
+.. include:: tutorial/active_tendering_get_bid.http
+    :code:
 
-Only the request that has been activated (3rd step above) has power to
-cancel auction.  I.e.  you have to not only prepare cancellation request but
-to activate it as well.
+activate
+""""""""
 
-See :ref:`cancellation` data structure for details.
+As we can see the bid is in draft status.
+In order to `activate bid` we must change status to `pending`:
 
-Preparing the cancellation request
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+.. include:: tutorial/active_tendering_activate_bid.http
+    :code:
 
-You should pass `reason`, `status` defaults to `pending`. `id` is
-autogenerated and passed in the `Location` header of response.
+We can see that the following fields have been generated:
 
-.. include:: tutorial/prepare-cancellation.http
-   :code:
+- date
+- id
+- owner
+- qualified: false
+
+make active status
+""""""""""""""""""
+
+When a bit in `pending` status it does not mean a fully active bit.
+In order to set `active` status we must
+
+- attach document with `documentType: eligibilityDocuments`
+- patch bid, set `qualified: true`
+- patch bid, set `bidNumber - integer`
+- patch bid, set `status - active`
+
+Performing the last three actions should be done as separate PATCHs, or the one PATCH
 
 
-Filling cancellation with protocol and supplementary documentation
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Let`s try to completely activate bid
 
-Upload the file contents:
+Attach document with `documentType: eligibilityDocuments`:
 
-.. include:: tutorial/upload-cancellation-doc.http
-   :code:
+.. include:: tutorial/active_tendering_bid_attach_document.http
+    :code:
 
-Change the document description and other properties:
+Patch with required data for completely activate bid:
 
-.. include:: tutorial/patch-cancellation.http
-   :code:
+.. include:: tutorial/active_tendering_bid_make_active_status.http
+    :code:
 
-Upload new version of the document:
+Now we can see completely activated bid:
 
-.. include:: tutorial/update-cancellation-doc.http
-   :code:
+.. include:: tutorial/active_tendering_bid_get_active_status.http
+    :code:
 
-Activating the request and cancelling auction
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+We can delete bid:
 
-.. include:: tutorial/active-cancellation.http
-   :code:
+.. include:: tutorial/active_tendering_delete_bid.http
+    :code:
+
+active.enquiry
+--------------
+In active.enquiry we can:
+
+- adding :ref:`adding auction documents`
+- :ref:`work with questions`
+- :ref:`work with bids`
+        - allowed:
+                - pending-> active
+                - pending-> deleted
+                - active-> deleted
+        - is prohibited:
+                - create a draft
+
+active.auction
+--------------
+After auction is scheduled anybody can visit it to watch. The auction can be reached at `Auction.auctionUrl`:
+
+.. include:: tutorial/active_auction_get_procedure.http
+    :code:

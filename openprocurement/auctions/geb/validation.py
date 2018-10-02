@@ -61,9 +61,9 @@ def validate_make_active_status_bid(request):
     bid = request.context
     bid_documents = bid.documents
     auction = bid.__parent__
-    new_status = request.validated['json_data'].get('status')
+    new_data = request.validated['json_data']
 
-    if request.authenticated_role == 'Administrator' or new_status != 'active':
+    if request.authenticated_role == 'Administrator' or new_data.get('status') != 'active':
         return True
 
     try:
@@ -73,10 +73,10 @@ def validate_make_active_status_bid(request):
         if not any([document.documentType == 'eligibilityDocuments' for document in bid_documents]):
             raise Exception('Can`t activate bid, need document of documentType: eligibilityDocuments')
 
-        if bid.qualified is not True:
+        if bid.qualified is not True and not new_data.get('qualified'):
             raise Exception('Can`t activate bid, qualified must be True')
 
-        if not bid.bidNumber:
+        if not bid.bidNumber and not new_data.get('bidNumber'):
             raise Exception('Can`t activate bid, you must add the bidNumber')
 
     except Exception as err:

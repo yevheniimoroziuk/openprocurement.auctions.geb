@@ -37,6 +37,7 @@ class AuctionChanger(object):
     def change(self):
         if self.validate():
             self._context.modified = apply_patch(self._request, save=False, src=self._request.validated['auction_src'])
+            return self._context.modified
 
 
 @implementer(IBidChanger)
@@ -60,6 +61,7 @@ class BidChanger(object):
     def change(self):
         if self.validate():
             self._auction.modified = apply_patch(self._request, save=False, src=self._context.serialize())
+            return self._auction.modified
 
 
 @implementer(IQuestionChanger)
@@ -81,3 +83,4 @@ class QuestionChanger(object):
     def change(self):
         if self.validate():
             self._auction.modified = apply_patch(self._request, save=False, src=self._context.serialize())
+            return self._auction.modified

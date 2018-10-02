@@ -1,0 +1,131 @@
+GET /api/2.5/auctions/ae7d7760cfc046b6b8b89e437cb4e761
+Authorization: Basic YnJva2VyOg==
+
+
+200 OK
+Content-Type: application/json
+
+{
+  "data": {
+    "procurementMethod": "open", 
+    "auctionID": "UA-EA-2018-09-20-000001", 
+    "minNumberOfQualifiedBids": 2, 
+    "registrationFee": {
+      "currency": "UAH", 
+      "amount": 700.87, 
+      "valueAddedTaxIncluded": true
+    }, 
+    "submissionMethod": "electronicAuction", 
+    "procuringEntity": {
+      "contactPoint": {
+        "name": "Державне управління справами", 
+        "telephone": "0440000000"
+      }, 
+      "identifier": {
+        "scheme": "UA-EDR", 
+        "id": "00037256", 
+        "uri": "http://www.dus.gov.ua/"
+      }, 
+      "name": "Державне управління справами", 
+      "address": {
+        "postalCode": "01220", 
+        "countryName": "Україна", 
+        "streetAddress": "вул. Банкова, 11, корпус 1", 
+        "region": "м. Київ", 
+        "locality": "м. Київ"
+      }
+    }, 
+    "owner": "broker", 
+    "guarantee": {
+      "currency": "UAH", 
+      "amount": 35
+    }, 
+    "title": "футляри до державних нагород", 
+    "tenderAttempts": 1, 
+    "auctionParameters": {
+      "type": "texas"
+    }, 
+    "dateModified": "2018-10-08T10:49:40.536187+03:00", 
+    "status": "draft", 
+    "lotHolder": {
+      "contactPoint": {
+        "name": "Державне управління справами", 
+        "telephone": "0440000000"
+      }, 
+      "identifier": {
+        "scheme": "UA-EDR", 
+        "id": "00037256", 
+        "uri": "http://www.dus.gov.ua/"
+      }, 
+      "name": "Державне управління справами", 
+      "address": {
+        "postalCode": "01220", 
+        "countryName": "Україна", 
+        "streetAddress": "вул. Банкова, 11, корпус 1", 
+        "region": "м. Київ", 
+        "locality": "м. Київ"
+      }
+    }, 
+    "description": "test procuredure", 
+    "procurementMethodType": "geb", 
+    "date": "2018-10-08T10:49:40.536187+03:00", 
+    "budgetSpent": {
+      "currency": "UAH", 
+      "amount": 35, 
+      "valueAddedTaxIncluded": true
+    }, 
+    "lotIdentifier": "219560", 
+    "contractTerms": {
+      "type": "lease", 
+      "leaseTerms": {
+        "leaseDuration": "P10Y"
+      }
+    }, 
+    "minimalStep": {
+      "currency": "UAH", 
+      "amount": 35, 
+      "valueAddedTaxIncluded": true
+    }, 
+    "items": [
+      {
+        "description": "Земля для військовослужбовців", 
+        "classification": {
+          "scheme": "CAV-PS", 
+          "id": "06110000-6", 
+          "description": "Земельні ділянки"
+        }, 
+        "additionalClassifications": [
+          {
+            "scheme": "kvtspz", 
+            "id": "01.04", 
+            "description": "Test"
+          }, 
+          {
+            "scheme": "cadastralNumber", 
+            "id": "42", 
+            "description": "Test"
+          }
+        ], 
+        "address": {
+          "postalCode": "79000", 
+          "countryName": "Україна", 
+          "streetAddress": "вул. Банкова 1", 
+          "region": "м. Київ", 
+          "locality": "м. Київ"
+        }, 
+        "id": "c40a06a9ad284719ae6d18f4bb57e76a", 
+        "unit": {
+          "code": "44617100-9", 
+          "name": "item"
+        }, 
+        "quantity": 5.001
+      }
+    ], 
+    "value": {
+      "currency": "UAH", 
+      "amount": 100.0, 
+      "valueAddedTaxIncluded": true
+    }, 
+    "awardCriteria": "highestCost"
+  }
+}

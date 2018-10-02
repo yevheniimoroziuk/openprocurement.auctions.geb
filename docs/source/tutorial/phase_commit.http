@@ -1,0 +1,154 @@
+PATCH /api/2.5/auctions/ae7d7760cfc046b6b8b89e437cb4e761?acc_token=6f90273c2b66498aac8f66e5d1e8671c
+Authorization: Basic YnJva2VyOg==
+Content-Type: application/json
+
+{
+  "data": {
+    "status": "active.rectification"
+  }
+}
+
+
+200 OK
+Content-Type: application/json
+
+{
+  "data": {
+    "procurementMethod": "open", 
+    "auctionID": "UA-EA-2018-09-20-000001", 
+    "minNumberOfQualifiedBids": 2, 
+    "enquiryPeriod": {
+      "startDate": "2018-10-08T10:49:42.418541+03:00", 
+      "endDate": "2018-10-19T20:00:00+03:00"
+    }, 
+    "registrationFee": {
+      "currency": "UAH", 
+      "amount": 700.87, 
+      "valueAddedTaxIncluded": true
+    }, 
+    "submissionMethod": "electronicAuction", 
+    "procuringEntity": {
+      "contactPoint": {
+        "name": "Державне управління справами", 
+        "telephone": "0440000000"
+      }, 
+      "identifier": {
+        "scheme": "UA-EDR", 
+        "id": "00037256", 
+        "uri": "http://www.dus.gov.ua/"
+      }, 
+      "name": "Державне управління справами", 
+      "address": {
+        "postalCode": "01220", 
+        "countryName": "Україна", 
+        "streetAddress": "вул. Банкова, 11, корпус 1", 
+        "region": "м. Київ", 
+        "locality": "м. Київ"
+      }
+    }, 
+    "owner": "broker", 
+    "id": "ae7d7760cfc046b6b8b89e437cb4e761", 
+    "tenderPeriod": {
+      "startDate": "2018-10-10T10:49:42.418541+03:00", 
+      "endDate": "2018-10-17T20:00:00+03:00"
+    }, 
+    "title": "футляри до державних нагород", 
+    "tenderAttempts": 1, 
+    "auctionParameters": {
+      "type": "texas"
+    }, 
+    "guarantee": {
+      "currency": "UAH", 
+      "amount": 35
+    }, 
+    "dateModified": "2018-10-08T10:49:42.420738+03:00", 
+    "status": "active.rectification", 
+    "lotHolder": {
+      "contactPoint": {
+        "name": "Державне управління справами", 
+        "telephone": "0440000000"
+      }, 
+      "identifier": {
+        "scheme": "UA-EDR", 
+        "id": "00037256", 
+        "uri": "http://www.dus.gov.ua/"
+      }, 
+      "name": "Державне управління справами", 
+      "address": {
+        "postalCode": "01220", 
+        "countryName": "Україна", 
+        "streetAddress": "вул. Банкова, 11, корпус 1", 
+        "region": "м. Київ", 
+        "locality": "м. Київ"
+      }
+    }, 
+    "description": "test procuredure", 
+    "auctionPeriod": {
+      "shouldStartAfter": "2018-10-20T00:00:00+03:00"
+    }, 
+    "procurementMethodType": "geb", 
+    "date": "2018-10-08T10:49:42.420738+03:00", 
+    "budgetSpent": {
+      "currency": "UAH", 
+      "amount": 35, 
+      "valueAddedTaxIncluded": true
+    }, 
+    "lotIdentifier": "219560", 
+    "rectificationPeriod": {
+      "startDate": "2018-10-08T10:49:42.418541+03:00", 
+      "endDate": "2018-10-10T10:49:42.418541+03:00"
+    }, 
+    "contractTerms": {
+      "type": "lease", 
+      "leaseTerms": {
+        "leaseDuration": "P10Y"
+      }
+    }, 
+    "minimalStep": {
+      "currency": "UAH", 
+      "amount": 35, 
+      "valueAddedTaxIncluded": true
+    }, 
+    "items": [
+      {
+        "description": "Земля для військовослужбовців", 
+        "classification": {
+          "scheme": "CAV-PS", 
+          "id": "06110000-6", 
+          "description": "Земельні ділянки"
+        }, 
+        "additionalClassifications": [
+          {
+            "scheme": "kvtspz", 
+            "id": "01.04", 
+            "description": "Test"
+          }, 
+          {
+            "scheme": "cadastralNumber", 
+            "id": "42", 
+            "description": "Test"
+          }
+        ], 
+        "address": {
+          "postalCode": "79000", 
+          "countryName": "Україна", 
+          "streetAddress": "вул. Банкова 1", 
+          "region": "м. Київ", 
+          "locality": "м. Київ"
+        }, 
+        "id": "47fad3af431b417db888b9fee9d80cc9", 
+        "unit": {
+          "code": "44617100-9", 
+          "name": "item"
+        }, 
+        "quantity": 5.001
+      }
+    ], 
+    "value": {
+      "currency": "UAH", 
+      "amount": 100.0, 
+      "valueAddedTaxIncluded": true
+    }, 
+    "awardCriteria": "highestCost"
+  }
+}
