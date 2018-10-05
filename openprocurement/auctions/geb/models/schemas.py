@@ -46,6 +46,7 @@ from openprocurement.auctions.core.validation import (
 from openprocurement.auctions.geb.interfaces import (
     IAuction,
     IBid,
+    IDocument,
     IQuestion
 )
 
@@ -68,6 +69,7 @@ from openprocurement.auctions.geb.models.roles import (
     auction_edit_enquiry_role,
     auction_contractTerms_create_role,
     question_enquiry_role,
+    question_rectification_role,
     bid_active_auction_role,
     bid_active_awarded_role,
     bid_active_enquiry_role,
@@ -87,12 +89,15 @@ from openprocurement.auctions.geb.validation import (
 )
 
 
+@implementer(IDocument)
 class GebAuctionDocument(dgfDocument):
+
     documentOf = StringType(required=True, choices=['auction'], default='auction')
 
     documentType = StringType(choices=AUCTION_DOCUMENT_TYPES)
 
 
+@implementer(IDocument)
 class GebBidDocument(dgfDocument):
     documentOf = StringType(required=True, choices=['bid'], default='bid')
 
@@ -104,7 +109,8 @@ class GebQuestion(Question):
 
     class Options:
         roles = {
-            'active.enquiry': question_enquiry_role
+            'active.enquiry': question_enquiry_role,
+            'active.rectification': question_rectification_role
         }
 
     questionOf = StringType(required=True, choices=['tender', 'item'], default='tender')

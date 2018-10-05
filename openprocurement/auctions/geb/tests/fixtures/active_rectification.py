@@ -15,8 +15,15 @@ from openprocurement.auctions.geb.tests.fixtures.common import (
     test_procuringEntity,
     test_registrationFee_created,
     test_transfer_token,
-    test_auction_guarantee
+    test_auction_guarantee,
+    test_document
 )
+
+from openprocurement.auctions.geb.tests.fixtures.questions import (
+    TEST_QESTION_IN_RECTIFICATION_PERIOD
+)
+
+# active rectification default auction
 
 now = get_now()
 calculator = Calculator(now, 'rectificationPeriod', 'start')
@@ -69,23 +76,41 @@ ACTIVE_RECTIFICATION_AUCTION_DEFAULT_FIXTURE = {
    "procuringEntity": test_procuringEntity
 }
 
+# end active rectification default fixture
+
 calculator = Calculator(now, 'rectificationPeriod', 'end')
 
-END_ACTIVE_RECTIFICATION_AUCTION_DEFAULT_FIXTURE = deepcopy(ACTIVE_RECTIFICATION_AUCTION_DEFAULT_FIXTURE)
-END_ACTIVE_RECTIFICATION_AUCTION_DEFAULT_FIXTURE["enquiryPeriod"] = {
-                  "startDate": calculator.enquiryPeriod.startDate.isoformat(),
-                  "endDate": calculator.enquiryPeriod.endDate.isoformat()
+auction = deepcopy(ACTIVE_RECTIFICATION_AUCTION_DEFAULT_FIXTURE)
+
+auction["enquiryPeriod"] = {
+    "startDate": calculator.enquiryPeriod.startDate.isoformat(),
+    "endDate": calculator.enquiryPeriod.endDate.isoformat()
 }
-END_ACTIVE_RECTIFICATION_AUCTION_DEFAULT_FIXTURE["next_check"] = calculator.rectificationPeriod.endDate.isoformat()
-END_ACTIVE_RECTIFICATION_AUCTION_DEFAULT_FIXTURE["auctionPeriod"] = {
-    "shouldStartAfter": calculator.auctionPeriod.shouldStartAfter.isoformat()
-}
-END_ACTIVE_RECTIFICATION_AUCTION_DEFAULT_FIXTURE["tenderPeriod"] = {
+auction["tenderPeriod"] = {
     "startDate": calculator.tenderPeriod.startDate.isoformat(),
     "endDate": calculator.tenderPeriod.endDate.isoformat()
 }
-END_ACTIVE_RECTIFICATION_AUCTION_DEFAULT_FIXTURE["date"] = calculator.auctionDate.date.isoformat()
-END_ACTIVE_RECTIFICATION_AUCTION_DEFAULT_FIXTURE["rectificationPeriod"] = {
+auction["rectificationPeriod"] = {
     "startDate": calculator.rectificationPeriod.startDate.isoformat(),
     "endDate": calculator.rectificationPeriod.endDate.isoformat()
 }
+auction["auctionPeriod"] = {
+    "shouldStartAfter": calculator.auctionPeriod.shouldStartAfter.isoformat()
+}
+auction["next_check"] = calculator.rectificationPeriod.endDate.isoformat()
+auction["date"] = calculator.auctionDate.date.isoformat()
+
+END_ACTIVE_RECTIFICATION_AUCTION_DEFAULT_FIXTURE = auction
+
+auction = deepcopy(ACTIVE_RECTIFICATION_AUCTION_DEFAULT_FIXTURE)
+
+auction['documents'] = [test_document]
+
+ACTIVE_RECTIFICATION_AUCTION_WITH_DOCUMENTS = auction
+
+# auction with questions fixture
+
+auction = deepcopy(ACTIVE_RECTIFICATION_AUCTION_DEFAULT_FIXTURE)
+auction['questions'] = [TEST_QESTION_IN_RECTIFICATION_PERIOD]
+
+ACTIVE_RECTIFICATION_AUCTION_FIXTURE_WITH_QUESTION = auction

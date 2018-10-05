@@ -3,6 +3,9 @@ from datetime import timedelta
 PROCEDURE_DOCUMENT_STATUSES = ['active.rectification', 'active.tendering', 'active.enquiry']
 AUCTION_DOCUMENT_STATUSES = ['active.auction', 'active.qualification']
 
+# statuses in which can edit auction document
+EDIT_AUCTION_DOCUMENT_STATUSES = ['active.rectification', 'active.tendering', 'active.enquiry']
+
 # duration of periods
 RECTIFICATION_PERIOD_DURATION = timedelta(days=2)
 MIN_NUMBER_OF_DAYS_TENDERING = timedelta(days=1)
@@ -65,11 +68,13 @@ AUCTION_STATUS_FOR_DELETING_BIDS = [
 ]
 
 AUCTION_STATUS_FOR_ADDING_QUESTIONS = [
+    'active.rectification',
     'active.tendering',
     'active.enquiry'
 ]
 
 AUCTION_STATUS_FOR_CHANGING_QUESTIONS = [
+    'active.rectification',
     'active.tendering',
     'active.enquiry'
 ]

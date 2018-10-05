@@ -14,27 +14,37 @@ from openprocurement.auctions.geb.tests.states import (
     ProcedureMachine
 )
 
+from openprocurement.auctions.geb.tests.fixtures.active_rectification import (
+    ACTIVE_RECTIFICATION_AUCTION_FIXTURE_WITH_QUESTION
+)
+
 from openprocurement.auctions.geb.tests.blanks.active_rectification import (
-    change_title,
+    add_document,
+    add_question,
+    answer_question,
+    change_bankAccount,
+    change_budgetSpent,
+    change_contractTerms,
     change_desctiption,
-    change_tenderAttempts,
-    change_lotIdentifier,
-    change_value,
-    change_minimalStep,
     change_guarantee,
     change_items,
-    change_budgetSpent,
-    change_registrationFee,
-    change_procuringEntity,
     change_lotHolder,
-    change_bankAccount,
-    change_contractTerms,
-    add_document
+    change_lotIdentifier,
+    change_minimalStep,
+    change_one_field_rest_same,
+    change_procuringEntity,
+    change_registrationFee,
+    change_tenderAttempts,
+    change_title,
+    change_value,
+    get_question,
+    patch_document
 )
 
 
 class StatusActiveRectificationChangeFieldTest(BaseWebTest):
 
+    test_add_question = snitch(add_question)
     test_change_title = snitch(change_title)
     test_change_description = snitch(change_desctiption)
     test_change_tenderAttempts = snitch(change_tenderAttempts)
@@ -49,6 +59,7 @@ class StatusActiveRectificationChangeFieldTest(BaseWebTest):
     test_change_lotHolder = snitch(change_lotHolder)
     test_change_bankAccount = snitch(change_bankAccount)
     test_change_contractTerms = snitch(change_contractTerms)
+    test_change_one_field_rest_same = snitch(change_one_field_rest_same)
 
     def setUp(self):
         super(StatusActiveRectificationChangeFieldTest, self).setUp()
@@ -58,12 +69,49 @@ class StatusActiveRectificationChangeFieldTest(BaseWebTest):
         change_machine_state(procedure, 'active.rectification')
         context = procedure.snapshot()
         self.auction = context['auction']
-        self.ENTRYPOINT = '/auctions/{}?acc_token={}'.format(self.auction['data']['id'],
-                                                             self.auction['access']['token'])
+
+        entrypoints = {}
+
+        entrypoints['patch_auction'] = '/auctions/{}?acc_token={}'.format(self.auction['data']['id'],
+                                                                          self.auction['access']['token'])
+        entrypoints['post_question'] = '/auctions/{}/questions'.format(self.auction['data']['id'])
+        entrypoints['get_auction'] = '/auctions/{}'.format(self.auction['data']['id'])
+
+        self.ENTRYPOINTS = entrypoints
+
+
+class StatusActiveRectificationQuestionsTest(BaseWebTest):
+
+    test_answer_question = snitch(answer_question)
+    test_get_question = snitch(get_question)
+
+    def setUp(self):
+        super(StatusActiveRectificationQuestionsTest, self).setUp()
+
+        procedure = ProcedureMachine()
+        procedure.set_db_connector(self.db)
+        procedure.toggle('active.tendering')
+        context = procedure.snapshot(fixture=ACTIVE_RECTIFICATION_AUCTION_FIXTURE_WITH_QUESTION)
+
+        self.auction = context['auction']
+        self.question = context['questions'][0]
+
+        entrypoints = {}
+
+        entrypoints['patch_question'] = '/auctions/{}/questions/{}?acc_token={}'.format(self.auction['data']['id'],
+                                                                                        self.question['data']['id'],
+                                                                                        self.auction['access']['token'])
+
+        entrypoints['question'] = '/auctions/{}/questions/{}'.format(self.auction['data']['id'],
+                                                                     self.question['data']['id'])
+        self.ENTRYPOINTS = entrypoints
 
 
 class StatusActiveRectificationDocumentTest(BaseWebTest):
     docservice = True
+
+    test_add_document = snitch(add_document)
+    test_patch_document = snitch(patch_document)
 
     def setUp(self):
         super(StatusActiveRectificationDocumentTest, self).setUp()
@@ -71,11 +119,7 @@ class StatusActiveRectificationDocumentTest(BaseWebTest):
         procedure = ProcedureMachine()
         procedure.set_db_connector(self.db)
         change_machine_state(procedure, 'active.rectification')
-        context = procedure.snapshot()
-        self.auction = context['auction']
-        self.ENTRYPOINT = '/auctions/{}/documents?acc_token={}'.format(self.auction['data']['id'], self.auction['access']['token'])
-
-    test_add_document = snitch(add_document)
+        self.procedure = procedure
 
 
 def suite():

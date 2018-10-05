@@ -28,6 +28,12 @@ def add_question(test_case):
 
     question = response.json['data']
 
+    auction_entrypoint = '/auctions/{}'.format(test_case.auction['data']['id'])
+    response = test_case.app.get(auction_entrypoint)
+    auction = response.json['data']
+    questions = [question['id'] for question in auction['questions']]
+    test_case.assertIn(question['id'], questions)
+
     question_url_pattern = '/auctions/{auction}/questions/{question}'
     question_url = question_url_pattern.format(auction=test_case.auction['data']['id'],
                                                question=question['id'])

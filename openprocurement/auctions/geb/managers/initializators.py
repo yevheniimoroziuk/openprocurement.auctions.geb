@@ -103,13 +103,14 @@ class AuctionInitializator(object):
         self._context.auctionPeriod.endDate = None
 
     def _check_demand(self):
-        if self._context.status == 'draft':
-            return True
+        auction_src = self._request.validated['auction_src']
 
+        if self._context.status == 'draft':                                     # create
+            return True
         elif self._context.status == 'active.rectification':
-            if self._request.validated['json_data'].get('status') == 'active.rectification':
+            if auction_src['status'] == 'draft':                                # two-phase commit
                 return True
-        elif self._context.status == 'active.auction':
+        elif self._context.status == 'active.auction':                          # chronograph switch to active.auction
             return True
         return False
 
