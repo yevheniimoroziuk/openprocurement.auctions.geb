@@ -10,9 +10,10 @@ Content-Type: application/json
     "procurementMethod": "open", 
     "auctionID": "UA-EA-2018-09-20-000001", 
     "minNumberOfQualifiedBids": 2, 
+    "auctionUrl": "http://auction-sandbox.openprocurement.org/auctions/ae7d7760cfc046b6b8b89e437cb4e761", 
     "enquiryPeriod": {
-      "startDate": "2018-09-28T10:49:40.545148+03:00", 
-      "endDate": "2018-10-08T10:49:40.545148+03:00"
+      "startDate": "2018-09-28T15:23:28.935947+03:00", 
+      "endDate": "2018-10-08T15:23:28.935947+03:00"
     }, 
     "registrationFee": {
       "currency": "UAH", 
@@ -42,7 +43,7 @@ Content-Type: application/json
     "owner": "broker", 
     "id": "ae7d7760cfc046b6b8b89e437cb4e761", 
     "tenderPeriod": {
-      "startDate": "2018-09-30T10:49:40.545148+03:00", 
+      "startDate": "2018-09-30T15:23:28.935947+03:00", 
       "endDate": "2018-10-05T20:00:00+03:00"
     }, 
     "title": "футляри до державних нагород", 
@@ -54,7 +55,7 @@ Content-Type: application/json
       "currency": "UAH", 
       "amount": 35
     }, 
-    "dateModified": "2018-10-08T10:49:40.538396+03:00", 
+    "dateModified": "2018-10-08T15:23:28.929421+03:00", 
     "status": "active.auction", 
     "lotHolder": {
       "contactPoint": {
@@ -79,8 +80,8 @@ Content-Type: application/json
     "auctionPeriod": {
       "shouldStartAfter": "2018-10-09T00:00:00+03:00"
     }, 
-    "procurementMethodType": "geb", 
-    "date": "2018-09-26T10:49:40.545148+03:00", 
+    "procurementMethodType": "landlease", 
+    "date": "2018-09-26T15:23:28.935947+03:00", 
     "budgetSpent": {
       "currency": "UAH", 
       "amount": 35, 
@@ -88,8 +89,8 @@ Content-Type: application/json
     }, 
     "lotIdentifier": "219560", 
     "rectificationPeriod": {
-      "startDate": "2018-09-28T10:49:40.545148+03:00", 
-      "endDate": "2018-09-30T10:49:40.545148+03:00"
+      "startDate": "2018-09-28T15:23:28.935947+03:00", 
+      "endDate": "2018-09-30T15:23:28.935947+03:00"
     }, 
     "contractTerms": {
       "type": "lease", 
@@ -129,7 +130,7 @@ Content-Type: application/json
           "region": "м. Київ", 
           "locality": "м. Київ"
         }, 
-        "id": "2c451b13a5e64ad2a1c5d66cb758bc88", 
+        "id": "8a5816f4ed764914a784fb4e63b4a4bc", 
         "unit": {
           "code": "44617100-9", 
           "name": "item"

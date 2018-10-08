@@ -41,7 +41,7 @@ Content-Type: application/json
       "startDate": "2018-10-22"
     }, 
     "tenderAttempts": 1, 
-    "procurementMethodType": "geb", 
+    "procurementMethodType": "landlease", 
     "value": {
       "currency": "UAH", 
       "amount": 100
@@ -117,12 +117,12 @@ Content-Type: application/json
 
 201 Created
 Content-Type: application/json
-Location: /api/2.5/auctions/4bdd6cf25ae64dcfb5ba7b13132152d2
+Location: /api/2.5/auctions/10529e490d424e58ba4cbf7eab4144f7
 
 {
   "access": {
-    "transfer": "1ec4e4094cfa4b7fb58ef2dc35cee00c", 
-    "token": "df43500715dc49f785931b8c2bb904fc"
+    "transfer": "a974bec898654fc28cacab06c3ae9ec4", 
+    "token": "064b7cae18fd4d43b43b9fde54ddaf8c"
   }, 
   "data": {
     "procurementMethod": "open", 
@@ -154,6 +154,7 @@ Location: /api/2.5/auctions/4bdd6cf25ae64dcfb5ba7b13132152d2
       }
     }, 
     "owner": "broker", 
+    "id": "10529e490d424e58ba4cbf7eab4144f7", 
     "guarantee": {
       "currency": "UAH", 
       "amount": 35
@@ -163,7 +164,7 @@ Location: /api/2.5/auctions/4bdd6cf25ae64dcfb5ba7b13132152d2
     "auctionParameters": {
       "type": "texas"
     }, 
-    "dateModified": "2018-10-08T10:49:41.962480+03:00", 
+    "dateModified": "2018-10-08T15:23:30.350514+03:00", 
     "status": "draft", 
     "lotHolder": {
       "contactPoint": {
@@ -185,8 +186,8 @@ Location: /api/2.5/auctions/4bdd6cf25ae64dcfb5ba7b13132152d2
       }
     }, 
     "description": "test procuredure", 
-    "procurementMethodType": "geb", 
-    "date": "2018-10-08T10:49:41.959671+03:00", 
+    "procurementMethodType": "landlease", 
+    "date": "2018-10-08T15:23:30.347973+03:00", 
     "budgetSpent": {
       "currency": "UAH", 
       "amount": 35, 
@@ -231,7 +232,7 @@ Location: /api/2.5/auctions/4bdd6cf25ae64dcfb5ba7b13132152d2
           "region": "м. Київ", 
           "locality": "м. Київ"
         }, 
-        "id": "6e520160acfd41f0b690640aedff3a61", 
+        "id": "19ad415119d149da9d1b01071f128a8b", 
         "unit": {
           "code": "44617100-9", 
           "name": "item"

@@ -250,6 +250,12 @@ bid_view_role = whitelist(
     'status',
     'tenderers',
     'value',
+    'documents',
+    'date',
+    'qualified',
+    'owner',
+    'participationUrl',
+    'bidNumber'
 )
 
 bid_pending_role = whitelist(

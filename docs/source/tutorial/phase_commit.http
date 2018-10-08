@@ -18,7 +18,7 @@ Content-Type: application/json
     "auctionID": "UA-EA-2018-09-20-000001", 
     "minNumberOfQualifiedBids": 2, 
     "enquiryPeriod": {
-      "startDate": "2018-10-08T10:49:42.418541+03:00", 
+      "startDate": "2018-10-08T15:23:30.808829+03:00", 
       "endDate": "2018-10-19T20:00:00+03:00"
     }, 
     "registrationFee": {
@@ -49,7 +49,7 @@ Content-Type: application/json
     "owner": "broker", 
     "id": "ae7d7760cfc046b6b8b89e437cb4e761", 
     "tenderPeriod": {
-      "startDate": "2018-10-10T10:49:42.418541+03:00", 
+      "startDate": "2018-10-10T15:23:30.808829+03:00", 
       "endDate": "2018-10-17T20:00:00+03:00"
     }, 
     "title": "футляри до державних нагород", 
@@ -61,7 +61,7 @@ Content-Type: application/json
       "currency": "UAH", 
       "amount": 35
     }, 
-    "dateModified": "2018-10-08T10:49:42.420738+03:00", 
+    "dateModified": "2018-10-08T15:23:30.811070+03:00", 
     "status": "active.rectification", 
     "lotHolder": {
       "contactPoint": {
@@ -86,8 +86,8 @@ Content-Type: application/json
     "auctionPeriod": {
       "shouldStartAfter": "2018-10-20T00:00:00+03:00"
     }, 
-    "procurementMethodType": "geb", 
-    "date": "2018-10-08T10:49:42.420738+03:00", 
+    "procurementMethodType": "landlease", 
+    "date": "2018-10-08T15:23:30.811070+03:00", 
     "budgetSpent": {
       "currency": "UAH", 
       "amount": 35, 
@@ -95,8 +95,8 @@ Content-Type: application/json
     }, 
     "lotIdentifier": "219560", 
     "rectificationPeriod": {
-      "startDate": "2018-10-08T10:49:42.418541+03:00", 
-      "endDate": "2018-10-10T10:49:42.418541+03:00"
+      "startDate": "2018-10-08T15:23:30.808829+03:00", 
+      "endDate": "2018-10-10T15:23:30.808829+03:00"
     }, 
     "contractTerms": {
       "type": "lease", 
@@ -136,7 +136,7 @@ Content-Type: application/json
           "region": "м. Київ", 
           "locality": "м. Київ"
         }, 
-        "id": "47fad3af431b417db888b9fee9d80cc9", 
+        "id": "9ecd43b21ba24192a9614af72691ad02", 
         "unit": {
           "code": "44617100-9", 
           "name": "item"

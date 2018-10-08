@@ -16,14 +16,25 @@ def get_auction_auction(test_case):
     test_case.assertEqual(response.status, expected_http_status)
 
 
-def get_procedure_in_active_auction_dump(test_case):
-    context = test_case.procedure.snapshot(fixture=ACTIVE_AUCTION_DEFAULT_FIXTURE)
+def get_auction_urls_dump(test_case):
+    context = test_case.procedure.snapshot(fixture=ACTIVE_AUCTION_DEFAULT_FIXTURE_WITH_URLS)
     auction = context['auction']
+    bid = context['bids'][0]
     auction_url = '/auctions/{}'.format(auction['data']['id'])
 
     response = test_case.app.get(auction_url)
-    filename = 'docs/source/tutorial/active_auction_get_procedure.http'
+    filename = 'docs/source/tutorial/active_auction_auction_url.http'
 
+    test_case.dump(response.request, response, filename)
+
+    bids_entrypoint_pattern = '/auctions/{}/bids/{}?acc_token={}'
+    entrypoint = bids_entrypoint_pattern.format(auction['data']['id'], bid['data']['id'], bid['access']['token'])
+    auth = test_case.app.authorization
+    test_case.app.authorization = ('Basic', ('{}'.format(bid['access']['owner']), ''))
+    response = test_case.app.get(entrypoint)
+    test_case.app.authorization = auth
+
+    filename = 'docs/source/tutorial/active_auction_participation_urls.http'
     test_case.dump(response.request, response, filename)
 
 
@@ -117,3 +128,21 @@ def update_auction_urls(test_case):
     request_data['bids'] = bids_info
     response = test_case.app.patch_json(auction_url, {'data': request_data})
     test_case.assertEqual(response.status, expected_http_status)
+
+
+def get_participation_urls(test_case):
+    context = test_case.procedure.snapshot(fixture=ACTIVE_AUCTION_DEFAULT_FIXTURE_WITH_URLS)
+    auction = context['auction']
+    bids = context['bids']
+
+    bids_entrypoint_pattern = '/auctions/{}/bids/{}?acc_token={}'
+    for bid in bids:
+
+        entrypoint = bids_entrypoint_pattern.format(auction['data']['id'], bid['data']['id'], bid['access']['token'])
+
+        auth = test_case.app.authorization
+        test_case.app.authorization = ('Basic', ('{}'.format(bid['access']['owner']), ''))
+        response = test_case.app.get(entrypoint)
+        test_case.app.authorization = auth
+
+        test_case.assertIsNotNone(response.json['data'].get('participationUrl'))

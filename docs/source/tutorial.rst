@@ -3,10 +3,10 @@
 Tutorial
 ========
 
-create
-------
+create procedure
+----------------
 
-Let's create some auction:
+Let’s create some procedure:
 
 .. include:: tutorial/create_auction.http
     :code:
@@ -20,13 +20,13 @@ body of response reveals the information about the created auction: its internal
 modified. Pay attention to the `procurementMethodType`. Note that auction is
 created with `draft` status.
 
-draft
------
+status: draft
+-------------
 
-get
-^^^
+get procedure
+^^^^^^^^^^^^^
 
-After the creation of the auction we can get it
+You can GET the auction as long as it's been created
 
 .. include:: tutorial/get_draft_auction.http
     :code:
@@ -34,7 +34,8 @@ After the creation of the auction we can get it
 two-phase commit
 ^^^^^^^^^^^^^^^^
 
-In order to activate the auction, we must make a two-phase commit
+For the procedure to be activated you should apply
+a two-phase commit (manually switch procedure to `active.rectification` status)
 
 .. include:: tutorial/phase_commit.http
     :code:
@@ -42,17 +43,17 @@ In order to activate the auction, we must make a two-phase commit
 We can see what new fields were generated in auction:
 
 rectificationPeriod
-        it lasts 2 working days (non-working days).
+        it lasts for 2 days.
         During this period, you can change some fields
 tenderPeriod
         this period ends at 8:00 pm 3 business days before the auction starts.
-        During this period, it is allowed to add documents, work with bids, work with questions
+        During this period, it is allowed to add documents, work with bids & questions
 enquiryPeriod
-        this period ends at 8:00 pm 1 business days before the auction starts.
-        During this period, it is allowed to add documents, work with bids, work with questions
+        this period ends at 8:00 pm the days before the auction starts
+        During this period, it is allowed to add documents, work with bids & questions
 
-active.rectification
---------------------
+status: active.rectification
+----------------------------
 
 auctions
 ^^^^^^^^
@@ -60,8 +61,8 @@ auctions
 change fields
 """""""""""""
 
-After the auction is activated, the auction goes into `active.rectification` status
-In this period we can change next fields:
+After the procedure is activated, it receives `active.rectification` status.
+During this term you can edit the next data:
 
 - title
 - description
@@ -83,15 +84,14 @@ Example:
 .. include:: tutorial/active_rectification_change_title.http
     :code:
 
-auction documents
 
-.. _adding auction documents:
+.. _add auction documents:
 
 auctions documents
 ^^^^^^^^^^^^^^^^^^
 
-add
-"""
+add document
+""""""""""""
 
 Example:
 
@@ -99,12 +99,12 @@ Example:
     :code:
 
 
-active.tendering
-----------------
+status: active.tendering
+------------------------
 
 In active.tendering we can:
 
-- adding :ref:`adding auction documents`
+- add :ref:`add auction documents`
 - work with questions
 - work with bids
 
@@ -113,18 +113,18 @@ In active.tendering we can:
 work with questions
 ^^^^^^^^^^^^^^^^^^^
 
-ask
-"""
+ask question
+""""""""""""
 
-After the auction has passed to the `active.tendering` status, we can ask questions:
+Bidders can ask questions within the `enquiryPeriod`:
 
 .. include:: tutorial/active_tendering_add_question.http
     :code:
 
-answer
-""""""
+answer question
+"""""""""""""""
 
-if we have any `questions` we can answer them:
+The Organizer can provide the answer:
 
 .. include:: tutorial/active_tendering_answer_question.http
     :code:
@@ -136,18 +136,18 @@ We can see the `answer` field appeared
 work with bids
 ^^^^^^^^^^^^^^
 
-add
-"""
+add bid
+"""""""
 
 In `active.tendering` status, we can add bids:
 
 .. include:: tutorial/active_tendering_add_bid.http
     :code:
 
-get
-"""
+get bid
+"""""""
 
-Get the bid:
+You can also GET the created bid:
 
 .. include:: tutorial/active_tendering_get_bid.http
     :code:
@@ -155,8 +155,7 @@ Get the bid:
 activate
 """"""""
 
-As we can see the bid is in draft status.
-In order to `activate bid` we must change status to `pending`:
+The bid is created in draft status. Use `pending` status for its activation:
 
 .. include:: tutorial/active_tendering_activate_bid.http
     :code:
@@ -171,25 +170,25 @@ We can see that the following fields have been generated:
 make active status
 """"""""""""""""""
 
-When a bit in `pending` status it does not mean a fully active bit.
-In order to set `active` status we must
+As long as a pre-qualification process has been performed out of the system,
+bid owner should add the next data
 
 - attach document with `documentType: eligibilityDocuments`
 - patch bid, set `qualified: true`
 - patch bid, set `bidNumber - integer`
 - patch bid, set `status - active`
 
-Performing the last three actions should be done as separate PATCHs, or the one PATCH
+The last 3 actions can be performed either using separate PATCHs, or applying the one
 
 
-Let`s try to completely activate bid
+Let's complete bid activation
 
 Attach document with `documentType: eligibilityDocuments`:
 
 .. include:: tutorial/active_tendering_bid_attach_document.http
     :code:
 
-Patch with required data for completely activate bid:
+Patch with required data for a complete bid activation:
 
 .. include:: tutorial/active_tendering_bid_make_active_status.http
     :code:
@@ -204,8 +203,8 @@ We can delete bid:
 .. include:: tutorial/active_tendering_delete_bid.http
     :code:
 
-active.enquiry
---------------
+status: active.enquiry
+----------------------
 In active.enquiry we can:
 
 - adding :ref:`adding auction documents`
@@ -218,9 +217,17 @@ In active.enquiry we can:
         - is prohibited:
                 - create a draft
 
-active.auction
---------------
+status: active.auction
+----------------------
 After auction is scheduled anybody can visit it to watch. The auction can be reached at `Auction.auctionUrl`:
 
-.. include:: tutorial/active_auction_get_procedure.http
+.. include:: tutorial/active_auction_auction_url.http
     :code:
+
+We can see what `auctionUrl` were generated in procedure
+
+And bidders can find out their participation URLs via their bids:
+
+.. include:: tutorial/active_auction_participation_urls.http
+    :code:
+We can see what `participationUrl` were generated in bid

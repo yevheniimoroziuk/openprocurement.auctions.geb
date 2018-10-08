@@ -1,6 +1,5 @@
-DELETE /api/2.5/auctions/ae7d7760cfc046b6b8b89e437cb4e761/bids/9ca5e52078464c3a965cff9a86c344e5?acc_token=626e4c9969b94db0a42ef62c8c471f8a
+GET /api/2.5/auctions/ae7d7760cfc046b6b8b89e437cb4e761/bids/3021b2a3f475498b9bff3d58f605319f?acc_token=27213c33fd4146839f11f4227836a7bb
 Authorization: Basic YnJva2VyOg==
-Content-Type: application/json
 
 
 200 OK
@@ -8,9 +7,7 @@ Content-Type: application/json
 
 {
   "data": {
-    "owner": "broker", 
-    "status": "draft", 
-    "id": "9ca5e52078464c3a965cff9a86c344e5", 
+    "status": "active", 
     "value": {
       "currency": "UAH", 
       "amount": 100.0, 
@@ -36,6 +33,9 @@ Content-Type: application/json
           "locality": "м. Київ"
         }
       }
-    ]
+    ], 
+    "owner": "broker", 
+    "id": "3021b2a3f475498b9bff3d58f605319f", 
+    "participationUrl": "http://auction-sandbox.openprocurement.org/auctions/ae7d7760cfc046b6b8b89e437cb4e761?key_for_bid=3021b2a3f475498b9bff3d58f605319f"
   }
 }

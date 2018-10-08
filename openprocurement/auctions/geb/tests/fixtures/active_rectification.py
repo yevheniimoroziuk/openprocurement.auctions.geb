@@ -49,7 +49,7 @@ ACTIVE_RECTIFICATION_AUCTION_DEFAULT_FIXTURE = {
    "auctionPeriod": {
        "shouldStartAfter": calculator.auctionPeriod.shouldStartAfter.isoformat()
    },
-   "procurementMethodType": "geb",
+   "procurementMethodType": "landlease",
    "tenderPeriod": {
        "startDate": calculator.tenderPeriod.startDate.isoformat(),
        "endDate": calculator.tenderPeriod.endDate.isoformat()

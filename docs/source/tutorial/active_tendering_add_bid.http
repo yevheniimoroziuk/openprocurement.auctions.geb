@@ -37,15 +37,16 @@ Content-Type: application/json
 
 201 Created
 Content-Type: application/json
-Location: /api/2.5/auctions/ae7d7760cfc046b6b8b89e437cb4e761/bids/15754471116d491e9c295ab1e8313ade
+Location: /api/2.5/auctions/ae7d7760cfc046b6b8b89e437cb4e761/bids/e8558a7961e344df9997ceeb9c0c3610
 
 {
   "access": {
-    "token": "676779bcfb4140f0bbb0f28127382452"
+    "token": "9a246532dff84de8ada7a5c33169c1dd"
   }, 
   "data": {
+    "owner": "broker", 
     "status": "draft", 
-    "id": "15754471116d491e9c295ab1e8313ade", 
+    "id": "e8558a7961e344df9997ceeb9c0c3610", 
     "value": {
       "currency": "UAH", 
       "amount": 100.0, 

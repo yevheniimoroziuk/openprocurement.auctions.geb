@@ -1,10 +1,10 @@
-POST /api/2.5/auctions/ae7d7760cfc046b6b8b89e437cb4e761/bids/6a6be189b09c4b2888f6c6b0a4851e39/documents?acc_token=d5827acc03bb4652bfd7a8c950c1c663
+POST /api/2.5/auctions/ae7d7760cfc046b6b8b89e437cb4e761/bids/9ca5e52078464c3a965cff9a86c344e5/documents?acc_token=626e4c9969b94db0a42ef62c8c471f8a
 Authorization: Basic YnJva2VyOg==
 Content-Type: application/json
 
 {
   "data": {
-    "url": "http://localhost/get/20912977bc96419283f918f3abb65621?KeyID=172d32c8&Signature=E0FPksBgPPyn58NYsMbDOLtgkuL7QQggKupHOrb9W9Fib6amkdhfc%2Fo2qhtz3GVgZlX5A98ZR0WpL5fJrF3VDg%3D%3D", 
+    "url": "http://localhost/get/d24bd947343a4916a629234197853e1c?KeyID=172d32c8&Signature=i45Jkn9pVnf%2F9b1h7dhaZT9anUSuOgmvCHPd4ZwQufe5NMq%2B1PsngPghg8pA0TA%2FFlWpFWbKmNGA0ixYyomSDg%3D%3D", 
     "format": "application/msword", 
     "title": "укр.doc", 
     "hash": "md5:00000000000000000000000000000000", 
@@ -15,18 +15,18 @@ Content-Type: application/json
 
 201 Created
 Content-Type: application/json
-Location: /api/2.5/auctions/ae7d7760cfc046b6b8b89e437cb4e761/bids/6a6be189b09c4b2888f6c6b0a4851e39/documents/5f0f5d166a9f4e57ace4d7801beb291e
+Location: /api/2.5/auctions/ae7d7760cfc046b6b8b89e437cb4e761/bids/9ca5e52078464c3a965cff9a86c344e5/documents/ac5452742f3146a99fcd9a74b36f5b1c
 
 {
   "data": {
     "hash": "md5:00000000000000000000000000000000", 
     "title": "укр.doc", 
-    "url": "http://localhost/api/2.5/auctions/ae7d7760cfc046b6b8b89e437cb4e761/bids/6a6be189b09c4b2888f6c6b0a4851e39/documents/5f0f5d166a9f4e57ace4d7801beb291e?download=20912977bc96419283f918f3abb65621", 
+    "url": "http://localhost/api/2.5/auctions/ae7d7760cfc046b6b8b89e437cb4e761/bids/9ca5e52078464c3a965cff9a86c344e5/documents/ac5452742f3146a99fcd9a74b36f5b1c?download=d24bd947343a4916a629234197853e1c", 
     "format": "application/msword", 
     "documentOf": "bid", 
-    "datePublished": "2018-10-08T10:49:43.982540+03:00", 
+    "datePublished": "2018-10-08T15:23:32.186567+03:00", 
     "documentType": "eligibilityDocuments", 
-    "dateModified": "2018-10-08T10:49:43.982560+03:00", 
-    "id": "5f0f5d166a9f4e57ace4d7801beb291e"
+    "dateModified": "2018-10-08T15:23:32.186591+03:00", 
+    "id": "ac5452742f3146a99fcd9a74b36f5b1c"
   }
 }
