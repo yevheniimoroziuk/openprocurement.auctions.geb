@@ -27,7 +27,7 @@ from openprocurement.auctions.geb.tests.blanks.active_tendering import (
     delete_bid_dump
 )
 from openprocurement.auctions.geb.tests.blanks.active_auction import (
-    get_procedure_in_active_auction_dump
+    get_auction_urls_dump
 )
 from openprocurement.auctions.geb.tests.helpers import (
     change_machine_state
@@ -164,7 +164,7 @@ class TenderingAuctionBidsDumpTest(BaseWebDocsTest):
 class ActiveAuctionDumpTest(BaseWebDocsTest):
     docservice = True
 
-    test_get_procedure_in_active_auction_dump = snitch(get_procedure_in_active_auction_dump)
+    test_get_auction_urls_dump = snitch(get_auction_urls_dump)
 
     def setUp(self):
         super(ActiveAuctionDumpTest, self).setUp()

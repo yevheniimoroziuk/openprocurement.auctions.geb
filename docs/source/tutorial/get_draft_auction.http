@@ -36,6 +36,7 @@ Content-Type: application/json
       }
     }, 
     "owner": "broker", 
+    "id": "ae7d7760cfc046b6b8b89e437cb4e761", 
     "guarantee": {
       "currency": "UAH", 
       "amount": 35
@@ -45,7 +46,7 @@ Content-Type: application/json
     "auctionParameters": {
       "type": "texas"
     }, 
-    "dateModified": "2018-10-08T10:49:40.536187+03:00", 
+    "dateModified": "2018-10-08T15:23:28.927341+03:00", 
     "status": "draft", 
     "lotHolder": {
       "contactPoint": {
@@ -67,8 +68,8 @@ Content-Type: application/json
       }
     }, 
     "description": "test procuredure", 
-    "procurementMethodType": "geb", 
-    "date": "2018-10-08T10:49:40.536187+03:00", 
+    "procurementMethodType": "landlease", 
+    "date": "2018-10-08T15:23:28.927341+03:00", 
     "budgetSpent": {
       "currency": "UAH", 
       "amount": 35, 
@@ -113,7 +114,7 @@ Content-Type: application/json
           "region": "м. Київ", 
           "locality": "м. Київ"
         }, 
-        "id": "c40a06a9ad284719ae6d18f4bb57e76a", 
+        "id": "75e1d882f3a6419d8eea06b09727fa8f", 
         "unit": {
           "code": "44617100-9", 
           "name": "item"

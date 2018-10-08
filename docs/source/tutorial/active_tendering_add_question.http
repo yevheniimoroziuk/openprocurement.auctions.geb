@@ -31,7 +31,7 @@ Content-Type: application/json
 
 201 Created
 Content-Type: application/json
-Location: /api/2.5/auctions/ae7d7760cfc046b6b8b89e437cb4e761/questions/57032402c4574f7d934199db2e2f0ad5
+Location: /api/2.5/auctions/ae7d7760cfc046b6b8b89e437cb4e761/questions/dce581747ec94a398e70b5e962785514
 
 {
   "data": {
@@ -56,8 +56,8 @@ Location: /api/2.5/auctions/ae7d7760cfc046b6b8b89e437cb4e761/questions/57032402c
       }
     }, 
     "title": "Калорійність", 
-    "date": "2018-10-08T10:47:08.955896+03:00", 
-    "id": "57032402c4574f7d934199db2e2f0ad5", 
+    "date": "2018-10-08T15:23:32.709208+03:00", 
+    "id": "dce581747ec94a398e70b5e962785514", 
     "questionOf": "tender"
   }
 }

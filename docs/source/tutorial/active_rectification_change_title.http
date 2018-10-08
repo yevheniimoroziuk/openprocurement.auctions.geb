@@ -18,7 +18,7 @@ Content-Type: application/json
     "auctionID": "UA-EA-2018-09-20-000001", 
     "minNumberOfQualifiedBids": 2, 
     "enquiryPeriod": {
-      "startDate": "2018-10-08T10:49:40.538396+03:00", 
+      "startDate": "2018-10-08T15:23:28.929421+03:00", 
       "endDate": "2018-10-21T20:00:00+03:00"
     }, 
     "registrationFee": {
@@ -49,7 +49,7 @@ Content-Type: application/json
     "owner": "broker", 
     "id": "ae7d7760cfc046b6b8b89e437cb4e761", 
     "tenderPeriod": {
-      "startDate": "2018-10-10T10:49:40.538396+03:00", 
+      "startDate": "2018-10-10T15:23:28.929421+03:00", 
       "endDate": "2018-10-19T20:00:00+03:00"
     }, 
     "title": "Test", 
@@ -61,7 +61,7 @@ Content-Type: application/json
       "currency": "UAH", 
       "amount": 35
     }, 
-    "dateModified": "2018-10-08T10:49:43.267689+03:00", 
+    "dateModified": "2018-10-08T15:23:31.585481+03:00", 
     "status": "active.rectification", 
     "lotHolder": {
       "contactPoint": {
@@ -86,8 +86,8 @@ Content-Type: application/json
     "auctionPeriod": {
       "shouldStartAfter": "2018-10-22T00:00:00+03:00"
     }, 
-    "procurementMethodType": "geb", 
-    "date": "2018-10-06T10:49:40.538396+03:00", 
+    "procurementMethodType": "landlease", 
+    "date": "2018-10-06T15:23:28.929421+03:00", 
     "budgetSpent": {
       "currency": "UAH", 
       "amount": 35, 
@@ -95,8 +95,8 @@ Content-Type: application/json
     }, 
     "lotIdentifier": "219560", 
     "rectificationPeriod": {
-      "startDate": "2018-10-08T10:49:40.538396+03:00", 
-      "endDate": "2018-10-10T10:49:40.538396+03:00"
+      "startDate": "2018-10-08T15:23:28.929421+03:00", 
+      "endDate": "2018-10-10T15:23:28.929421+03:00"
     }, 
     "contractTerms": {
       "type": "lease", 
@@ -136,7 +136,7 @@ Content-Type: application/json
           "region": "м. Київ", 
           "locality": "м. Київ"
         }, 
-        "id": "8b84aa5721d645edb779738e9c95c3f9", 
+        "id": "66852d82aeb34d5cbe277c678d65d0a4", 
         "unit": {
           "code": "44617100-9", 
           "name": "item"

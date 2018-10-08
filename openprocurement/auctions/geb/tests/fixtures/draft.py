@@ -41,7 +41,7 @@ DRAFT_AUCTION_DEFAULT_FIXTURE = {
    "auctionPeriod": {
        "startDate": (now + timedelta(days=14)).isoformat()
    },
-   "procurementMethodType": "geb",
+   "procurementMethodType": "landlease",
    "date": now.isoformat(),
    "budgetSpent": test_auction_budgetSpent_created,
    "doc_type": "Auction",
@@ -76,7 +76,7 @@ DRAFT_AUCTION_DEFAULT_FIXTURE_WITH_INVALID_AUCTON_PERIOD = {
    "auctionPeriod": {
        "startDate": (now + timedelta(days=3)).isoformat()
    },
-   "procurementMethodType": "geb",
+   "procurementMethodType": "landlease",
    "date": now.isoformat(),
    "budgetSpent": test_auction_budgetSpent_created,
    "doc_type": "Auction",
