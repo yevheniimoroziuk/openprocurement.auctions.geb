@@ -41,3 +41,13 @@ def create_auction_invalid_auctionPeriod(self):
     auction['auctionPeriod'] = {'startDate': None}
     response = self.app.post_json(entrypoint, request_data, status=422)
     self.assertEqual(response.status, expected_http_status)
+
+
+def create_auction_dump(self):
+
+    request_data = {"data": self.auction}
+    entrypoint = '/auctions'
+    response = self.app.post_json(entrypoint, request_data)
+    filename = 'docs/source/tutorial/create_auction.http'
+
+    self.dump(response.request, response, filename)

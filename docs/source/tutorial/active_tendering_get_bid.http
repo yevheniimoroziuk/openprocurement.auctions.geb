@@ -1,0 +1,39 @@
+GET /api/2.5/auctions/ae7d7760cfc046b6b8b89e437cb4e761/bids/6a6be189b09c4b2888f6c6b0a4851e39?acc_token=d5827acc03bb4652bfd7a8c950c1c663
+Authorization: Basic YnJva2VyOg==
+
+
+200 OK
+Content-Type: application/json
+
+{
+  "data": {
+    "status": "draft", 
+    "id": "6a6be189b09c4b2888f6c6b0a4851e39", 
+    "value": {
+      "currency": "UAH", 
+      "amount": 100.0, 
+      "valueAddedTaxIncluded": true
+    }, 
+    "tenderers": [
+      {
+        "contactPoint": {
+          "name": "Державне управління справами", 
+          "telephone": "0440000000"
+        }, 
+        "identifier": {
+          "scheme": "UA-EDR", 
+          "id": "00037256", 
+          "uri": "http://www.dus.gov.ua/"
+        }, 
+        "name": "Державне управління справами", 
+        "address": {
+          "postalCode": "01220", 
+          "countryName": "Україна", 
+          "streetAddress": "вул. Банкова, 11, корпус 1", 
+          "region": "м. Київ", 
+          "locality": "м. Київ"
+        }
+      }
+    ]
+  }
+}

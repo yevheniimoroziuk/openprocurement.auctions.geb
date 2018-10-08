@@ -21,6 +21,17 @@ def change_title(self):
     self.assertEqual(new_title, response.json['data'][field])
 
 
+def change_title_dump(self):
+    new_title = 'Test'
+    field = "title"
+
+    request_data = {"data": {field: new_title}}
+    response = self.app.patch_json(self.ENTRYPOINT, request_data)
+
+    filename = 'docs/source/tutorial/active_rectification_change_title.http'
+    self.dump(response.request, response, filename)
+
+
 def change_desctiption(self):
     new = 'Test'
     field = "description"
@@ -157,3 +168,15 @@ def add_document(self):
     request_data = {'data': document}
     response = self.app.post_json(self.ENTRYPOINT, request_data)
     self.assertEqual(expected_http_status, response.status)
+
+
+def add_document_dump(self):
+    document = deepcopy(test_document_data)
+    url = self.generate_docservice_url(),
+    document['url'] = url[0]
+
+    request_data = {'data': document}
+    response = self.app.post_json(self.ENTRYPOINT, request_data)
+
+    filename = 'docs/source/tutorial/active_rectification_add_document.http'
+    self.dump(response.request, response, filename)

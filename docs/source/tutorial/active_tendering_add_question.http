@@ -1,0 +1,63 @@
+POST /api/2.5/auctions/ae7d7760cfc046b6b8b89e437cb4e761/questions
+Authorization: Basic YnJva2VyOg==
+Content-Type: application/json
+
+{
+  "data": {
+    "author": {
+      "contactPoint": {
+        "name": "Державне управління справами", 
+        "telephone": "0440000000"
+      }, 
+      "identifier": {
+        "scheme": "UA-EDR", 
+        "id": "00037256", 
+        "uri": "http://www.dus.gov.ua/"
+      }, 
+      "name": "Державне управління справами", 
+      "address": {
+        "countryName": "Україна", 
+        "postalCode": "01220", 
+        "region": "м. Київ", 
+        "streetAddress": "вул. Банкова, 11, корпус 1", 
+        "locality": "м. Київ"
+      }
+    }, 
+    "description": "Просимо додати таблицю потрібної калорійності харчування", 
+    "title": "Калорійність"
+  }
+}
+
+
+201 Created
+Content-Type: application/json
+Location: /api/2.5/auctions/ae7d7760cfc046b6b8b89e437cb4e761/questions/57032402c4574f7d934199db2e2f0ad5
+
+{
+  "data": {
+    "description": "Просимо додати таблицю потрібної калорійності харчування", 
+    "author": {
+      "contactPoint": {
+        "name": "Державне управління справами", 
+        "telephone": "0440000000"
+      }, 
+      "identifier": {
+        "scheme": "UA-EDR", 
+        "id": "00037256", 
+        "uri": "http://www.dus.gov.ua/"
+      }, 
+      "name": "Державне управління справами", 
+      "address": {
+        "postalCode": "01220", 
+        "countryName": "Україна", 
+        "streetAddress": "вул. Банкова, 11, корпус 1", 
+        "region": "м. Київ", 
+        "locality": "м. Київ"
+      }
+    }, 
+    "title": "Калорійність", 
+    "date": "2018-10-08T10:47:08.955896+03:00", 
+    "id": "57032402c4574f7d934199db2e2f0ad5", 
+    "questionOf": "tender"
+  }
+}

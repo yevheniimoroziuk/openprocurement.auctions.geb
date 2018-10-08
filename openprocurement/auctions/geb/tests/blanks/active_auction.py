@@ -16,6 +16,17 @@ def get_auction_auction(test_case):
     test_case.assertEqual(response.status, expected_http_status)
 
 
+def get_procedure_in_active_auction_dump(test_case):
+    context = test_case.procedure.snapshot(fixture=ACTIVE_AUCTION_DEFAULT_FIXTURE)
+    auction = context['auction']
+    auction_url = '/auctions/{}'.format(auction['data']['id'])
+
+    response = test_case.app.get(auction_url)
+    filename = 'docs/source/tutorial/active_auction_get_procedure.http'
+
+    test_case.dump(response.request, response, filename)
+
+
 def switch_to_qualification(test_case):
     expected_http_status = '200 OK'
     context = test_case.procedure.snapshot(fixture=ACTIVE_AUCTION_DEFAULT_FIXTURE_WITH_URLS)

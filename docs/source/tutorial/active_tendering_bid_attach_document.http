@@ -1,0 +1,32 @@
+POST /api/2.5/auctions/ae7d7760cfc046b6b8b89e437cb4e761/bids/6a6be189b09c4b2888f6c6b0a4851e39/documents?acc_token=d5827acc03bb4652bfd7a8c950c1c663
+Authorization: Basic YnJva2VyOg==
+Content-Type: application/json
+
+{
+  "data": {
+    "url": "http://localhost/get/20912977bc96419283f918f3abb65621?KeyID=172d32c8&Signature=E0FPksBgPPyn58NYsMbDOLtgkuL7QQggKupHOrb9W9Fib6amkdhfc%2Fo2qhtz3GVgZlX5A98ZR0WpL5fJrF3VDg%3D%3D", 
+    "format": "application/msword", 
+    "title": "укр.doc", 
+    "hash": "md5:00000000000000000000000000000000", 
+    "documentType": "eligibilityDocuments"
+  }
+}
+
+
+201 Created
+Content-Type: application/json
+Location: /api/2.5/auctions/ae7d7760cfc046b6b8b89e437cb4e761/bids/6a6be189b09c4b2888f6c6b0a4851e39/documents/5f0f5d166a9f4e57ace4d7801beb291e
+
+{
+  "data": {
+    "hash": "md5:00000000000000000000000000000000", 
+    "title": "укр.doc", 
+    "url": "http://localhost/api/2.5/auctions/ae7d7760cfc046b6b8b89e437cb4e761/bids/6a6be189b09c4b2888f6c6b0a4851e39/documents/5f0f5d166a9f4e57ace4d7801beb291e?download=20912977bc96419283f918f3abb65621", 
+    "format": "application/msword", 
+    "documentOf": "bid", 
+    "datePublished": "2018-10-08T10:49:43.982540+03:00", 
+    "documentType": "eligibilityDocuments", 
+    "dateModified": "2018-10-08T10:49:43.982560+03:00", 
+    "id": "5f0f5d166a9f4e57ace4d7801beb291e"
+  }
+}

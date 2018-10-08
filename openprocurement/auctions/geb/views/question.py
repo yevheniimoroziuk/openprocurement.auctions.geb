@@ -59,8 +59,8 @@ class AuctionQuestionResource(AuctionQuestionResource):
 
         manager = self.request.registry.queryMultiAdapter((self.request, self.context), IQuestionManager)
 
-        if manager.change():
-            save = manager.save()
+        manager.change()
+        save = manager.save()
 
         if save:
             extra = context_unpack(self.request, {'MESSAGE_ID': 'auction_question_patch'})

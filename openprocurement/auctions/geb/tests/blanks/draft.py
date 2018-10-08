@@ -1,5 +1,5 @@
 from openprocurement.auctions.geb.tests.fixtures.draft import (
-    DRAFT_AUCTION_DEFAULT_FIXTURE_WITH_INVALID_AUCTON_PERIOD
+    DRAFT_AUCTION_DEFAULT_FIXTURE_WITH_INVALID_AUCTON_PERIOD,
 )
 
 
@@ -50,4 +50,27 @@ def invalid_phase_commit(test_case):
     entrypoint = '/auctions/{}?acc_token={}'.format(auction['data']['id'],
                                                     auction['access']['token'])
     test_case.app.patch_json(entrypoint, request_data, status=403)
+    test_case.app.authorization = auth
+
+
+def get_auction_dump(test_case):
+
+    entrypoint = '/auctions/{}'.format(test_case.auction['data']['id'])
+    response = test_case.app.get(entrypoint)
+    filename = 'docs/source/tutorial/get_draft_auction.http'
+
+    test_case.dump(response.request, response, filename)
+
+
+def phase_commit_dump(test_case):
+    next_status = 'active.rectification'
+    request_data = {"data": {'status': next_status}}
+    auth = test_case.app.authorization
+
+    test_case.app.authorization = ('Basic', ('{}'.format(test_case.auction['access']['owner']), ''))
+    entrypoint = '/auctions/{}?acc_token={}'.format(test_case.auction['data']['id'],
+                                                    test_case.auction['access']['token'])
+    response = test_case.app.patch_json(entrypoint, request_data)
+    filename = 'docs/source/tutorial/phase_commit.http'
+    test_case.dump(response.request, response, filename)
     test_case.app.authorization = auth

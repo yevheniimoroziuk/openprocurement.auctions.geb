@@ -1,7 +1,6 @@
 from setuptools import setup, find_packages
-import os
 
-version = '1.2.1'
+version = '0.0.1'
 
 entry_points = {
     'openprocurement.auctions.core.plugins': [
@@ -12,22 +11,11 @@ entry_points = {
     ]
 }
 
-requires = [
-    'setuptools',
-    'openprocurement.api',
-    'openprocurement.auctions.core',
-]
-
-test_requires = requires + []
-
-docs_requires = requires + [
-    'sphinxcontrib-httpdomain',
-]
 
 setup(name='openprocurement.auctions.geb',
       version=version,
       description="",
-      long_description=open("README.rst").read() + "\n" + open(os.path.join("docs", "HISTORY.txt")).read(),
+      long_description=open("README.md").read(),
       # Get more strings from
       # http://pypi.python.org/pypi?:action=list_classifiers
       classifiers=[
@@ -42,7 +30,5 @@ setup(name='openprocurement.auctions.geb',
       namespace_packages=['openprocurement', 'openprocurement.auctions'],
       include_package_data=True,
       zip_safe=False,
-      extras_require={'docs': docs_requires, 'test': test_requires},
-      install_requires=requires,
       entry_points=entry_points,
       )
