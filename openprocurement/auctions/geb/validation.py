@@ -17,9 +17,10 @@ from openprocurement.auctions.geb.constants import (
     AUCTION_STATUS_FOR_DELETING_BIDS,
     BID_STATUSES_FOR_ADDING_DOCUMENTS,
     CAV_PS_CODES,
+    EDIT_AUCTION_DOCUMENT_STATUSES,
+    MIN_NUMBER_OF_DAYS_TENDERING,
     PROCEDURE_DOCUMENT_STATUSES,
-    RECTIFICATION_PERIOD_DURATION,
-    MIN_NUMBER_OF_DAYS_TENDERING
+    RECTIFICATION_PERIOD_DURATION
 )
 
 
@@ -244,5 +245,15 @@ def validate_auctionPeriod_startDate(request):
         err_msg = "Not enough days for the procedure, change auctionPeriod startDate"
         request.errors.add('body', 'data', err_msg)
         request.errors.status = 422
+        return False
+    return True
+
+
+def validate_edit_auction_document_period(request, auction, document):
+    """
+    Validate period in which can edit auction document
+    """
+
+    if auction.status not in EDIT_AUCTION_DOCUMENT_STATUSES:
         return False
     return True

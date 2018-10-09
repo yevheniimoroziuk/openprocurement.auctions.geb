@@ -49,6 +49,13 @@ class State(object):
                                   'owner': bid['owner']}
                 context['bids'].append(info)
 
+        context['documents'] = []
+        documents = fixture.get('documents', None)
+        if documents:
+            for document in documents:
+                info = {}
+                info['data'] = {'id': document['id']}
+                context['documents'].append(info)
         return context
 
 # Auction States

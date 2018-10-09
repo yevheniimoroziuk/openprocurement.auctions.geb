@@ -1,6 +1,7 @@
 from openprocurement.auctions.core.managers import (
     AuctionManager,
     BidManager,
+    DocumentManager,
     QuestionManager
 )
 from openprocurement.auctions.geb.managers.initializators import (
@@ -10,7 +11,8 @@ from openprocurement.auctions.geb.managers.initializators import (
 from openprocurement.auctions.geb.managers.changers import (
     AuctionChanger,
     BidChanger,
-    QuestionChanger
+    QuestionChanger,
+    DocumentChanger
 )
 from openprocurement.auctions.geb.managers.documenters import (
     AuctionDocumenter,
@@ -54,3 +56,7 @@ class BidManager(BidManager):
 
 class QuestionManager(QuestionManager):
     Changer = QuestionChanger
+
+
+class DocumentManager(DocumentManager):
+    Changer = DocumentChanger

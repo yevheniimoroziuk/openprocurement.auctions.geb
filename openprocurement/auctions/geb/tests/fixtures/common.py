@@ -129,3 +129,14 @@ test_bid_data = {
 }
 
 test_document_service_url = 'http://localhost/get/6f63b414f958418082d22ec971424ca4?KeyID=172d32c8&Signature=2RWdpnpuy95Gn7E2vIDsHPPeRrtZUgtS75FsMxZBllnUUXNx%2BK7WvGeTtPvxHhcFAeW6UNfGtexCH2pNPPuzCA%3D%3D'
+
+test_document = {
+    "hash": "md5:00000000000000000000000000000000",
+    "format": "application/msword",
+    "url": "http://localhost/get/3ed16c4e58964858a170d38719b76996?KeyID=172d32c8&Signature=qQwkBqe5hs4MLTzh3dv7mcLRPK6JQ9O2FvXhnNzyFjyNitoOlJ%2FNvKYl9MaqExLwk1tZ9kH5aBI6Od90uPmdBw%253D%253D",
+    "title": "укр.doc",
+    "documentOf": "auction",
+    "datePublished": now.isoformat(),
+    "id": "08ced2084fdf44dc856859d478063a41",
+    "dateModified": now.isoformat()
+}
