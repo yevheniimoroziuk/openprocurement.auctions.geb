@@ -123,21 +123,50 @@ def change_guarantee(test_case):
     test_case.assertEqual(new, response.json['data'][field])
 
 
-def change_items(test_case):
-    pass
-#    item = deepcopy(test_item)
-#    new = 42
-#    field = "quantity"
-#    item[field] = new
-#
-#    import ipdb; ipdb.set_trace()  # XXX BREAKPOINT
-#    request_data = {"data": {['items': [new]}}
-#    response = test_case.app.patch_json(test_case.ENTRYPOINT, request_data)
-#    test_case.assertEqual(response.json['data'][field][0]['quantity'], new['quantity'])
-#
-#    auction_entrypoint = '/auctions/{}'.format(test_case.auction['data']['id'])
-#    response = test_case.app.get(auction_entrypoint, request_data)
-#    test_case.assertEqual([new], response.json['data']['items'][field])
+def change_items_singly(test_case):
+    field = "quantity"
+    new_value = 42
+
+    request_data = {'data': {field: new_value}}
+    response = test_case.app.patch_json(test_case.ENTRYPOINTS['patch_item'], request_data)
+    item = response.json['data']
+
+    test_case.assertEqual(response.status, '200 OK')
+    test_case.assertEqual(item[field], new_value)
+
+    response = test_case.app.get(test_case.ENTRYPOINTS['get_item'])
+    item = response.json['data']
+    test_case.assertEqual(item[field], new_value)
+
+
+def get_items_collection(test_case):
+    response = test_case.app.get(test_case.ENTRYPOINTS['get_auction'])
+    auction = response.json['data']
+    auction_items = [item['id'] for item in auction['items']]
+
+    response = test_case.app.get(test_case.ENTRYPOINTS['get_items_collection'])
+    items = response.json['data']
+    for item in items:
+        test_case.assertIn(item['id'], auction_items)
+
+
+def change_items_collections(test_case):
+    items_data = [deepcopy(item['data']) for item in test_case.items]
+    order = 0
+    field = "quantity"
+    new_value = 42
+
+    items_data[order][field] = new_value
+    request_data = {"data": {'items': items_data}}
+
+    response = test_case.app.patch_json(test_case.ENTRYPOINTS['patch_auction'], request_data)
+
+    auction = response.json['data']
+    test_case.assertEqual(auction['items'][order][field], new_value)
+
+    response = test_case.app.get(test_case.ENTRYPOINTS['get_auction'], request_data)
+    auction = response.json['data']
+    test_case.assertEqual(auction['items'][order][field], new_value)
 
 
 def change_budgetSpent(test_case):

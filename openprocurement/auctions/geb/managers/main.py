@@ -2,8 +2,10 @@ from openprocurement.auctions.core.managers import (
     AuctionManager,
     BidManager,
     DocumentManager,
+    ItemManager,
     QuestionManager
 )
+
 from openprocurement.auctions.geb.managers.initializators import (
     AuctionInitializator,
     BidInitializator
@@ -11,8 +13,9 @@ from openprocurement.auctions.geb.managers.initializators import (
 from openprocurement.auctions.geb.managers.changers import (
     AuctionChanger,
     BidChanger,
-    QuestionChanger,
-    DocumentChanger
+    DocumentChanger,
+    ItemChanger,
+    QuestionChanger
 )
 from openprocurement.auctions.geb.managers.documenters import (
     AuctionDocumenter,
@@ -21,8 +24,16 @@ from openprocurement.auctions.geb.managers.documenters import (
 from openprocurement.auctions.geb.managers.questioners import (
     AuctionQuestioner
 )
+from openprocurement.auctions.geb.managers.itemers import (
+    AuctionItemer
+)
 from openprocurement.auctions.geb.managers.checkers import (
     AuctionChecker
+)
+
+from openprocurement.auctions.geb.managers.representers import (
+    ItemRepresenter,
+    AuctionSubResourceRepresenter
 )
 
 from openprocurement.auctions.geb.managers.creators import (
@@ -36,6 +47,10 @@ from openprocurement.auctions.geb.managers.deleters import (
     BidDeleter
 )
 
+from openprocurement.auctions.geb.managers.loggers import (
+    ItemLogger
+)
+
 
 class AuctionManager(AuctionManager):
     Auctioneer = Auctioneer
@@ -45,6 +60,9 @@ class AuctionManager(AuctionManager):
     Documenter = AuctionDocumenter
     Initializator = AuctionInitializator
     Questioner = AuctionQuestioner
+    Itemer = AuctionItemer
+    # Representer = AuctionRepresenter
+    SubResourceRepresenter = AuctionSubResourceRepresenter
 
 
 class BidManager(BidManager):
@@ -56,6 +74,12 @@ class BidManager(BidManager):
 
 class QuestionManager(QuestionManager):
     Changer = QuestionChanger
+
+
+class ItemManager(ItemManager):
+    Changer = ItemChanger
+    Representer = ItemRepresenter
+    Logger = ItemLogger
 
 
 class DocumentManager(DocumentManager):

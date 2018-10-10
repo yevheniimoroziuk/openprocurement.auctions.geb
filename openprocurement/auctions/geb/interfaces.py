@@ -2,15 +2,19 @@ from zope.interface import Interface
 
 
 class IAuction(Interface):
-    """Interface for Geb auction"""
+    """Interface for Geb Auction"""
 
 
 class IBid(Interface):
-    """Interface for Geb bid"""
+    """Interface for Geb Bid"""
+
+
+class IItem(Interface):
+    """Interface for Geb Item"""
 
 
 class IDocument(Interface):
-    """Interface for Geb document"""
+    """Interface for Geb Document"""
 
 
 class IQuestion(Interface):

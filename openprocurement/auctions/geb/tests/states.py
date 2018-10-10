@@ -1,3 +1,5 @@
+from copy import deepcopy
+
 from openprocurement.auctions.geb.tests.fixtures.create import (
     CREATE_AUCTION_DEFAULT_FIXTURE
 )
@@ -26,6 +28,8 @@ class State(object):
 
     def context(self, fixture):
         context = {}
+
+        # add auction context
         context['auction'] = {}
         context['auction']['data'] = {'id': fixture['_id']}
         context['auction']['access'] = {'owner': fixture['owner'],
@@ -38,6 +42,7 @@ class State(object):
                 info['data'] = {'id': question['id']}
                 context['questions'].append(info)
 
+        # add bids context
         context['bids'] = []
         bids = fixture.get('bids', None)
         if bids:
@@ -49,6 +54,7 @@ class State(object):
                                   'owner': bid['owner']}
                 context['bids'].append(info)
 
+        # add documents context
         context['documents'] = []
         documents = fixture.get('documents', None)
         if documents:
@@ -56,6 +62,15 @@ class State(object):
                 info = {}
                 info['data'] = {'id': document['id']}
                 context['documents'].append(info)
+
+        # add items context
+        context['items'] = []
+        items = fixture.get('items', None)
+        if items:
+            for item in items:
+                info = {}
+                info['data'] = deepcopy(item)
+                context['items'].append(info)
         return context
 
 # Auction States

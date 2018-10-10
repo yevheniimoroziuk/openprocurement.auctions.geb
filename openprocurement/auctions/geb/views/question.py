@@ -28,7 +28,8 @@ class AuctionQuestionResource(AuctionQuestionResource):
 
     @json_view(content_type="application/json", validators=(validate_question_data,), permission='create_question')
     def collection_post(self):
-        """Post a question
+        """
+        Post a question
         """
         save = None
 
@@ -40,7 +41,7 @@ class AuctionQuestionResource(AuctionQuestionResource):
 
         if save:
             msg = 'Created auction question {}'.format(question['id'])
-            extra = context_unpack(self.request, {'MESSAGE_ID': 'auction_question_create'}, {'document_id': question['id']})
+            extra = context_unpack(self.request, {'MESSAGE_ID': 'auction_question_create'}, {'question_id': question['id']})
             self.LOGGER.info(msg, extra=extra)
 
             self.request.response.status = 201
@@ -52,9 +53,9 @@ class AuctionQuestionResource(AuctionQuestionResource):
 
     @json_view(content_type="application/json", permission='edit_auction', validators=(validate_patch_question_data,))
     def patch(self):
-        """Post an Answer
         """
-        save = None
+        Post an Answer
+        """
         question = self.request.context
 
         manager = self.request.registry.queryMultiAdapter((self.request, self.context), IQuestionManager)

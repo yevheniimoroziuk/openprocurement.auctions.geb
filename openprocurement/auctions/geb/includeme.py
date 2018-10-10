@@ -10,6 +10,7 @@ from openprocurement.auctions.geb.managers.main import (
     AuctionManager,
     BidManager,
     DocumentManager,
+    ItemManager,
     QuestionManager
 )
 from openprocurement.auctions.geb.constants import (
@@ -25,6 +26,7 @@ from openprocurement.auctions.core.interfaces import (
     IBidManager,
     IContentConfigurator,
     IDocumentManager,
+    IItemManager,
     IQuestionManager
 )
 from openprocurement.auctions.geb.adapters import (
@@ -34,6 +36,7 @@ from openprocurement.auctions.geb.interfaces import (
     IAuction,
     IBid,
     IDocument,
+    IItem,
     IQuestion
 )
 
@@ -56,6 +59,7 @@ def includeme(config, plugin_map):
     config.registry.registerAdapter(AuctionManager, (IRequest, IAuction), IAuctionManager)
     config.registry.registerAdapter(BidManager, (IRequest, IBid), IBidManager)
     config.registry.registerAdapter(QuestionManager, (IRequest, IQuestion), IQuestionManager)
+    config.registry.registerAdapter(ItemManager, (IRequest, IItem), IItemManager)
     config.registry.registerAdapter(DocumentManager, (IRequest, IDocument), IDocumentManager)
     config.registry.registerAdapter(AuctionConfigurator, (IAuction, IRequest), IContentConfigurator)
 
