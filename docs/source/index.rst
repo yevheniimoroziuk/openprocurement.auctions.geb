@@ -13,5 +13,8 @@ Contents:
 .. toctree::
    :maxdepth: 4
 
+   overview
+   procedureWorkflow
+   standard/index
+   upload
    tutorial
-..
