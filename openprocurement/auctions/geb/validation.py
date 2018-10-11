@@ -14,6 +14,7 @@ from openprocurement.auctions.geb.constants import (
     AUCTION_DOCUMENT_STATUSES,
     AUCTION_STATUS_FOR_ADDING_QUESTIONS,
     AUCTION_STATUS_FOR_CHANGING_QUESTIONS,
+    AUCTION_STATUS_FOR_CHANGING_ITEMS,
     AUCTION_STATUS_FOR_DELETING_BIDS,
     BID_STATUSES_FOR_ADDING_DOCUMENTS,
     CAV_PS_CODES,
@@ -24,7 +25,7 @@ from openprocurement.auctions.geb.constants import (
 )
 
 
-def validate_change_bid_check_auction_status(request):
+def validate_change_bid_check_auction_status(request, **kwargs):
     if request.authenticated_role == 'Administrator':
         return True
     if request.validated['auction_status'] not in ['active.tendering', 'active.enquiry']:
@@ -35,8 +36,10 @@ def validate_change_bid_check_auction_status(request):
     return True
 
 
-def validate_change_bid_check_status(request):
-    status = request.context.status
+def validate_change_bid_check_status(request, **kwargs):
+    bid = kwargs['bid']
+
+    status = bid.status
     auction_status = request.validated['auction_status']
     new_status = request.validated['json_data'].get('status')
 
@@ -57,11 +60,12 @@ def validate_change_bid_check_status(request):
     return True
 
 
-def validate_make_active_status_bid(request):
+def validate_make_active_status_bid(request, **kwargs):
+    bid = kwargs['bid']
+    auction = kwargs['auction']
+
     now = get_now()
-    bid = request.context
     bid_documents = bid.documents
-    auction = bid.__parent__
     new_data = request.validated['json_data']
 
     if request.authenticated_role == 'Administrator' or new_data.get('status') != 'active':
@@ -103,7 +107,7 @@ def check_auction_status_for_deleting_bids(request):
     return True
 
 
-def validate_document_editing_period(request, *kwargs):
+def validate_document_adding_period(request):
     status = request.context.status
     role = request.authenticated_role
 
@@ -131,8 +135,8 @@ def validate_question_adding_period(request):
     return True
 
 
-def validate_question_changing_period(request):
-    auction = request.context.__parent__
+def validate_question_changing_period(request, **kwargs):
+    auction = kwargs['auction']
 
     if auction.status not in AUCTION_STATUS_FOR_CHANGING_QUESTIONS:
         err_msg = 'Can update question only in {}'.format(AUCTION_STATUS_FOR_CHANGING_QUESTIONS)
@@ -168,9 +172,10 @@ def validate_bid_document(request):
     return True
 
 
-def validate_phase_commit(request):
+def validate_phase_commit(request, **kwargs):
+    auction = kwargs['auction']
     new_status = request.validated['json_data'].get('status')
-    status = request.context.status
+    status = auction.status
 
     if new_status != 'active.rectification' and status == 'draft':
         err_msg = 'Can\'t switch to ({}) only to active.rectification'.format(new_status)
@@ -249,11 +254,26 @@ def validate_auctionPeriod_startDate(request):
     return True
 
 
-def validate_edit_auction_document_period(request, auction, document):
+def validate_edit_auction_document_period(request, **kwargs):
     """
     Validate period in which can edit auction document
     """
+    auction = kwargs['auction']
 
     if auction.status not in EDIT_AUCTION_DOCUMENT_STATUSES:
+        return False
+    return True
+
+
+def validate_item_changing_period(request, **kwargs):
+    """
+    Validate period in which can edit auction item
+    """
+    auction = kwargs['auction']
+
+    if auction.status not in AUCTION_STATUS_FOR_CHANGING_ITEMS:
+        err_msg = 'Can update question only in {}'.format(AUCTION_STATUS_FOR_CHANGING_ITEMS)
+        request.errors.add('body', 'data', err_msg)
+        request.errors.status = 403
         return False
     return True

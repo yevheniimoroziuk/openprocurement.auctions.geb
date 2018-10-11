@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-
+from uuid import uuid4
 from datetime import timedelta
 from openprocurement.auctions.core.utils import get_now
 from openprocurement.auctions.geb.tests.fixtures.common import (
@@ -8,18 +8,20 @@ from openprocurement.auctions.geb.tests.fixtures.common import (
     test_auction_minimalStep_created,
     test_auction_value_created,
     test_contractTerms,
-    test_item,
     test_lotHolder,
     test_procuringEntity,
     test_registrationFee_created,
     test_transfer_token,
     test_auction_guarantee
 )
+from openprocurement.auctions.geb.tests.fixtures.items import (
+    TEST_ITEM
+)
 
 now = get_now()
 
 DRAFT_AUCTION_DEFAULT_FIXTURE = {
-   "_id": "ae7d7760cfc046b6b8b89e437cb4e761",
+   "_id": uuid4().hex,
    "procurementMethod": "open",
    "auctionID": "UA-EA-2018-09-20-000001",
    "minNumberOfQualifiedBids": 2,
@@ -30,7 +32,7 @@ DRAFT_AUCTION_DEFAULT_FIXTURE = {
    "title": "футляри до державних нагород",
    "tenderAttempts": 1,
    "registrationFee": test_registrationFee_created,
-   "owner_token": "6f90273c2b66498aac8f66e5d1e8671c",
+   "owner_token": uuid4().hex,
    "auctionParameters": test_auctionParameters,
    "guarantee": test_auction_guarantee,
    "dateModified": now.isoformat(),
@@ -47,14 +49,14 @@ DRAFT_AUCTION_DEFAULT_FIXTURE = {
    "doc_type": "Auction",
    "contractTerms": test_contractTerms,
    "minimalStep": test_auction_minimalStep_created,
-   "items": [test_item],
+   "items": [TEST_ITEM],
    "value": test_auction_value_created,
    "numberOfBids": 0,
    "procuringEntity": test_procuringEntity
 }
 
 DRAFT_AUCTION_DEFAULT_FIXTURE_WITH_INVALID_AUCTON_PERIOD = {
-   "_id": "ae7d7760cfc046b6b8b89e437cb4e761",
+   "_id": uuid4().hex,
    "procurementMethod": "open",
    "auctionID": "UA-EA-2018-09-20-000001",
    "minNumberOfQualifiedBids": 2,
@@ -65,7 +67,7 @@ DRAFT_AUCTION_DEFAULT_FIXTURE_WITH_INVALID_AUCTON_PERIOD = {
    "title": u"футляри до державних нагород",
    "tenderAttempts": 1,
    "registrationFee": test_registrationFee_created,
-   "owner_token": "6f90273c2b66498aac8f66e5d1e8671c",
+   "owner_token": uuid4().hex,
    "auctionParameters": test_auctionParameters,
    "guarantee": test_auction_guarantee,
    "dateModified": now.isoformat(),
@@ -82,7 +84,7 @@ DRAFT_AUCTION_DEFAULT_FIXTURE_WITH_INVALID_AUCTON_PERIOD = {
    "doc_type": "Auction",
    "contractTerms": test_contractTerms,
    "minimalStep": test_auction_minimalStep_created,
-   "items": [test_item],
+   "items": [TEST_ITEM],
    "value": test_auction_value_created,
    "numberOfBids": 0,
    "procuringEntity": test_procuringEntity

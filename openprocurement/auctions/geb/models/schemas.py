@@ -23,11 +23,10 @@ from openprocurement.auctions.core.models import (
     ListType,
     Model,
     Period,
-    Question,
+    Question as BaseQuestion,
     Value,
-    dgfCDB2Item,
-    dgfCancellation,
-    dgfDocument,
+    dgfCDB2Item as BaseItem,
+    dgfDocument as BaseDocument,
     get_auction,
     validate_items_uniq
 )
@@ -47,6 +46,7 @@ from openprocurement.auctions.geb.interfaces import (
     IAuction,
     IBid,
     IDocument,
+    IItem,
     IQuestion
 )
 
@@ -59,17 +59,15 @@ from openprocurement.auctions.geb.constants import (
 )
 
 from openprocurement.auctions.geb.models.roles import (
-    auction_draft_role,
+    auction_contractTerms_create_role,
     auction_create_role,
-    auction_rectification_role,
+    auction_draft_role,
+    auction_edit_enquiry_role,
     auction_edit_rectification_role,
-    auction_tendering_role,
     auction_edit_tendering_role,
     auction_enquiry_role,
-    auction_edit_enquiry_role,
-    auction_contractTerms_create_role,
-    question_enquiry_role,
-    question_rectification_role,
+    auction_rectification_role,
+    auction_tendering_role,
     bid_active_auction_role,
     bid_active_awarded_role,
     bid_active_enquiry_role,
@@ -81,7 +79,11 @@ from openprocurement.auctions.geb.models.roles import (
     bid_edit_draft_role,
     bid_edit_pending_role,
     bid_pending_role,
-    bid_view_role
+    bid_view_role,
+    item_edit_role,
+    item_view_role,
+    question_enquiry_role,
+    question_rectification_role
 )
 
 from openprocurement.auctions.geb.validation import (
@@ -90,7 +92,7 @@ from openprocurement.auctions.geb.validation import (
 
 
 @implementer(IDocument)
-class GebAuctionDocument(dgfDocument):
+class AuctionDocument(BaseDocument):
 
     documentOf = StringType(required=True, choices=['auction'], default='auction')
 
@@ -98,14 +100,14 @@ class GebAuctionDocument(dgfDocument):
 
 
 @implementer(IDocument)
-class GebBidDocument(dgfDocument):
+class BidDocument(BaseDocument):
     documentOf = StringType(required=True, choices=['bid'], default='bid')
 
     documentType = StringType(choices=BID_DOCUMENT_TYPES)
 
 
 @implementer(IQuestion)
-class GebQuestion(Question):
+class Question(BaseQuestion):
 
     class Options:
         roles = {
@@ -143,10 +145,6 @@ class AuctionParameters(Model):
     """Configurable auction parameters"""
 
     type = StringType(choices=['texas'])
-
-
-class Cancellation(dgfCancellation):
-    documents = ListType(ModelType(GebAuctionDocument), default=list())
 
 
 def rounding_shouldStartAfter(start_after, auction, use_from=datetime(2016, 6, 1, tzinfo=TZ)):  # TODO rm black box
@@ -201,7 +199,7 @@ class GebBid(Model):
 
     bidNumber = IntType()
     date = IsoDateTimeType()
-    documents = ListType(ModelType(GebBidDocument), default=list())
+    documents = ListType(ModelType(BidDocument), default=list())
     id = MD5Type(required=True, default=lambda: uuid4().hex)
     modified = False
     owner = StringType()
@@ -260,8 +258,14 @@ class GebAdditionalClassification(Classification):
                                                                   kvtspz_validator)
 
 
-class GebItem(dgfCDB2Item):
+@implementer(IItem)
+class Item(BaseItem):
+    class Options:
+        roles = {
+            'edit': item_edit_role,
+            'view': item_view_role
 
+        }
     classification = ModelType(GebClassification,
                                required=True)
     additionalClassifications = ListType(ModelType(GebAdditionalClassification), required=True)
@@ -313,13 +317,11 @@ class Auction(BaseAuction):
 
     bids = ListType(ModelType(GebBid), default=list())
 
-    questions = ListType(ModelType(GebQuestion), default=list())
+    questions = ListType(ModelType(Question), default=list())
 
     bankAccount = ModelType(BankAccount)
 
     budgetSpent = ModelType(Value, required=True)
-
-    cancellations = ListType(ModelType(Cancellation), default=list())
 
     contracts = ListType(ModelType(Contract), default=list())
 
@@ -334,13 +336,13 @@ class Auction(BaseAuction):
 
     dateModified = IsoDateTimeType()
 
-    documents = ListType(ModelType(GebAuctionDocument), default=list())
+    documents = ListType(ModelType(AuctionDocument), default=list())
 
     enquiryPeriod = ModelType(Period)
 
     guarantee = ModelType(Guarantee, required=True)
 
-    items = ListType(ModelType(GebItem),
+    items = ListType(ModelType(Item),
                      required=True,
                      min_size=1,
                      validators=[validate_items_uniq])

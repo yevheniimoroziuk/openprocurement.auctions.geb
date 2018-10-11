@@ -79,6 +79,10 @@ AUCTION_STATUS_FOR_CHANGING_QUESTIONS = [
     'active.enquiry'
 ]
 
+AUCTION_STATUS_FOR_CHANGING_ITEMS = [
+    'active.rectification'
+]
+
 BID_STATUSES = [
     'draft',
     'pending',

@@ -6,7 +6,7 @@ from openprocurement.auctions.core.interfaces import (
 )
 
 from openprocurement.auctions.geb.validation import (
-    validate_document_editing_period,
+    validate_document_adding_period,
     validate_bid_document
 )
 
@@ -18,7 +18,7 @@ from openprocurement.auctions.geb.utils import (
 @implementer(IAuctionDocumenter)
 class AuctionDocumenter(object):
     name = 'Auction Documenter'
-    validators = [validate_document_editing_period]
+    validators = [validate_document_adding_period]
 
     def __init__(self, request, context):
         self._request = request

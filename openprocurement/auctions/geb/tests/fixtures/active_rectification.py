@@ -1,6 +1,9 @@
 # -*- coding: utf-8 -*-
 from copy import deepcopy
+from uuid import uuid4
+
 from openprocurement.auctions.core.utils import get_now
+
 from openprocurement.auctions.geb.tests.fixtures.calculator import (
     Calculator
 )
@@ -10,7 +13,6 @@ from openprocurement.auctions.geb.tests.fixtures.common import (
     test_auction_minimalStep_created,
     test_auction_value_created,
     test_contractTerms,
-    test_item,
     test_lotHolder,
     test_procuringEntity,
     test_registrationFee_created,
@@ -19,6 +21,9 @@ from openprocurement.auctions.geb.tests.fixtures.common import (
     test_document
 )
 
+from openprocurement.auctions.geb.tests.fixtures.items import (
+    TEST_ITEM
+)
 from openprocurement.auctions.geb.tests.fixtures.questions import (
     TEST_QESTION_IN_RECTIFICATION_PERIOD
 )
@@ -29,7 +34,7 @@ now = get_now()
 calculator = Calculator(now, 'rectificationPeriod', 'start')
 
 ACTIVE_RECTIFICATION_AUCTION_DEFAULT_FIXTURE = {
-   "_id": "ae7d7760cfc046b6b8b89e437cb4e761",
+   "_id": uuid4().hex,
    "procurementMethod": "open",
    "auctionID": "UA-EA-2018-09-20-000001",
    "minNumberOfQualifiedBids": 2,
@@ -45,7 +50,7 @@ ACTIVE_RECTIFICATION_AUCTION_DEFAULT_FIXTURE = {
    "title": "футляри до державних нагород",
    "tenderAttempts": 1,
    "registrationFee": test_registrationFee_created,
-   "owner_token": "6f90273c2b66498aac8f66e5d1e8671c",
+   "owner_token": uuid4().hex,
    "auctionParameters": test_auctionParameters,
    "guarantee": test_auction_guarantee,
    "dateModified": now.isoformat(),
@@ -70,7 +75,7 @@ ACTIVE_RECTIFICATION_AUCTION_DEFAULT_FIXTURE = {
    },
    "contractTerms": test_contractTerms,
    "minimalStep": test_auction_minimalStep_created,
-   "items": [test_item],
+   "items": [TEST_ITEM],
    "value": test_auction_value_created,
    "numberOfBids": 0,
    "procuringEntity": test_procuringEntity

@@ -19,38 +19,6 @@ now = datetime.now()
 test_procuringEntity = test_organization.copy()
 test_lotHolder = test_organization.copy()
 test_transfer_token = "f8d93b3cd541e545927e511c215d9c21d19d14e73945ee5726e0b02b9c1474dba89375fd0dfa2245a248e76f11144b0672afb2e18afa6f27995df2bc3f57873f"
-test_item = {
-    "description": u"Земля для військовослужбовців",
-    "classification": {
-        "scheme": u"CAV-PS",
-        "id": "06110000-6",
-        "description": u"Земельні ділянки"
-    },
-    "additionalClassifications": [
-            {
-                "scheme": u"kvtspz",
-                "id": "01.04",
-                "description": "Test"
-            },
-            {
-                "scheme": "cadastralNumber",
-                "id": "42",
-                "description": "Test"
-            }
-    ],
-    "unit": {
-        "name": u"item",
-        "code": u"44617100-9"
-    },
-    "quantity": 5.001,
-    "address": {
-        "countryName": u"Україна",
-        "postalCode": "79000",
-        "region": u"м. Київ",
-        "locality": u"м. Київ",
-        "streetAddress": u"вул. Банкова 1"
-    }
-}
 
 test_auctionParameters = {
        "type": "texas"

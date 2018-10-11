@@ -10,10 +10,12 @@ from openprocurement.auctions.geb.tests.fixtures.common import (
     test_auction_minimalStep,
     test_auction_value,
     test_contractTerms,
-    test_item,
     test_lotHolder,
     test_procuringEntity,
     test_registrationFee
+)
+from openprocurement.auctions.geb.tests.fixtures.items import (
+    INITIAL_TEST_ITEM
 )
 
 CREATE_AUCTION_DEFAULT_FIXTURE = {
@@ -23,7 +25,7 @@ CREATE_AUCTION_DEFAULT_FIXTURE = {
         "description": "test procuredure",
         "tenderAttempts": 1,
         "guarantee": test_auction_guarantee,
-        "items": [test_item],
+        "items": [INITIAL_TEST_ITEM],
         "lotHolder": test_lotHolder,
         "contractTerms": test_contractTerms,
         "lotIdentifier": u"219560",
