@@ -26,6 +26,7 @@ class AuctionResource(AuctionResource):
         manager = self.request.registry.queryMultiAdapter((self.request, self.context), IAuctionManager)
 
         if self.request.authenticated_role == 'chronograph':
+            manager.change()
             manager.check()
         else:
             manager.change()
