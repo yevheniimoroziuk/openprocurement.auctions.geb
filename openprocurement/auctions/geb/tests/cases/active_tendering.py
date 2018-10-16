@@ -17,6 +17,7 @@ from openprocurement.auctions.geb.tests.fixtures.active_tendering import (
 )
 
 from openprocurement.auctions.geb.tests.blanks.active_tendering import (
+    add_offline_document,
     add_document,
     add_invalid_bid,
     add_question,
@@ -193,6 +194,7 @@ class StatusActiveTenderingActiveBidsTest(BaseWebTest):
 class StatusActiveTenderingDocumentsTest(BaseWebTest):
     docservice = True
 
+    test_add_offline_document = snitch(add_offline_document)
     test_add_document = snitch(add_document)
 
     def setUp(self):

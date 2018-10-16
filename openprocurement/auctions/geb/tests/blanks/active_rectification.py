@@ -250,22 +250,56 @@ def change_contractTerms(test_case):
     test_case.assertEqual(new, response.json['data'][field])
 
 
-def add_document(test_case):
+def add_offline_document(test_case):
     context = test_case.procedure.snapshot()
     auction = context['auction']
-
+    expected_http_status = '201 Created'
     entrypoint_pattern = '/auctions/{}/documents?acc_token={}'
     entrypoint = entrypoint_pattern.format(auction['data']['id'], auction['access']['token'])
-
     document = deepcopy(test_document_data)
-    url = test_case.generate_docservice_url(),
-    document['url'] = url[0]
-    document['documentType'] = 'technicalSpecifications'
-    expected_http_status = '201 Created'
+    document.pop('hash')
+    document['accessDetails'] = 'test accessDetails'
+    document['documentType'] = 'x_dgfAssetFamiliarization'
 
     request_data = {'data': document}
     response = test_case.app.post_json(entrypoint, request_data)
     test_case.assertEqual(expected_http_status, response.status)
+
+
+def add_document(test_case):
+    context = test_case.procedure.snapshot()
+    auction = context['auction']
+    expected_http_status = '201 Created'
+    entrypoint_pattern = '/auctions/{}/documents?acc_token={}'
+    entrypoint = entrypoint_pattern.format(auction['data']['id'], auction['access']['token'])
+    auction_documents_type = [
+        'technicalSpecifications',
+        'evaluationCriteria',
+        'clarifications',
+        'billOfQuantity',
+        'conflictOfInterest',
+        'evaluationReports',
+        'complaints',
+        'eligibilityCriteria',
+        'tenderNotice',
+        'illustration',
+        'x_financialLicense',
+        'x_virtualDataRoom',
+        'x_presentation',
+        'x_nda',
+        'x_qualificationDocuments',
+        'cancellationDetails',
+    ]
+    init_document = deepcopy(test_document_data)
+    url = test_case.generate_docservice_url(),
+    init_document['url'] = url[0]
+    for doc_type in auction_documents_type:
+        document = deepcopy(init_document)
+        document['documentType'] = doc_type
+
+        request_data = {'data': document}
+        response = test_case.app.post_json(entrypoint, request_data)
+        test_case.assertEqual(expected_http_status, response.status)
 
 
 def patch_document(test_case):

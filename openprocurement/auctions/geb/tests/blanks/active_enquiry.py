@@ -9,13 +9,47 @@ from openprocurement.auctions.geb.tests.fixtures.common import (
 )
 
 
-def add_document(test_case):
-    document = deepcopy(test_document_data)
-    url = test_case.generate_docservice_url(),
-    document['url'] = url[0]
+def add_offline_document(test_case):
     expected_http_status = '201 Created'
+    document = deepcopy(test_document_data)
+    document.pop('hash')
+    document['accessDetails'] = 'test accessDetails'
+    document['documentType'] = 'x_dgfAssetFamiliarization'
 
     request_data = {'data': document}
+    response = test_case.app.post_json(test_case.ENTRYPOINTS['documents'], request_data)
+    test_case.assertEqual(expected_http_status, response.status)
+
+
+def add_document(test_case):
+    expected_http_status = '201 Created'
+    document = deepcopy(test_document_data)
+    auction_documents_type = [
+        'technicalSpecifications',
+        'evaluationCriteria',
+        'clarifications',
+        'billOfQuantity',
+        'conflictOfInterest',
+        'evaluationReports',
+        'complaints',
+        'eligibilityCriteria',
+        'tenderNotice',
+        'illustration',
+        'x_financialLicense',
+        'x_virtualDataRoom',
+        'x_presentation',
+        'x_nda',
+        'x_qualificationDocuments',
+        'cancellationDetails',
+    ]
+    init_document = deepcopy(test_document_data)
+    url = test_case.generate_docservice_url(),
+    init_document['url'] = url[0]
+    for doc_type in auction_documents_type:
+        document = deepcopy(init_document)
+        document['documentType'] = doc_type
+
+        request_data = {'data': document}
     response = test_case.app.post_json(test_case.ENTRYPOINTS['documents'], request_data)
     test_case.assertEqual(expected_http_status, response.status)
 

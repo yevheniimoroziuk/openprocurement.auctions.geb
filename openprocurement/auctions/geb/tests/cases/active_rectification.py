@@ -20,6 +20,7 @@ from openprocurement.auctions.geb.tests.fixtures.active_rectification import (
 
 from openprocurement.auctions.geb.tests.blanks.active_rectification import (
     add_document,
+    add_offline_document,
     add_question,
     answer_question,
     change_bankAccount,
@@ -151,7 +152,8 @@ class StatusActiveRectificationItemsTest(BaseWebTest):
 class StatusActiveRectificationDocumentTest(BaseWebTest):
     docservice = True
 
-    test_add_document = snitch(add_document)
+    test_add_online_document = snitch(add_document)
+    test_add_offline_document = snitch(add_offline_document)
     test_patch_document = snitch(patch_document)
 
     def setUp(self):

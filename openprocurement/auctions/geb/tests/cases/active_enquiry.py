@@ -17,6 +17,7 @@ from openprocurement.auctions.geb.tests.fixtures.active_enquiry import (
 )
 from openprocurement.auctions.geb.tests.blanks.active_enquiry import (
     add_document,
+    add_offline_document,
     add_question,
     answer_question,
     get_question,
@@ -149,6 +150,7 @@ class StatusActiveEnquiryDocumentsTest(BaseWebTest):
     docservice = True
 
     test_add_document = snitch(add_document)
+    test_add_offline_document = snitch(add_offline_document)
 
     def setUp(self):
         super(StatusActiveEnquiryDocumentsTest, self).setUp()
