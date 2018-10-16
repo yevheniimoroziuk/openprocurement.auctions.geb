@@ -28,6 +28,18 @@ def change_title(test_case):
     test_case.assertEqual(new_title, response.json['data'][field])
 
 
+def change_minNumberOfQualifiedBids(test_case):
+    new = 1
+    field = "minNumberOfQualifiedBids"
+
+    request_data = {"data": {field: new}}
+    response = test_case.app.patch_json(test_case.ENTRYPOINTS['patch_auction'], request_data)
+    test_case.assertEqual(new, response.json['data'][field])
+
+    response = test_case.app.get(test_case.ENTRYPOINTS['get_auction'], request_data)
+    test_case.assertEqual(new, response.json['data'][field])
+
+
 def change_one_field_rest_same(test_case):
     new_title = 'Test'
     field = "title"
