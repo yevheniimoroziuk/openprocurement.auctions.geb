@@ -177,7 +177,7 @@ Administrator_role = (Administrator_role + whitelist('awards'))
 
 
 @implementer(IBid)
-class GebBid(Model):
+class Bid(Model):
     class Options:
         roles = {
             'Administrator': Administrator_bid_role,
@@ -189,11 +189,11 @@ class GebBid(Model):
             'active.tendering': bid_active_tendering_role,
             'create': bid_create_role,
             'draft': bid_view_role,
+            'unsuccessful': bid_view_role,
             'edit_active': bid_edit_active_role,
             'edit_draft': bid_edit_draft_role,
             'edit_pending': bid_edit_pending_role,
             'pending': bid_pending_role,
-            'unsuccessful': bid_view_role,
             'view': bid_view_role,
         }
 
@@ -315,7 +315,7 @@ class Auction(BaseAuction):
 
     awards = ListType(ModelType(Award), default=list())
 
-    bids = ListType(ModelType(GebBid), default=list())
+    bids = ListType(ModelType(Bid), default=list())
 
     questions = ListType(ModelType(Question), default=list())
 
@@ -364,7 +364,7 @@ class Auction(BaseAuction):
     submissionMethod = StringType(choices=['electronicAuction'],
                                   default='electronicAuction')
 
-    tenderAttempts = IntType(required=True, choices=range(1, 11))
+    tenderAttempts = IntType(choices=range(1, 11))
 
     tenderPeriod = ModelType(Period)
 

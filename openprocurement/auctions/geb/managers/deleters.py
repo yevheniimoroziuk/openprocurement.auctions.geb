@@ -1,31 +1,36 @@
 from zope.interface import implementer
 
 from openprocurement.auctions.core.interfaces import (
-    IBidDeleter
+    IBidDeleter,
 )
 
 from openprocurement.auctions.geb.validation import (
-    check_auction_status_for_deleting_bids
+    validate_bid_delete_auction_period,
+    validate_bid_delete_period
 )
 
 
 @implementer(IBidDeleter)
 class BidDeleter(object):
     name = 'Bid Deleter'
-    validators = [check_auction_status_for_deleting_bids]
+    validators = (
+        validate_bid_delete_auction_period,
+        validate_bid_delete_period
+    )
 
     def __init__(self, request, context):
         self._request = request
         self._context = context
         self._auction = context.__parent__
 
-    def validate(self):
+    def _validate(self, status):
         for validator in self.validators:
-            if not validator(self._request):
-                return
+            if not validator(self._request, auction=self._auction, bid=self._context):
+                return False
         return True
 
     def delete(self):
-        self._auction.bids.remove(self._context)
-        self._auction.modified = True
-        return self._context
+        if self._validate(self._context.status):
+            self._auction.bids.remove(self._context)
+            self._auction.modified = True
+            return self._context

@@ -5,21 +5,28 @@ from openprocurement.auctions.core.interfaces import (
     IBidChanger,
     IDocumentChanger,
     IItemChanger,
-    IQuestionChanger
+    IQuestionChanger,
+    INamedValidators
 )
 
 from openprocurement.auctions.core.utils import (
     apply_patch,
 )
 
+from openprocurement.auctions.geb.managers.utils import (
+    NamedValidators
+)
+
 from openprocurement.auctions.geb.validation import (
-    validate_change_bid_check_auction_status,
-    validate_change_bid_check_status,
-    validate_make_active_status_bid,
     validate_question_changing_period,
     validate_item_changing_period,
     validate_phase_commit,
-    validate_edit_auction_document_period
+    validate_edit_auction_document_period,
+    # patch bids validators
+    validate_bid_patch_draft,
+    validate_bid_patch_pending,
+    validate_bid_patch_active,
+    validate_bid_patch_auction_period
 )
 
 
@@ -47,23 +54,48 @@ class AuctionChanger(object):
 @implementer(IBidChanger)
 class BidChanger(object):
     name = 'Bid Changer'
-    validators = [validate_change_bid_check_auction_status,
-                  validate_change_bid_check_status,
-                  validate_make_active_status_bid]
+    validators_named = [
+        NamedValidators(name='draft', validators=(
+            validate_bid_patch_draft,
+        )),
+        NamedValidators(name='pending', validators=(
+            validate_bid_patch_pending,
+        )),
+        NamedValidators(name='active', validators=(
+            validate_bid_patch_active,
+        )),
+    ]
+    validators_collective = (
+        validate_bid_patch_auction_period,
+    )
 
     def __init__(self, request, context):
         self._request = request
         self._context = context
         self._auction = context.__parent__
 
-    def validate(self):
-        for validator in self.validators:
+    def _validate_named(self, name):
+        for validator in self.validators_named:
+            if INamedValidators.providedBy(validator) and validator.name == name:
+                break
+        for named_validator in validator.validators:
+            if not named_validator(self._request, auction=self._auction, bid=self._context):
+                return False
+        return True
+
+    def _validate_collective(self):
+        for validator in self.validators_collective:
             if not validator(self._request, auction=self._auction, bid=self._context):
-                return
+                return False
+        return True
+
+    def _validate(self, status):
+        if not self._validate_collective() or not self._validate_named(status):
+            return False
         return True
 
     def change(self):
-        if self.validate():
+        if self._validate(self._context.status):
             self._auction.modified = apply_patch(self._request, save=False, src=self._context.serialize())
             return self._auction.modified
 

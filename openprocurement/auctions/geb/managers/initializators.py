@@ -22,7 +22,7 @@ from openprocurement.auctions.geb.validation import (
 )
 
 from openprocurement.auctions.geb.managers.utils import (
-    Validators
+    NamedValidators
 )
 
 
@@ -30,7 +30,7 @@ from openprocurement.auctions.geb.managers.utils import (
 class AuctionInitializator(object):
     name = 'Auction Initializator'
     validators = [
-        Validators(name='active.rectification', validators=(validate_auctionPeriod_startDate,))
+        NamedValidators(name='active.rectification', validators=(validate_auctionPeriod_startDate,))
     ]
 
     def __init__(self, request, context):

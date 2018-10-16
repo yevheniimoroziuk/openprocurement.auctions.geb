@@ -66,6 +66,15 @@ AUCTION_STATUS_FOR_DELETING_BIDS = [
     'active.tendering',
     'active.enquiry'
 ]
+AUCTION_STATUS_FOR_ACTIVATING_BIDS = [
+    'active.tendering',
+    'active.enquiry'
+]
+
+AUCTION_STATUS_FOR_PATCHING_BIDS = [
+    'active.tendering',
+    'active.enquiry'
+]
 
 AUCTION_STATUS_FOR_ADDING_QUESTIONS = [
     'active.rectification',
@@ -87,15 +96,29 @@ BID_STATUSES = [
     'draft',
     'pending',
     'active',
-    'unsuccessful'
+    'unsuccessful',
 ]
 
-BID_STATUSES_FOR_ADDING_DOCUMENTS = [
+AUCTION_STATUS_FOR_ADDING_BID_DOCUMENTS = [
     'active.tendering',
     'active.enquiry',
     'active.qualification'
 ]
 
+BID_STATUSES_FOR_PATCHING = [
+    'pending',
+    'active',
+]
+
+BID_STATUSES_FOR_DELETING = [
+    'pending',
+    'active',
+]
+
+BID_STATUSES_FOR_ADDING_BID_DOCUMENTS = [
+    'pending',
+    'active',
+]
 
 CAV_PS_CODES = [
     "06110000-6",

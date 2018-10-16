@@ -19,12 +19,12 @@ from openprocurement.auctions.geb.tests.blanks.active_rectification import (
 )
 from openprocurement.auctions.geb.tests.blanks.active_tendering import (
     add_question_dump,
-    add_bid_dump,
     answer_question_dump,
-    get_bid_dump,
-    activate_bid_dump,
-    make_active_status_bid_dump,
-    delete_bid_dump
+    bid_make_pending_dump,
+    bid_delete_in_pending_status_dump,
+    bid_get_in_pending_status_dump,
+    bid_make_activate_dump,
+    bid_add_dump
 )
 from openprocurement.auctions.geb.tests.blanks.active_auction import (
     get_auction_urls_dump
@@ -38,7 +38,8 @@ from openprocurement.auctions.geb.tests.states import (
 
 from openprocurement.auctions.geb.tests.fixtures.active_tendering import (
     ACTIVE_TENDERING_AUCTION_DEFAULT_FIXTURE_WITH_QUESTION,
-    ACTIVE_TENDERING_AUCTION_DEFAULT_FIXTURE_WITH_BIDS
+    AUCTION_WITH_DRAFT_BID,
+    AUCTION_WITH_PENDING_BID
 )
 
 
@@ -106,7 +107,7 @@ class RectificationAuctionDocumentsDumpTest(BaseWebDocsTest):
 class TenderingAuctionDumpTest(BaseWebDocsTest):
 
     test_add_question_dump = snitch(add_question_dump)
-    test_add_bid_dump = snitch(add_bid_dump)
+    test_bid_add_dump = snitch(bid_add_dump)
 
     def setUp(self):
         super(TenderingAuctionDumpTest, self).setUp()
@@ -115,9 +116,7 @@ class TenderingAuctionDumpTest(BaseWebDocsTest):
         procedure.set_db_connector(self.db)
         procedure.toggle('active.tendering')
         context = procedure.snapshot()
-
         self.auction = context['auction']
-
         entrypoints = {}
         entrypoints['questions'] = '/auctions/{}/questions'.format(self.auction['data']['id'])
         entrypoints['bids'] = '/auctions/{}/bids'.format(self.auction['data']['id'])
@@ -141,24 +140,65 @@ class TenderingAuctionQuestionsDumpTest(BaseWebDocsTest):
         self.questions = context['questions']
 
 
-class TenderingAuctionBidsDumpTest(BaseWebDocsTest):
-    docservice = True
+class TenderingAuctionBidsDraftDumpTest(BaseWebDocsTest):
 
-    test_get_bid_dump = snitch(get_bid_dump)
-    test_activate_bid_dump = snitch(activate_bid_dump)
-    test_make_active_status_bid_dump = snitch(make_active_status_bid_dump)
-    test_delete_bid = snitch(delete_bid_dump)
+    test_bid_make_pending_dump = snitch(bid_make_pending_dump)
 
     def setUp(self):
-        super(TenderingAuctionBidsDumpTest, self).setUp()
+        super(TenderingAuctionBidsDraftDumpTest, self).setUp()
 
         procedure = ProcedureMachine()
         procedure.set_db_connector(self.db)
         procedure.toggle('active.tendering')
-        context = procedure.snapshot(fixture=ACTIVE_TENDERING_AUCTION_DEFAULT_FIXTURE_WITH_BIDS)
+        context = procedure.snapshot(fixture=AUCTION_WITH_DRAFT_BID)
 
-        self.auction = context['auction']
-        self.bids = context['bids']
+        auction = context['auction']
+        bid = context['bids'][0]
+
+        entrypoints = {}
+
+        pattern = '/auctions/{auction}/bids/{bid}?acc_token={token}'
+        entrypoints['bid'] = pattern.format(auction=auction['data']['id'],
+                                            bid=bid['data']['id'],
+                                            token=bid['access']['token'])
+
+        self.ENTRYPOINTS = entrypoints
+        self.bid = bid
+        self.auction = auction
+
+
+class TenderingAuctionBidsPendingDumpTest(BaseWebDocsTest):
+    docservice = True
+
+    test_bid_delete_in_pending_status_dump = snitch(bid_delete_in_pending_status_dump)
+    test_bid_make_activate_dump = snitch(bid_make_activate_dump)
+    test_bid_get_in_pending_status_dump = snitch(bid_get_in_pending_status_dump)
+
+    def setUp(self):
+        super(TenderingAuctionBidsPendingDumpTest, self).setUp()
+
+        procedure = ProcedureMachine()
+        procedure.set_db_connector(self.db)
+        procedure.toggle('active.tendering')
+        context = procedure.snapshot(fixture=AUCTION_WITH_PENDING_BID)
+
+        auction = context['auction']
+        bid = context['bids'][0]
+
+        entrypoints = {}
+
+        pattern = '/auctions/{auction}/bids/{bid}?acc_token={token}'
+        entrypoints['bid'] = pattern.format(auction=auction['data']['id'],
+                                            bid=bid['data']['id'],
+                                            token=bid['access']['token'])
+
+        pattern = '/auctions/{auction}/bids/{bid}/documents?acc_token={token}'
+        entrypoints['add_bid_document'] = pattern.format(auction=auction['data']['id'],
+                                                         bid=bid['data']['id'],
+                                                         token=bid['access']['token'])
+        self.ENTRYPOINTS = entrypoints
+        self.bid = bid
+        self.auction = auction
 
 
 class ActiveAuctionDumpTest(BaseWebDocsTest):
@@ -183,8 +223,9 @@ def suite():
     suite.addTest(unittest.makeSuite(RectificationAuctionDumpTest))
     suite.addTest(unittest.makeSuite(RectificationAuctionDocumentsDumpTest))
     suite.addTest(unittest.makeSuite(TenderingAuctionDumpTest))
+    suite.addTest(unittest.makeSuite(TenderingAuctionBidsDraftDumpTest))
+    suite.addTest(unittest.makeSuite(TenderingAuctionBidsPendingDumpTest))
     suite.addTest(unittest.makeSuite(TenderingAuctionQuestionsDumpTest))
-    suite.addTest(unittest.makeSuite(TenderingAuctionBidsDumpTest))
     suite.addTest(unittest.makeSuite(ActiveAuctionDumpTest))
     return suite
 

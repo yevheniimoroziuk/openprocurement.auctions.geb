@@ -1,3 +1,12 @@
-from collections import namedtuple
+from zope.interface import implementer
+from openprocurement.auctions.core.interfaces import (
+    INamedValidators
+)
 
-Validators = namedtuple('Validators', ('name', 'validators'))
+
+@implementer(INamedValidators)
+class NamedValidators():
+
+    def __init__(self, name, validators):
+        self.name = name
+        self.validators = validators

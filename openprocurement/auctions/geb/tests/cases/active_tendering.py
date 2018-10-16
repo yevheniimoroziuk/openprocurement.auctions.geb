@@ -10,29 +10,40 @@ from openprocurement.auctions.geb.tests.states import (
     ProcedureMachine
 )
 from openprocurement.auctions.geb.tests.fixtures.active_tendering import (
-    ACTIVE_TENDERING_AUCTION_DEFAULT_FIXTURE_WITH_BIDS,
-    ACTIVE_TENDERING_AUCTION_DEFAULT_FIXTURE_WITH_QUESTION
+    ACTIVE_TENDERING_AUCTION_DEFAULT_FIXTURE_WITH_QUESTION,
+    AUCTION_WITH_DRAFT_BID,
+    AUCTION_WITH_PENDING_BID,
+    AUCTION_WITH_ACTIVE_BID
 )
 
 from openprocurement.auctions.geb.tests.blanks.active_tendering import (
-    activate_bid,
-    add_bid,
-    get_bid,
-    add_bid_document,
     add_document,
     add_invalid_bid,
     add_question,
     answer_question,
-    delete_bid,
+    bid_add,
+    bid_add_document_in_active_status,
+    bid_add_document_in_draft_status,
+    bid_add_document_in_pending_status,
+    bid_delete_in_active_status,
+    bid_delete_in_draft_status,
+    bid_delete_in_pending_status,
+    bid_get_in_active_status,
+    bid_get_in_draft_status,
+    bid_get_in_pending_status,
+    bid_make_activate,
+    bid_make_pending,
+    bid_patch_in_active_status,
+    bid_patch_in_draft_status,
+    bid_patch_in_pending_status,
     get_question,
-    make_active_status_bid
 )
 
 
 class StatusActiveTenderingTest(BaseWebTest):
 
     test_add_question = snitch(add_question)
-    test_add_bid = snitch(add_bid)
+    test_bid_add = snitch(bid_add)
     test_add_invalid_bid = snitch(add_invalid_bid)
 
     def setUp(self):
@@ -69,25 +80,114 @@ class StatusActiveTenderingQuestionsTest(BaseWebTest):
         self.questions = context['questions']
 
 
-class StatusActiveTenderingBidsTest(BaseWebTest):
+class StatusActiveTenderingDraftBidsTest(BaseWebTest):
     docservice = True
 
-    test_add_bid_document = snitch(add_bid_document)
-    test_get_bid = snitch(get_bid)
-    test_activate_bid = snitch(activate_bid)
-    test_make_active_status_bid = snitch(make_active_status_bid)
-    test_delete_bid = snitch(delete_bid)
+    test_bid_patch_in_draft_status = snitch(bid_patch_in_draft_status)
+    test_bid_make_pending = snitch(bid_make_pending)
+    test_bid_add_document_in_draft_status = snitch(bid_add_document_in_draft_status)
+    test_bid_delete_in_draft_status = snitch(bid_delete_in_draft_status)
+    test_bid_get_in_draft_status = snitch(bid_get_in_draft_status)
+    test_bid_patch_in_draft_status = snitch(bid_patch_in_draft_status)
 
     def setUp(self):
-        super(StatusActiveTenderingBidsTest, self).setUp()
+        super(StatusActiveTenderingDraftBidsTest, self).setUp()
 
         procedure = ProcedureMachine()
         procedure.set_db_connector(self.db)
         procedure.toggle('active.tendering')
-        context = procedure.snapshot(fixture=ACTIVE_TENDERING_AUCTION_DEFAULT_FIXTURE_WITH_BIDS)
+        context = procedure.snapshot(fixture=AUCTION_WITH_DRAFT_BID)
 
-        self.auction = context['auction']
-        self.bids = context['bids']
+        auction = context['auction']
+        bid = context['bids'][0]
+
+        entrypoints = {}
+
+        pattern = '/auctions/{auction}/bids/{bid}?acc_token={token}'
+        entrypoints['bid'] = pattern.format(auction=auction['data']['id'],
+                                            bid=bid['data']['id'],
+                                            token=bid['access']['token'])
+
+        pattern = '/auctions/{auction}/bids/{bid}/documents?acc_token={token}'
+        entrypoints['add_bid_document'] = pattern.format(auction=auction['data']['id'],
+                                                         bid=bid['data']['id'],
+                                                         token=bid['access']['token'])
+        self.ENTRYPOINTS = entrypoints
+        self.bid = bid
+        self.auction = auction
+
+
+class StatusActiveTenderingPendingBidsTest(BaseWebTest):
+    docservice = True
+
+    test_bid_patch_in_pending_status = snitch(bid_patch_in_pending_status)
+    test_bid_make_activate = snitch(bid_make_activate)
+    test_bid_add_document_in_pending_status = snitch(bid_add_document_in_pending_status)
+    test_bid_delete_in_pending_status = snitch(bid_delete_in_pending_status)
+    test_bid_get_in_pending_status = snitch(bid_get_in_pending_status)
+    test_bid_patch_in_pending_status = snitch(bid_patch_in_pending_status)
+
+    def setUp(self):
+        super(StatusActiveTenderingPendingBidsTest, self).setUp()
+
+        procedure = ProcedureMachine()
+        procedure.set_db_connector(self.db)
+        procedure.toggle('active.tendering')
+        context = procedure.snapshot(fixture=AUCTION_WITH_PENDING_BID)
+
+        auction = context['auction']
+        bid = context['bids'][0]
+
+        entrypoints = {}
+
+        pattern = '/auctions/{auction}/bids/{bid}?acc_token={token}'
+        entrypoints['bid'] = pattern.format(auction=auction['data']['id'],
+                                            bid=bid['data']['id'],
+                                            token=bid['access']['token'])
+
+        pattern = '/auctions/{auction}/bids/{bid}/documents?acc_token={token}'
+        entrypoints['add_bid_document'] = pattern.format(auction=auction['data']['id'],
+                                                         bid=bid['data']['id'],
+                                                         token=bid['access']['token'])
+        self.ENTRYPOINTS = entrypoints
+        self.bid = bid
+        self.auction = auction
+
+
+class StatusActiveTenderingActiveBidsTest(BaseWebTest):
+    docservice = True
+
+    test_bid_patch_in_active_status = snitch(bid_patch_in_active_status)
+    test_bid_add_document_in_active_status = snitch(bid_add_document_in_active_status)
+    test_bid_delete_in_active_status = snitch(bid_delete_in_active_status)
+    test_bid_get_in_active_status = snitch(bid_get_in_active_status)
+    test_bid_patch_in_active_status = snitch(bid_patch_in_active_status)
+
+    def setUp(self):
+        super(StatusActiveTenderingActiveBidsTest, self).setUp()
+
+        procedure = ProcedureMachine()
+        procedure.set_db_connector(self.db)
+        procedure.toggle('active.tendering')
+        context = procedure.snapshot(fixture=AUCTION_WITH_ACTIVE_BID)
+
+        auction = context['auction']
+        bid = context['bids'][0]
+
+        entrypoints = {}
+
+        pattern = '/auctions/{auction}/bids/{bid}?acc_token={token}'
+        entrypoints['bid'] = pattern.format(auction=auction['data']['id'],
+                                            bid=bid['data']['id'],
+                                            token=bid['access']['token'])
+
+        pattern = '/auctions/{auction}/bids/{bid}/documents?acc_token={token}'
+        entrypoints['add_bid_document'] = pattern.format(auction=auction['data']['id'],
+                                                         bid=bid['data']['id'],
+                                                         token=bid['access']['token'])
+        self.ENTRYPOINTS = entrypoints
+        self.bid = bid
+        self.auction = auction
 
 
 class StatusActiveTenderingDocumentsTest(BaseWebTest):
@@ -116,7 +216,9 @@ def suite():
     suite = unittest.TestSuite()
     suite.addTest(unittest.makeSuite(StatusActiveTenderingTest))
     suite.addTest(unittest.makeSuite(StatusActiveTenderingQuestionsTest))
-    suite.addTest(unittest.makeSuite(StatusActiveTenderingBidsTest))
+    suite.addTest(unittest.makeSuite(StatusActiveTenderingDraftBidsTest))
+    suite.addTest(unittest.makeSuite(StatusActiveTenderingPendingBidsTest))
+    suite.addTest(unittest.makeSuite(StatusActiveTenderingActiveBidsTest))
     suite.addTest(unittest.makeSuite(StatusActiveTenderingDocumentsTest))
     return suite
 

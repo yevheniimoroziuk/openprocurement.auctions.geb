@@ -7,7 +7,8 @@ from openprocurement.auctions.core.interfaces import (
 
 from openprocurement.auctions.geb.validation import (
     validate_document_adding_period,
-    validate_bid_document
+    validate_auction_status_for_adding_bid_document,
+    validate_bid_status_for_adding_bid_document
 )
 
 from openprocurement.auctions.geb.utils import (
@@ -41,7 +42,8 @@ class AuctionDocumenter(object):
 @implementer(IBidDocumenter)
 class BidDocumenter(object):
     name = 'Bid Documenter'
-    validators = [validate_bid_document]
+    validators = [validate_auction_status_for_adding_bid_document,
+                  validate_bid_status_for_adding_bid_document]
 
     def __init__(self, request, context):
         self._request = request
@@ -50,7 +52,7 @@ class BidDocumenter(object):
 
     def validate(self):
         for validator in self.validators:
-            if not validator(self._request):
+            if not validator(self._request, auction=self._auction, bid=self._context):
                 return
         return True
 
