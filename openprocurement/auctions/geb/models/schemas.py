@@ -364,7 +364,7 @@ class Auction(BaseAuction):
     submissionMethod = StringType(choices=['electronicAuction'],
                                   default='electronicAuction')
 
-    tenderAttempts = IntType(required=True, choices=range(1, 11))
+    tenderAttempts = IntType(choices=range(1, 11))
 
     tenderPeriod = ModelType(Period)
 
