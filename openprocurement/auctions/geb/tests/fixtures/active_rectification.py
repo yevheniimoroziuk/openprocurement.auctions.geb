@@ -18,11 +18,13 @@ from openprocurement.auctions.geb.tests.fixtures.common import (
     test_registrationFee_created,
     test_transfer_token,
     test_auction_guarantee,
-    test_document
 )
 
 from openprocurement.auctions.geb.tests.fixtures.items import (
     TEST_ITEM
+)
+from openprocurement.auctions.geb.tests.fixtures.documents import (
+    DOCUMENT
 )
 from openprocurement.auctions.geb.tests.fixtures.questions import (
     TEST_QESTION_IN_RECTIFICATION_PERIOD
@@ -109,7 +111,7 @@ END_ACTIVE_RECTIFICATION_AUCTION_DEFAULT_FIXTURE = auction
 
 auction = deepcopy(ACTIVE_RECTIFICATION_AUCTION_DEFAULT_FIXTURE)
 
-auction['documents'] = [test_document]
+auction['documents'] = [DOCUMENT]
 
 ACTIVE_RECTIFICATION_AUCTION_WITH_DOCUMENTS = auction
 

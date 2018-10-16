@@ -85,7 +85,7 @@ def get_question(test_case):
     test_case.assertEqual(response.status, expected_http_status)
 
 
-def add_bid(test_case):
+def bid_add(test_case):
     expected_http_status = '201 Created'
 
     request_data = test_bid_data
@@ -93,36 +93,11 @@ def add_bid(test_case):
     test_case.assertEqual(response.status, expected_http_status)
 
 
-def add_bid_dump(test_case):
+def bid_add_dump(test_case):
 
     request_data = test_bid_data
     response = test_case.app.post_json(test_case.ENTRYPOINTS['bids'], request_data)
     filename = 'docs/source/tutorial/active_tendering_add_bid.http'
-    test_case.dump(response.request, response, filename)
-
-
-def get_bid(test_case):
-    expected_http_status = '200 OK'
-    bid = test_case.bids[0]
-    bid_url_pattern = '/auctions/{auction}/bids/{bid}?acc_token={token}'
-    bid_url = bid_url_pattern.format(auction=test_case.auction['data']['id'],
-                                     bid=bid['data']['id'],
-                                     token=bid['access']['token'])
-
-    response = test_case.app.get(bid_url)
-    test_case.assertEqual(response.status, expected_http_status)
-
-
-def get_bid_dump(test_case):
-    bid = test_case.bids[0]
-    bid_url_pattern = '/auctions/{auction}/bids/{bid}?acc_token={token}'
-    bid_url = bid_url_pattern.format(auction=test_case.auction['data']['id'],
-                                     bid=bid['data']['id'],
-                                     token=bid['access']['token'])
-
-    response = test_case.app.get(bid_url)
-
-    filename = 'docs/source/tutorial/active_tendering_get_bid.http'
     test_case.dump(response.request, response, filename)
 
 
@@ -148,167 +123,241 @@ def add_invalid_bid(test_case):
     test_case.assertEqual(response.status, expected_http_status)
 
 
-def add_bid_document(test_case):
+def bid_add_document_in_draft_status(test_case):
+
+    document = deepcopy(test_document_data)
+    url = test_case.generate_docservice_url(),
+    document['url'] = url[0]
+    expected_http_status = '403 Forbidden'
+
+    request_data = {'data': document}
+    response = test_case.app.post_json(test_case.ENTRYPOINTS['add_bid_document'], request_data, status=403)
+    test_case.assertEqual(expected_http_status, response.status)
+
+
+def bid_add_document_in_pending_status(test_case):
     document = deepcopy(test_document_data)
     url = test_case.generate_docservice_url(),
     document['url'] = url[0]
     expected_http_status = '201 Created'
-    add_bid_document_url_pattern = '/auctions/{auction}/bids/{bid}/documents?acc_token={token}'
-    bid = test_case.bids[0]
-    add_bid_document_url = add_bid_document_url_pattern.format(auction=test_case.auction['data']['id'],
-                                                               bid=bid['data']['id'],
-                                                               token=bid['access']['token'])
 
     request_data = {'data': document}
-    response = test_case.app.post_json(add_bid_document_url, request_data)
+    response = test_case.app.post_json(test_case.ENTRYPOINTS['add_bid_document'], request_data)
     test_case.assertEqual(expected_http_status, response.status)
 
-    entrypoint = '/auctions/{}/bids/{}/documents/{}?acc_token={}'.format(test_case.auction['data']['id'],
-                                                                         bid['data']['id'],
-                                                                         response.json['data']['id'],
-                                                                         bid['access']['token'])
-    response = test_case.app.get(entrypoint)
-    test_case.assertEqual('200 OK', response.status)
+
+def bid_add_document_in_active_status(test_case):
+    document = deepcopy(test_document_data)
+    url = test_case.generate_docservice_url(),
+    document['url'] = url[0]
+    expected_http_status = '201 Created'
+
+    request_data = {'data': document}
+    response = test_case.app.post_json(test_case.ENTRYPOINTS['add_bid_document'], request_data)
+    test_case.assertEqual(expected_http_status, response.status)
 
 
-def activate_bid(test_case):
+def bid_delete_in_draft_status(test_case):
+    expected_http_status = '403 Forbidden'
+
+    response = test_case.app.delete_json(test_case.ENTRYPOINTS['bid'], status=403)
+
+    test_case.assertEqual(expected_http_status, response.status)
+
+
+def bid_delete_in_pending_status(test_case):
+    expected_http_status = '200 OK'
+    response = test_case.app.delete_json(test_case.ENTRYPOINTS['bid'])
+    test_case.assertEqual(expected_http_status, response.status)
+
+    expected_http_status = '404 Not Found'
+    response = test_case.app.get(test_case.ENTRYPOINTS['bid'], status=404)
+    test_case.assertEqual(expected_http_status, response.status)
+
+
+def bid_delete_in_pending_status_dump(test_case):
+
+    response = test_case.app.delete_json(test_case.ENTRYPOINTS['bid'])
+    filename = 'docs/source/tutorial/active_tendering_delete_bid.http'
+    test_case.dump(response.request, response, filename)
+
+
+def bid_delete_in_active_status(test_case):
+    expected_http_status = '200 OK'
+    response = test_case.app.delete_json(test_case.ENTRYPOINTS['bid'])
+    test_case.assertEqual(expected_http_status, response.status)
+
+    expected_http_status = '404 Not Found'
+    response = test_case.app.get(test_case.ENTRYPOINTS['bid'], status=404)
+    test_case.assertEqual(expected_http_status, response.status)
+
+
+def bid_patch_in_draft_status(test_case):
+    expected_http_status = '403 Forbidden'
+    request_data = {"data": {"status": "active"}}
+    auth = test_case.app.authorization
+
+    test_case.app.authorization = ('Basic', ('{}'.format(test_case.bid['access']['owner']), ''))
+
+    response = test_case.app.patch_json(test_case.ENTRYPOINTS['bid'], request_data, status=403)
+    test_case.assertEqual(expected_http_status, response.status)
+
+    request_data = {"data": {'qualified': True}}
+    response = test_case.app.patch_json(test_case.ENTRYPOINTS['bid'], request_data, status=403)
+    test_case.assertEqual(expected_http_status, response.status)
+
+    test_case.app.authorization = auth
+
+
+def bid_patch_in_pending_status(test_case):
+    auth = test_case.app.authorization
+
+    test_case.app.authorization = ('Basic', ('{}'.format(test_case.bid['access']['owner']), ''))
+
+    expected_http_status = '403 Forbidden'
+    request_data = {"data": {"status": "draft"}}
+    response = test_case.app.patch_json(test_case.ENTRYPOINTS['bid'], request_data, status=403)
+    test_case.assertEqual(expected_http_status, response.status)
+
+    request_data = {"data": {"status": "active"}}
+    response = test_case.app.patch_json(test_case.ENTRYPOINTS['bid'], request_data, status=403)
+    test_case.assertEqual(expected_http_status, response.status)
+
+    expected_http_status = '200 OK'
+    request_data = {"data": {'qualified': True}}
+    response = test_case.app.patch_json(test_case.ENTRYPOINTS['bid'], request_data)
+    test_case.assertEqual(expected_http_status, response.status)
+
+    test_case.app.authorization = auth
+
+
+def bid_patch_in_active_status(test_case):
+    auth = test_case.app.authorization
+
+    test_case.app.authorization = ('Basic', ('{}'.format(test_case.bid['access']['owner']), ''))
+
+    expected_http_status = '403 Forbidden'
+    request_data = {"data": {"status": "pending"}}
+    response = test_case.app.patch_json(test_case.ENTRYPOINTS['bid'], request_data, status=403)
+    test_case.assertEqual(expected_http_status, response.status)
+
+    test_case.app.authorization = auth
+
+
+def bid_get_in_draft_status(test_case):
+    auth = test_case.app.authorization
+
+    test_case.app.authorization = ('Basic', ('{}'.format(test_case.bid['access']['owner']), ''))
+
+    expected_http_status = '200 OK'
+    response = test_case.app.get(test_case.ENTRYPOINTS['bid'])
+    test_case.assertEqual(expected_http_status, response.status)
+
+    test_case.app.authorization = auth
+
+
+def bid_get_in_pending_status(test_case):
+    auth = test_case.app.authorization
+
+    test_case.app.authorization = ('Basic', ('{}'.format(test_case.bid['access']['owner']), ''))
+
+    expected_http_status = '200 OK'
+    response = test_case.app.get(test_case.ENTRYPOINTS['bid'])
+    test_case.assertEqual(expected_http_status, response.status)
+
+    test_case.app.authorization = auth
+
+
+def bid_get_in_pending_status_dump(test_case):
+
+    response = test_case.app.get(test_case.ENTRYPOINTS['bid'])
+
+    filename = 'docs/source/tutorial/active_tendering_get_bid.http'
+    test_case.dump(response.request, response, filename)
+
+
+def bid_get_in_active_status(test_case):
+    auth = test_case.app.authorization
+
+    test_case.app.authorization = ('Basic', ('{}'.format(test_case.bid['access']['owner']), ''))
+
+    expected_http_status = '200 OK'
+    response = test_case.app.get(test_case.ENTRYPOINTS['bid'])
+    test_case.assertEqual(expected_http_status, response.status)
+
+    test_case.app.authorization = auth
+
+
+def bid_make_pending(test_case):
+
     expected_http_status = '200 OK'
     expected_data = ['date', 'owner', 'id', 'qualified', 'value', 'status', 'tenderers']
-    patch_bid_url_pattern = '/auctions/{auction}/bids/{bid}?acc_token={token}'
 
     request_data = {"data": {"status": "pending"}}
-    for bid in test_case.bids:
-        entrypoint = patch_bid_url_pattern.format(auction=test_case.auction['data']['id'],
-                                                  bid=bid['data']['id'],
-                                                  token=bid['access']['token'])
-
-        auth = test_case.app.authorization
-        test_case.app.authorization = ('Basic', ('{}'.format(bid['access']['owner']), ''))
-        response = test_case.app.patch_json(entrypoint, request_data)
-        test_case.app.authorization = auth
-
-        test_case.assertEqual(expected_http_status, response.status)
-        test_case.assertSetEqual(set(expected_data), set(response.json['data'].keys()))
-
-
-def activate_bid_dump(test_case):
-    patch_bid_url_pattern = '/auctions/{auction}/bids/{bid}?acc_token={token}'
-
-    request_data = {"data": {"status": "pending"}}
-    bid = test_case.bids[0]
-    entrypoint = patch_bid_url_pattern.format(auction=test_case.auction['data']['id'],
-                                              bid=bid['data']['id'],
-                                              token=bid['access']['token'])
 
     auth = test_case.app.authorization
-    test_case.app.authorization = ('Basic', ('{}'.format(bid['access']['owner']), ''))
-    response = test_case.app.patch_json(entrypoint, request_data)
+    test_case.app.authorization = ('Basic', ('{}'.format(test_case.bid['access']['owner']), ''))
+    response = test_case.app.patch_json(test_case.ENTRYPOINTS['bid'], request_data)
+    test_case.app.authorization = auth
+
+    test_case.assertEqual(expected_http_status, response.status)
+    test_case.assertSetEqual(set(expected_data), set(response.json['data'].keys()))
+
+
+def bid_make_pending_dump(test_case):
+
+    request_data = {"data": {"status": "pending"}}
+
+    auth = test_case.app.authorization
+    test_case.app.authorization = ('Basic', ('{}'.format(test_case.bid['access']['owner']), ''))
+    response = test_case.app.patch_json(test_case.ENTRYPOINTS['bid'], request_data)
     test_case.app.authorization = auth
 
     filename = 'docs/source/tutorial/active_tendering_activate_bid.http'
     test_case.dump(response.request, response, filename)
 
 
-def delete_bid(test_case):
-    expected_http_status = '200 OK'
-
-    bid_url_pattern = '/auctions/{auction}/bids/{bid}?acc_token={token}'
-    bid = test_case.bids[0]
-    bid_url = bid_url_pattern.format(auction=test_case.auction['data']['id'],
-                                     bid=bid['data']['id'],
-                                     token=bid['access']['token'])
-
-    test_case.app.get(bid_url)
-    response = test_case.app.delete_json(bid_url)
-
-    test_case.app.get(bid_url, status=404)
-    test_case.assertEqual(expected_http_status, response.status)
-
-
-def delete_bid_dump(test_case):
-    bid_url_pattern = '/auctions/{auction}/bids/{bid}?acc_token={token}'
-    bid = test_case.bids[0]
-    bid_url = bid_url_pattern.format(auction=test_case.auction['data']['id'],
-                                     bid=bid['data']['id'],
-                                     token=bid['access']['token'])
-
-    test_case.app.get(bid_url)
-    response = test_case.app.delete_json(bid_url)
-    filename = 'docs/source/tutorial/active_tendering_delete_bid.http'
-    test_case.dump(response.request, response, filename)
-
-
-def make_active_status_bid(test_case):
-    expected_http_status = '200 OK'
-
+def bid_make_activate(test_case):
     document = deepcopy(test_document_data)
     document['documentType'] = 'eligibilityDocuments'
     url = test_case.generate_docservice_url(),
     document['url'] = url[0]
-    patch_bid_url_pattern = '/auctions/{auction}/bids/{bid}?acc_token={token}'
-    add_bid_document_url_pattern = '/auctions/{auction}/bids/{bid}/documents?acc_token={token}'
-    bid = test_case.bids[0]
-    patch_bid_url = patch_bid_url_pattern.format(auction=test_case.auction['data']['id'],
-                                                 bid=bid['data']['id'],
-                                                 token=bid['access']['token'])
-
-    add_bid_document_url = add_bid_document_url_pattern.format(auction=test_case.auction['data']['id'],
-                                                               bid=bid['data']['id'],
-                                                               token=bid['access']['token'])
-
-    request_data = {"data": {"status": "pending"}}
-    response = test_case.app.patch_json(patch_bid_url, request_data)
-
-    request_data = {"data": {"status": "active"}}
-    response = test_case.app.patch_json(patch_bid_url, request_data, status=403)
-    test_case.assertEqual('403 Forbidden', response.status)
 
     request_data = {'data': document}
-    response = test_case.app.post_json(add_bid_document_url, request_data)
+    response = test_case.app.post_json(test_case.ENTRYPOINTS['add_bid_document'], request_data)
 
     request_data = {"data": {"status": "active"}}
-    response = test_case.app.patch_json(patch_bid_url, request_data, status=403)
+    response = test_case.app.patch_json(test_case.ENTRYPOINTS['bid'], request_data, status=403)
     test_case.assertEqual('403 Forbidden', response.status)
 
     request_data = {"data": {"qualified": True}}
-    response = test_case.app.patch_json(patch_bid_url, request_data)
-    test_case.assertEqual(expected_http_status, response.status)
+    response = test_case.app.patch_json(test_case.ENTRYPOINTS['bid'], request_data)
 
     request_data = {"data": {"status": "active"}}
-    response = test_case.app.patch_json(patch_bid_url, request_data, status=403)
+    response = test_case.app.patch_json(test_case.ENTRYPOINTS['bid'], request_data, status=403)
     test_case.assertEqual('403 Forbidden', response.status)
 
     request_data = {"data": {"bidNumber": 1}}
-    response = test_case.app.patch_json(patch_bid_url, request_data)
-    test_case.assertEqual(expected_http_status, response.status)
+    response = test_case.app.patch_json(test_case.ENTRYPOINTS['bid'], request_data)
 
     request_data = {"data": {"status": "active"}}
-    response = test_case.app.patch_json(patch_bid_url, request_data)
-    test_case.assertEqual(expected_http_status, response.status)
+    response = test_case.app.patch_json(test_case.ENTRYPOINTS['bid'], request_data)
+    test_case.assertEqual('200 OK', response.status)
+
+    response = test_case.app.get(test_case.ENTRYPOINTS['bid'])
+    bid = response.json['data']
+    test_case.assertEqual('active', bid['status'])
 
 
-def make_active_status_bid_dump(test_case):
+def bid_make_activate_dump(test_case):
 
     document = deepcopy(test_document_data)
     document['documentType'] = 'eligibilityDocuments'
     url = test_case.generate_docservice_url(),
     document['url'] = url[0]
-    patch_bid_url_pattern = '/auctions/{auction}/bids/{bid}?acc_token={token}'
-    add_bid_document_url_pattern = '/auctions/{auction}/bids/{bid}/documents?acc_token={token}'
-    bid = test_case.bids[0]
-    patch_bid_url = patch_bid_url_pattern.format(auction=test_case.auction['data']['id'],
-                                                 bid=bid['data']['id'],
-                                                 token=bid['access']['token'])
-
-    add_bid_document_url = add_bid_document_url_pattern.format(auction=test_case.auction['data']['id'],
-                                                               bid=bid['data']['id'],
-                                                               token=bid['access']['token'])
-
-    request_data = {"data": {"status": "pending"}}
-    response = test_case.app.patch_json(patch_bid_url, request_data)
 
     request_data = {'data': document}
-    response = test_case.app.post_json(add_bid_document_url, request_data)
+    response = test_case.app.post_json(test_case.ENTRYPOINTS['add_bid_document'], request_data)
 
     filename = 'docs/source/tutorial/active_tendering_bid_attach_document.http'
     test_case.dump(response.request, response, filename)
@@ -316,12 +365,12 @@ def make_active_status_bid_dump(test_case):
     request_data = {"data": {"qualified": True,
                              "bidNumber": 1,
                              "status": "active"}}
-    response = test_case.app.patch_json(patch_bid_url, request_data)
+    response = test_case.app.patch_json(test_case.ENTRYPOINTS['bid'], request_data)
 
     filename = 'docs/source/tutorial/active_tendering_bid_make_active_status.http'
     test_case.dump(response.request, response, filename)
 
-    response = test_case.app.get(patch_bid_url, request_data)
+    response = test_case.app.get(test_case.ENTRYPOINTS['bid'])
 
     filename = 'docs/source/tutorial/active_tendering_bid_get_active_status.http'
     test_case.dump(response.request, response, filename)

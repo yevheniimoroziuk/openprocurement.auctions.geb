@@ -249,29 +249,26 @@ question_enquiry_role = whitelist(
 )
 question_rectification_role = question_enquiry_role
 
+# bid roles
+
 bid_view_role = whitelist(
     'id',
     'status',
     'tenderers',
     'value',
-    'documents',
     'date',
-    'qualified',
+    'id',
     'owner',
-    'participationUrl',
-    'bidNumber'
+    'qualified',
+    'bidNumber',
+    'documents',
+    'participationUrl'
+
 )
 
-bid_pending_role = whitelist(
-    'id',
-    'status',
-    'tenderers',
-    'value',
-    'date',
-    'id',
-    'owner',
-    'qualified',
-)
+bid_pending_role = bid_view_role
+
+bid_active_role = bid_view_role
 
 bid_edit_pending_role = whitelist(
     'id',
@@ -285,17 +282,6 @@ bid_edit_pending_role = whitelist(
     'bidNumber'
 )
 
-bid_active_role = whitelist(
-    'id',
-    'status',
-    'tenderers',
-    'value',
-    'date',
-    'id',
-    'owner',
-    'qualified',
-    'bidNumber'
-)
 
 bid_edit_active_role = whitelist(
     'id',
