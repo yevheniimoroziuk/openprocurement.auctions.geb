@@ -20,6 +20,7 @@ from openprocurement.auctions.geb.tests.fixtures.active_rectification import (
 
 from openprocurement.auctions.geb.tests.blanks.active_rectification import (
     add_document,
+    add_offline_document,
     add_question,
     answer_question,
     change_bankAccount,
@@ -34,6 +35,7 @@ from openprocurement.auctions.geb.tests.blanks.active_rectification import (
     change_minimalStep,
     change_one_field_rest_same,
     change_procuringEntity,
+    change_minNumberOfQualifiedBids,
     change_registrationFee,
     change_tenderAttempts,
     change_title,
@@ -56,6 +58,7 @@ class StatusActiveRectificationChangeFieldTest(BaseWebTest):
     test_change_guarantee = snitch(change_guarantee)
     test_change_budgetSpent = snitch(change_budgetSpent)
     test_change_registrationFee = snitch(change_registrationFee)
+    test_change_minNumberOfQualifiedBids = snitch(change_minNumberOfQualifiedBids)
     test_change_procuringEntity = snitch(change_procuringEntity)
     test_change_lotHolder = snitch(change_lotHolder)
     test_change_bankAccount = snitch(change_bankAccount)
@@ -151,7 +154,8 @@ class StatusActiveRectificationItemsTest(BaseWebTest):
 class StatusActiveRectificationDocumentTest(BaseWebTest):
     docservice = True
 
-    test_add_document = snitch(add_document)
+    test_add_online_document = snitch(add_document)
+    test_add_offline_document = snitch(add_offline_document)
     test_patch_document = snitch(patch_document)
 
     def setUp(self):

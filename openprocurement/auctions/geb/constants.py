@@ -16,22 +16,23 @@ DOCUMENT_TYPE_OFFLINE = ['x_dgfAssetFamiliarization']
 DOCUMENT_TYPE_URL_ONLY = ['virtualDataRoom']
 
 AUCTION_DOCUMENT_TYPES = [
-        'technicalSpecifications',
-        'evaluationCriteria',
-        'clarifications',
-        'billOfQuantity',
-        'conflictOfInterest',
-        'evaluationReports',
-        'eligibilityCriteria',
-        'tenderNotice',
-        'illustration',
-        'x_financialLicense',
-        'x_virtualDataRoom',
-        'x_dgfAssetFamiliarization',
-        'x_presentation',
-        'x_nda',
-        'x_qualificationDocuments',
-        'cancellationDetails'
+    'technicalSpecifications',
+    'evaluationCriteria',
+    'clarifications',
+    'billOfQuantity',
+    'conflictOfInterest',
+    'evaluationReports',
+    'complaints',
+    'eligibilityCriteria',
+    'tenderNotice',
+    'illustration',
+    'x_financialLicense',
+    'x_virtualDataRoom',
+    'x_dgfAssetFamiliarization',
+    'x_presentation',
+    'x_nda',
+    'x_qualificationDocuments',
+    'cancellationDetails',
     ]
 
 BID_DOCUMENT_TYPES = [

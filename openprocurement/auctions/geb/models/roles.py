@@ -232,6 +232,7 @@ auction_edit_rectification_role = whitelist(
     'minimalStep',
     'procuringEntity',
     'registrationFee',
+    'minNumberOfQualifiedBids',
     'tenderAttempts',
     'title',
     'title_en',
