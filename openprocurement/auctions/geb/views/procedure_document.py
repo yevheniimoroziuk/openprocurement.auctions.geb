@@ -2,12 +2,9 @@
 from openprocurement.auctions.core.utils import (
     json_view,
     context_unpack,
-    save_auction,
-    apply_patch,
     opresource,
 )
 from openprocurement.auctions.core.validation import (
-    validate_file_update,
     validate_file_upload,
     validate_patch_document_data,
 )
@@ -19,7 +16,7 @@ from openprocurement.auctions.core.interfaces import (
 )
 
 from openprocurement.auctions.geb.utils import (
-    upload_file, get_file
+    get_file
 )
 
 
@@ -69,21 +66,6 @@ class AuctionDocumentResource(AuctionDocumentResource):
             (offline and i.dateModified != document.dateModified)
         ]
         return {'data': document_data}
-
-#    @json_view(permission='upload_auction_documents', validators=(validate_file_update,))
-#    def put(self):
-#        """Auction Document Update"""                                           # TODO rm black box
-#        if not self.validate_document_editing_period('update'):
-#            return
-#        document = upload_file(self.request)
-#        if self.request.authenticated_role != "auction":
-#            pass
-#            # invalidate_bids_data(self.request.auction)
-#        self.request.validated['auction'].documents.append(document)
-#        if save_auction(self.request):
-#            self.LOGGER.info('Updated auction document {}'.format(self.request.context.id),
-#                             extra=context_unpack(self.request, {'MESSAGE_ID': 'auction_document_put'}))
-#            return {'data': document.serialize("view")}
 
     @json_view(content_type="application/json", permission='upload_auction_documents', validators=(validate_patch_document_data,))
     def patch(self):

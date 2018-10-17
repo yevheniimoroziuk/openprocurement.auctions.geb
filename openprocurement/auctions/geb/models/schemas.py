@@ -55,7 +55,10 @@ from openprocurement.auctions.geb.constants import (
     AUCTION_STATUSES,
     BID_DOCUMENT_TYPES,
     BID_STATUSES,
-    GEB_ITEM_ADDITIONAL_CLASSIFICATIONS
+    GEB_ITEM_ADDITIONAL_CLASSIFICATIONS,
+    RECTIFICATION_PERIOD_DURATION,
+    MIN_NUMBER_OF_TENDERING_DURATION,
+    MIN_NUMBER_OF_ENQUIRING_DURATION,
 )
 
 from openprocurement.auctions.geb.models.roles import (
@@ -375,13 +378,29 @@ class Auction(BaseAuction):
             (Allow, '{}_{}'.format(self.owner, self.owner_token), 'upload_auction_documents'),
         ]
 
-    def validate_tenderPeriod(self, data, period):                              # TODO implement
+    def validate_tenderPeriod(self, data, period):
         if not period:
             return
+        period_duration = period.endDate - period.startDate
 
-    def validate_rectificationPeriod(self, data, period):                       # TODO implement
+        if period_duration < MIN_NUMBER_OF_TENDERING_DURATION:
+            raise ValidationError("Not enough days for the tendering, change auctionPeriod startDate")
+
+    def validate_enquiryPeriod(self, data, period):
         if not period:
             return
+        period_duration = period.endDate - period.startDate
+
+        if period_duration < MIN_NUMBER_OF_ENQUIRING_DURATION:
+            raise ValidationError("Not enough days for the enquiring, change auctionPeriod startDate")
+
+    def validate_rectificationPeriod(self, data, period):
+        if not period:
+            return
+        period_duration = period.endDate - period.startDate
+
+        if period_duration < RECTIFICATION_PERIOD_DURATION:
+            raise ValidationError("Not enough days for the rectification, change auctionPeriod startDate")
 
     def validate_value(self, data, value):
         if value.currency != u'UAH':

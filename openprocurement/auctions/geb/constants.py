@@ -7,8 +7,9 @@ AUCTION_DOCUMENT_STATUSES = ['active.auction', 'active.qualification']
 EDIT_AUCTION_DOCUMENT_STATUSES = ['active.rectification', 'active.tendering', 'active.enquiry']
 
 # duration of periods
-RECTIFICATION_PERIOD_DURATION = timedelta(days=2)
-MIN_NUMBER_OF_DAYS_TENDERING = timedelta(days=1)
+RECTIFICATION_PERIOD_DURATION = timedelta(hours=48)
+MIN_NUMBER_OF_TENDERING_DURATION = timedelta(days=6)
+MIN_NUMBER_OF_ENQUIRING_DURATION = timedelta(days=10)
 
 
 # documets
@@ -43,7 +44,7 @@ BID_DOCUMENT_TYPES = [
 NUMBER_OF_BIDS_TO_BE_QUALIFIED = 2
 
 DEFAULT_LEVEL_OF_ACCREDITATION = {
-    'create': [1],                                # TODO ask what permissions
+    'create': [1],
     'edit': [2]
 }
 

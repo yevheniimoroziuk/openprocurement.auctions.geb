@@ -2,31 +2,32 @@
 from schematics.transforms import whitelist
 
 auction_draft_role = whitelist(
-    'procurementMethod',
     'auctionID',
-    'minNumberOfQualifiedBids',
-    'registrationFee',
-    'submissionMethod',
-    'procuringEntity',
-    'owner',
+    'auctionParameters',
+    'auctionPeriod',
+    'awardCriteria'
+    'budgetSpent',
+    'contractTerms',
+    'date',
+    'dateModified',
+    'description',
     'doc_id',
     'guarantee',
-    'title',
-    'tenderAttempts',
-    'auctionParameters',
-    'dateModified',
-    'status',
-    'lotHolder',
-    'description',
-    'procurementMethodType',
-    'date',
-    'budgetSpent',
-    'lotIdentifier',
-    'contractTerms',
-    'minimalStep',
     'items',
-    'value',
-    'awardCriteria'
+    'lotHolder',
+    'lotIdentifier',
+    'minNumberOfQualifiedBids',
+    'minimalStep',
+    'owner',
+    'procurementMethod',
+    'procurementMethodType',
+    'procuringEntity',
+    'registrationFee',
+    'status',
+    'submissionMethod',
+    'tenderAttempts',
+    'title',
+    'value'
 )
 
 auction_create_role = whitelist(
