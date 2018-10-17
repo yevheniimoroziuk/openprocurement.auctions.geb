@@ -1,10 +1,10 @@
 from copy import deepcopy
 
 from openprocurement.auctions.geb.tests.fixtures.create import (
-    CREATE_AUCTION_DEFAULT_FIXTURE
+    CREATE_AUCTION_DEFAULT_FIXTURE as CREATE_AUCTION
 )
 from openprocurement.auctions.geb.tests.fixtures.draft import (
-    DRAFT_AUCTION_DEFAULT_FIXTURE
+    AUCTION as DRAFT_AUCTION
 )
 from openprocurement.auctions.geb.tests.fixtures.active_rectification import (
     ACTIVE_RECTIFICATION_AUCTION_DEFAULT_FIXTURE,
@@ -156,7 +156,7 @@ class ActiveRetification(State):
 
 
 class Draft(State):
-    fixture = DRAFT_AUCTION_DEFAULT_FIXTURE
+    fixture = DRAFT_AUCTION
     status = 'draft'
 
     def _next(self, end=False):
@@ -164,7 +164,7 @@ class Draft(State):
 
 
 class Create(State):
-    fixture = CREATE_AUCTION_DEFAULT_FIXTURE
+    fixture = CREATE_AUCTION
     status = 'create'
 
     def context(self, fixture):

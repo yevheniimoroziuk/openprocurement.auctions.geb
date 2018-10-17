@@ -6,3 +6,7 @@ def change_machine_state(machine, status, end=False):
             break
     if end:
         machine.next(end=True)
+
+
+def recalculate_procedure():
+    pass

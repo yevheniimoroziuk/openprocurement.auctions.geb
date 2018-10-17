@@ -13,25 +13,18 @@ from openprocurement.auctions.core.utils import (
 )
 
 from openprocurement.auctions.geb.constants import (
-    RECTIFICATION_PERIOD_DURATION,
-    AUCTION_PARAMETERS_TYPE
+    AUCTION_PARAMETERS_TYPE,
+    RECTIFICATION_PERIOD_DURATION
 )
 from openprocurement.auctions.geb.validation import (
     validate_bid_initialization,
-    validate_auctionPeriod_startDate
-)
-
-from openprocurement.auctions.geb.managers.utils import (
-    NamedValidators
 )
 
 
 @implementer(IAuctionInitializator)
 class AuctionInitializator(object):
     name = 'Auction Initializator'
-    validators = [
-        NamedValidators(name='active.rectification', validators=(validate_auctionPeriod_startDate,))
-    ]
+    validators = []
 
     def __init__(self, request, context):
         self._now = get_now()
@@ -56,8 +49,7 @@ class AuctionInitializator(object):
         end_date = calculate_business_date(self._context.auctionPeriod.startDate,
                                            -timedelta(days=1),
                                            self._context,
-                                           specific_hour=20,
-                                           working_days=True)
+                                           specific_hour=20)
 
         period.startDate = start_date
         period.endDate = end_date
@@ -69,7 +61,7 @@ class AuctionInitializator(object):
 
         start_date = self._context.rectificationPeriod.endDate
         end_date = calculate_business_date(self._context.auctionPeriod.startDate,
-                                           -timedelta(days=3),
+                                           -timedelta(days=4),
                                            self._context,
                                            specific_hour=20,
                                            working_days=True)

@@ -37,7 +37,7 @@ class TenderPeriod(Period):
             if instance.state == 'start':
                 self._startDate = instance.time
                 self._endDate = ccbd(instance.auctionPeriod.shouldStartAfter,
-                                     -timedelta(days=3),
+                                     -timedelta(days=4),
                                      working_days=self.working_days,
                                      specific_hour=self.specific_hour)
             elif instance.state == 'end':
@@ -47,21 +47,28 @@ class TenderPeriod(Period):
         elif instance.period == 'rectificationPeriod':
                 self._startDate = instance.rectificationPeriod.endDate
                 self._endDate = ccbd(instance.auctionPeriod.shouldStartAfter,
-                                     -timedelta(days=3),
+                                     -timedelta(days=4),
                                      working_days=self.working_days,
                                      specific_hour=self.specific_hour)
         elif instance.period == 'enquiryPeriod':
                 self._startDate = ccbd(instance.enquiryPeriod.startDate,
                                        timedelta(days=2))
                 self._endDate = ccbd(instance.auctionPeriod.shouldStartAfter,
-                                     -timedelta(days=3),
+                                     -timedelta(days=4),
                                      working_days=self.working_days,
                                      specific_hour=self.specific_hour)
         elif instance.period == 'auctionDate':
                 self._startDate = ccbd(self.auctionDate.date,
                                        timedelta(days=5))
                 self._endDate = ccbd(instance.auctionPeriod.shouldStartAfter,
-                                     -timedelta(days=3),
+                                     -timedelta(days=4),
+                                     working_days=self.working_days,
+                                     specific_hour=self.specific_hour)
+        elif instance.period == 'auctionPeriod':
+                self._startDate = ccbd(instance.time, -timedelta(days=16))
+
+                self._endDate = ccbd(instance.time,
+                                     -timedelta(days=4),
                                      working_days=self.working_days,
                                      specific_hour=self.specific_hour)
         return self
@@ -99,6 +106,10 @@ class RectificationPeriod(Period):
         elif instance.period == 'auctionDate':
                 self._startDate = ccbd(instance.auctionDate.date, timedelta(days=3))
                 self._endDate = ccbd(self._startDate, self.duration)
+        elif instance.period == 'auctionPeriod':
+                self._startDate = ccbd(instance.time, -timedelta(days=18))
+
+                self._endDate = ccbd(instance.time, -timedelta(days=14))
         return self
 
     @property
@@ -127,7 +138,7 @@ class EnquiryPeriod(Period):
                                      specific_hour=self.specific_hour)
             elif instance.state == 'end':
                 self._endDate = instance.time
-                self._startDate = ccbd(instance.time, -timedelta(days=10))
+                self._startDate = ccbd(instance.time, -timedelta(days=14))
 
         elif instance.period == 'rectificationPeriod':
                 self._startDate = instance.time
@@ -148,6 +159,12 @@ class EnquiryPeriod(Period):
                 self._endDate = ccbd(instance.auctionPeriod.shouldStartAfter,
                                      -timedelta(days=1),
                                      working_days=self.working_days,
+                                     specific_hour=self.specific_hour)
+        elif instance.period == 'auctionPeriod':
+                self._startDate = ccbd(instance.time, -timedelta(days=18))
+
+                self._endDate = ccbd(instance.time,
+                                     -timedelta(days=1),
                                      specific_hour=self.specific_hour)
         return self
 
@@ -174,7 +191,7 @@ class AuctionPeriod(Period):
         elif instance.period == 'rectificationPeriod':
                 self._shouldStartAfter = ccbd(instance.time, timedelta(days=14))
         elif instance.period == 'tenderPeriod':
-                self._shouldStartAfter = ccbd(instance.time, timedelta(days=10))
+                self._shouldStartAfter = ccbd(instance.time, timedelta(days=14))
         elif instance.period == 'auctionDate':
                 self._shouldStartAfter = ccbd(instance.time, timedelta(days=14))
         elif instance.period == 'enquiryPeriod':
