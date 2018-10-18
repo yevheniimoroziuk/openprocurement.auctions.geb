@@ -261,14 +261,13 @@ def add_invalid_bid(test_case):
 
 
 def bid_add_document_in_draft_status(test_case):
-
     document = deepcopy(test_document_data)
     url = test_case.generate_docservice_url(),
     document['url'] = url[0]
-    expected_http_status = '403 Forbidden'
+    expected_http_status = '201 Created'
 
     request_data = {'data': document}
-    response = test_case.app.post_json(test_case.ENTRYPOINTS['add_bid_document'], request_data, status=403)
+    response = test_case.app.post_json(test_case.ENTRYPOINTS['add_bid_document'], request_data)
     test_case.assertEqual(expected_http_status, response.status)
 
 
