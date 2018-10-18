@@ -1,12 +1,19 @@
 # -*- coding: utf-8 -*-
-from schematics.exceptions import ValidationError
+from schematics.exceptions import (
+    ModelValidationError,
+    ModelConversionError,
+    ValidationError
+)
+from jsonpatch import JsonPointerException
 from schematics.types import BaseType
 from openprocurement.auctions.core.validation import (
-    validate_data
+    validate_json_data,
+    error_handler
 )
 
 from openprocurement.auctions.core.utils import (
-    get_now
+    get_now,
+    apply_data_patch
 )
 from openprocurement.auctions.geb.constants import (
     AUCTION_DOCUMENT_STATUSES,
@@ -23,6 +30,66 @@ from openprocurement.auctions.geb.constants import (
     PROCEDURE_DOCUMENT_STATUSES,
     AUCTION_STATUS_FOR_PATCHING_BIDS
 )
+
+# base validators
+
+
+def _get_contexture_to_patch(request, model):
+    initial_data = request.context.serialize()
+    contexture = model(initial_data)
+    contexture.__parent__ = request.context.__parent__
+    return contexture
+
+
+def _get_role_to_patch(contexture):
+    role = contexture.get_role()
+    return role
+
+
+def _revel_patch(contexture, data):
+    patch = apply_data_patch(contexture.serialize(), data)
+    return patch
+
+
+def impose_patch(contexture, patch):
+    contexture.import_data(patch, partial=True, strict=True)
+
+
+def _validate_patch_data(request, model, data):
+    contexture = _get_contexture_to_patch(request, model)
+    contexture_to_patch = _get_contexture_to_patch(request, model)
+    method = contexture_to_patch.to_patch
+    role = _get_role_to_patch(contexture)
+
+    patch = _revel_patch(contexture_to_patch, data)
+    # check if data received make patch
+    if patch:
+        # apply patch to contexture
+        impose_patch(contexture_to_patch, patch)
+        # serialize and cut off not valid fields
+        data = method(role)
+        # check if patch include valid fields
+        patch = _revel_patch(contexture_to_patch, data)
+        if patch:
+            impose_patch(contexture_to_patch, patch)
+            contexture = contexture_to_patch
+
+    contexture.validate()
+    request.validated['data'] = method(role)
+
+
+def validate_patch_data(request, model, data):
+    try:
+        _validate_patch_data(request, model, data)
+    except (ModelValidationError, ModelConversionError) as e:
+        for i in e.message:
+            request.errors.add('body', i, e.message[i])
+        request.errors.status = 422
+        raise error_handler(request)
+    except JsonPointerException as err:
+        request.errors.add('body', 'data', err.message)
+        request.errors.status = 422
+        raise error_handler(request)
 
 # patch bid validators
 
@@ -162,7 +229,8 @@ def validate_bid_delete_period(request, **kwargs):
 
 
 def validate_patch_auction_data(request, **kwargs):
-    validate_data(request, request.auction.__class__)
+    data = validate_json_data(request)
+    validate_patch_data(request, request.auction.__class__, data)
 
 
 def validate_document_adding_period(request):

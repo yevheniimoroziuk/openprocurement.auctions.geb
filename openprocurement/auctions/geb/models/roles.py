@@ -177,47 +177,9 @@ auction_enquiry_role = whitelist(
     'value'
 )
 
-auction_edit_enquiry_role = whitelist(
-    'bankAccount',
-    'budgetSpent',
-    'contractTerms',
-    'description',
-    'description_en',
-    'description_ru',
-    'guarantee',
-    'items',
-    'lotHolder',
-    'lotIdentifier',
-    'minimalStep',
-    'procuringEntity',
-    'registrationFee',
-    'tenderAttempts',
-    'title',
-    'title_en',
-    'title_ru',
-    'value'
-)
+auction_edit_enquiry_role = whitelist()
 
-auction_edit_tendering_role = whitelist(
-    'bankAccount',
-    'budgetSpent',
-    'contractTerms',
-    'description',
-    'description_en',
-    'description_ru',
-    'guarantee',
-    'items',
-    'lotHolder',
-    'lotIdentifier',
-    'minimalStep',
-    'procuringEntity',
-    'registrationFee',
-    'tenderAttempts',
-    'title',
-    'title_en',
-    'title_ru',
-    'value'
-)
+auction_edit_tendering_role = whitelist()
 
 auction_edit_rectification_role = whitelist(
     'bankAccount',
@@ -233,7 +195,6 @@ auction_edit_rectification_role = whitelist(
     'minimalStep',
     'procuringEntity',
     'registrationFee',
-    'minNumberOfQualifiedBids',
     'tenderAttempts',
     'title',
     'title_en',

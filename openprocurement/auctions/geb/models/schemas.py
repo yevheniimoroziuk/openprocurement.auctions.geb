@@ -166,7 +166,7 @@ class AuctionAuctionPeriod(Period):
         if self.endDate:
             return
         auction = self.__parent__
-        if auction.status in ['draft']:
+        if auction.status in ['draft'] or not auction.enquiryPeriod:
             return
         start_after = auction.enquiryPeriod.endDate
         return rounding_shouldStartAfter(start_after, auction).isoformat()

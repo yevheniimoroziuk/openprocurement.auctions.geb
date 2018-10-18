@@ -2,11 +2,114 @@
 from copy import deepcopy
 from openprocurement.auctions.core.tests.base import (
     test_document_data,
+    test_organization
 )
 from openprocurement.auctions.geb.tests.fixtures.common import (
     test_question_data,
     test_bid_data
 )
+
+
+def auction_change_fields(test_case):
+    new_data = {}
+
+    field = "title"
+    new_value = 'New Title'
+    new_data[field] = new_value
+
+    field = "bankAccount"
+    new_value = {
+        "bankName": "New Test bank name",
+        "description": u"Test Bank Account",
+        "accountIdentification": [{
+            "scheme": u'UA-EDR',
+            "id": u"66113000-5",
+            "description": u"Test"
+        }]
+    }
+    new_data[field] = new_value
+
+    field = "budgetSpent"
+    new_value = {
+        "amount": 42,
+        "currency": u"UAH"
+    }
+    new_data[field] = new_value
+
+    field = "contractTerms"
+    new_value = {
+        "type": "lease",
+        "leaseTerms": {
+            "leaseDuration": "P11Y",
+        }
+    }
+    new_data[field] = new_value
+
+    field = "description"
+    new_value = 'New description'
+    new_data[field] = new_value
+
+    field = "guarantee"
+    new_value = {
+        "amount": 42,
+        "currency": u"UAH"
+    }
+    new_data[field] = new_value
+
+    field = "guarantee"
+    new_value = {
+        "amount": 42,
+        "currency": u"UAH"
+    }
+
+    field = "lotHolder"
+    new_lotHolder = test_organization.copy()
+    new_lotHolder['name'] = 'New Name'
+    new_value = new_lotHolder
+    new_data[field] = new_value
+
+    field = "lotIdentifier"
+    new_value = "219570"
+    new_data[field] = new_value
+
+    field = "minimalStep"
+    new_value = {
+        "amount": 42,
+        "currency": u"UAH"
+    }
+
+    field = "procuringEntity"
+    new_procuringEntity = test_organization.copy()
+    new_procuringEntity['name'] = 'New Name'
+    new_value = new_procuringEntity
+    new_data[field] = new_value
+
+    field = "registrationFee"
+    new_value = {
+        "amount": 703,
+        "currency": u"UAH"
+    }
+    new_data[field] = new_value
+
+    field = "tenderAttempts"
+    new_value = 2
+    new_data[field] = new_value
+
+    field = "value"
+    new_value = {
+        "amount": 123,
+        "currency": u"UAH"
+    }
+    new_data[field] = new_value
+
+    request_data = {"data": new_data}
+    test_case.app.patch_json(test_case.ENTRYPOINTS['patch_auction'], request_data)
+    response = test_case.app.get(test_case.ENTRYPOINTS['get_auction'])
+    auction = response.json['data']
+
+    for field, value in new_data.items():
+        recieve_field = auction[field]
+        test_case.assertNotEqual(recieve_field, new_data[field])
 
 
 def add_offline_document(test_case):

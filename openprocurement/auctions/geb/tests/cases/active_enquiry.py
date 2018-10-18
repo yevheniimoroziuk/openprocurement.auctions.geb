@@ -20,6 +20,7 @@ from openprocurement.auctions.geb.tests.blanks.active_enquiry import (
     add_offline_document,
     add_question,
     answer_question,
+    auction_change_fields,
     get_question,
     bid_add,
     bid_add_document_in_active_status,
@@ -38,6 +39,7 @@ class StatusActiveEnquiryTest(BaseWebTest):
 
     test_bid_add = snitch(bid_add)
     test_add_question = snitch(add_question)
+    test_auction_change_fields = snitch(auction_change_fields)
 
     def setUp(self):
         super(StatusActiveEnquiryTest, self).setUp()
@@ -50,6 +52,9 @@ class StatusActiveEnquiryTest(BaseWebTest):
         self.auction = context['auction']
 
         entrypoints = {}
+        entrypoints['patch_auction'] = '/auctions/{}?acc_token={}'.format(self.auction['data']['id'],
+                                                                          self.auction['access']['token'])
+        entrypoints['get_auction'] = '/auctions/{}'.format(self.auction['data']['id'])
         entrypoints['questions'] = '/auctions/{}/questions'.format(self.auction['data']['id'])
         entrypoints['bids'] = '/auctions/{}/bids'.format(self.auction['data']['id'])
 
