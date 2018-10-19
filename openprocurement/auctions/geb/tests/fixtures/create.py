@@ -11,6 +11,7 @@ from openprocurement.auctions.geb.tests.fixtures.common import (
     test_auction_value,
     test_contractTerms,
     test_lotHolder,
+    test_bankAccount,
     test_procuringEntity,
     test_registrationFee
 )
@@ -22,6 +23,7 @@ CREATE_AUCTION_DEFAULT_FIXTURE = {
         "status": "draft",
         "auctionPeriod": test_auctionPeriod,
         "budgetSpent": test_auction_budgetSpent,
+        "bankAccount": test_bankAccount,
         "description": "test procuredure",
         "tenderAttempts": 1,
         "guarantee": test_auction_guarantee,

@@ -118,6 +118,7 @@ BID_STATUSES_FOR_DELETING = [
 ]
 
 BID_STATUSES_FOR_ADDING_BID_DOCUMENTS = [
+    'draft',
     'pending',
     'active',
 ]

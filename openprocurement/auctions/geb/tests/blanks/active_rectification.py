@@ -33,11 +33,10 @@ def change_minNumberOfQualifiedBids(test_case):
     field = "minNumberOfQualifiedBids"
 
     request_data = {"data": {field: new}}
-    response = test_case.app.patch_json(test_case.ENTRYPOINTS['patch_auction'], request_data)
-    test_case.assertEqual(new, response.json['data'][field])
+    test_case.app.patch_json(test_case.ENTRYPOINTS['patch_auction'], request_data)
 
     response = test_case.app.get(test_case.ENTRYPOINTS['get_auction'], request_data)
-    test_case.assertEqual(new, response.json['data'][field])
+    test_case.assertNotEqual(new, response.json['data'][field])
 
 
 def change_one_field_rest_same(test_case):
