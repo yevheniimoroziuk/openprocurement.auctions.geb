@@ -4,6 +4,7 @@ from openprocurement.auctions.core.managers import (
     BidDocumentManager,
     DocumentManager,
     ItemManager,
+    CancellationManager,
     QuestionManager
 )
 
@@ -17,11 +18,13 @@ from openprocurement.auctions.geb.managers.changers import (
     BidDocumentChanger,
     DocumentChanger,
     ItemChanger,
+    CancellationChanger,
     QuestionChanger
 )
 from openprocurement.auctions.geb.managers.documenters import (
     AuctionDocumenter,
-    BidDocumenter
+    BidDocumenter,
+    CancellationDocumenter
 )
 from openprocurement.auctions.geb.managers.questioners import (
     AuctionQuestioner
@@ -29,13 +32,18 @@ from openprocurement.auctions.geb.managers.questioners import (
 from openprocurement.auctions.geb.managers.itemers import (
     AuctionItemer
 )
+from openprocurement.auctions.geb.managers.cancellers import (
+    AuctionCanceller
+)
 from openprocurement.auctions.geb.managers.checkers import (
     AuctionChecker
 )
 
 from openprocurement.auctions.geb.managers.representers import (
     ItemRepresenter,
-    AuctionSubResourceRepresenter
+    CancellationRepresenter,
+    AuctionSubResourceRepresenter,
+    CancellationSubResourceRepresenter,
 )
 
 from openprocurement.auctions.geb.managers.creators import (
@@ -50,6 +58,8 @@ from openprocurement.auctions.geb.managers.deleters import (
 )
 
 from openprocurement.auctions.geb.managers.loggers import (
+    AuctionLogger,
+    CancellationLogger,
     ItemLogger
 )
 
@@ -63,7 +73,8 @@ class AuctionManager(AuctionManager):
     Initializator = AuctionInitializator
     Questioner = AuctionQuestioner
     Itemer = AuctionItemer
-    # Representer = AuctionRepresenter
+    Logger = AuctionLogger
+    Canceller = AuctionCanceller
     SubResourceRepresenter = AuctionSubResourceRepresenter
 
 
@@ -84,6 +95,14 @@ class ItemManager(ItemManager):
     Changer = ItemChanger
     Representer = ItemRepresenter
     Logger = ItemLogger
+
+
+class CancellationManager(CancellationManager):
+    Changer = CancellationChanger
+    Representer = CancellationRepresenter
+    Logger = CancellationLogger
+    Documenter = CancellationDocumenter
+    SubResourceRepresenter = CancellationSubResourceRepresenter
 
 
 class DocumentManager(DocumentManager):

@@ -1,13 +1,13 @@
 
 from openprocurement.auctions.geb.tests.fixtures.active_tendering import (
-    END_ACTIVE_TENDERING_AUCTION_DEFAULT_FIXTURE_WITH_ONE_BID,
-    END_ACTIVE_TENDERING_AUCTION_DEFAULT_FIXTURE_WITH_TWO_BIDS,
-    END_ACTIVE_TENDERING_AUCTION_DEFAULT_FIXTURE_WITH_TWO_BIDS_AND_ONE_DRAFT
+    END_ACTIVE_TENDERING_AUCTION_WITH_ONE_BID,
+    END_ACTIVE_TENDERING_AUCTION_WITH_TWO_BIDS,
+    END_ACTIVE_TENDERING_AUCTION_WITH_TWO_BIDS_AND_ONE_DRAFT
 )
 from openprocurement.auctions.geb.tests.fixtures.active_enquiry import (
-    END_ACTIVE_ENQUIRY_UNSUCCESSFUL_NO_ACTIVE_BIDS,
-    END_ACTIVE_ENQUIRY_AUCTION_DEFAULT_FIXTURE,
-    END_ACTIVE_ENQUIRY_AUCTION_QUALIFICATION
+    END_ACTIVE_ENQUIRY_AUCTION,
+    END_ACTIVE_ENQUIRY_AUCTION_QUALIFICATION,
+    END_ACTIVE_ENQUIRY_UNSUCCESSFUL_NO_ACTIVE_BIDS
 )
 
 
@@ -36,7 +36,7 @@ def check_tender_period_end_no_active_bids(test_case):
 
 
 def check_tender_period_end_no_minNumberOfQualifiedBids(test_case):
-    context = test_case.procedure.snapshot(fixture=END_ACTIVE_TENDERING_AUCTION_DEFAULT_FIXTURE_WITH_ONE_BID)
+    context = test_case.procedure.snapshot(fixture=END_ACTIVE_TENDERING_AUCTION_WITH_ONE_BID)
     auction = context['auction']
 
     request_data = {'data': {'id': auction['data']['id']}}
@@ -50,7 +50,7 @@ def check_tender_period_end_no_minNumberOfQualifiedBids(test_case):
 
 
 def check_tender_period_end_successful(test_case):
-    context = test_case.procedure.snapshot(fixture=END_ACTIVE_TENDERING_AUCTION_DEFAULT_FIXTURE_WITH_TWO_BIDS)
+    context = test_case.procedure.snapshot(fixture=END_ACTIVE_TENDERING_AUCTION_WITH_TWO_BIDS)
     auction = context['auction']
 
     request_data = {'data': {'id': auction['data']['id']}}
@@ -96,7 +96,7 @@ def check_enquiry_period_end_active_qualification(test_case):
 
 def check_enquiry_period_end_active_auction(test_case):
 
-    context = test_case.procedure.snapshot(fixture=END_ACTIVE_ENQUIRY_AUCTION_DEFAULT_FIXTURE)
+    context = test_case.procedure.snapshot(fixture=END_ACTIVE_ENQUIRY_AUCTION)
 
     auction = context['auction']
 
@@ -142,7 +142,7 @@ def chronograph(test_case, auction):
 
 
 def check_tender_period_end_delete_draft_bids(test_case):
-    context = test_case.procedure.snapshot(fixture=END_ACTIVE_TENDERING_AUCTION_DEFAULT_FIXTURE_WITH_TWO_BIDS_AND_ONE_DRAFT)
+    context = test_case.procedure.snapshot(fixture=END_ACTIVE_TENDERING_AUCTION_WITH_TWO_BIDS_AND_ONE_DRAFT)
     auction = context['auction']
     bids = context['bids']
     draft_bid = [bid for bid in bids if bid['data']['status'] == 'draft'][0]

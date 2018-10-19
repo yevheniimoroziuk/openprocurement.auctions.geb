@@ -4,10 +4,11 @@ from openprocurement.auctions.core.interfaces import (
     IAuctionChanger,
     IBidChanger,
     IBidDocumentChanger,
+    ICancellationChanger,
     IDocumentChanger,
     IItemChanger,
-    IQuestionChanger,
-    INamedValidators
+    INamedValidators,
+    IQuestionChanger
 )
 
 from openprocurement.auctions.core.utils import (
@@ -28,6 +29,10 @@ from openprocurement.auctions.geb.validation import (
     validate_bid_patch_pending,
     validate_bid_patch_active,
     validate_bid_patch_auction_period
+)
+
+from openprocurement.auctions.geb.managers.initializators import (
+    CancellationChangerInitializator
 )
 
 
@@ -186,4 +191,37 @@ class ItemChanger(object):
     def change(self):
         if self.validate():
             self._auction.modified = apply_patch(self._request, save=False, src=self._context.serialize())
+            return self._auction.modified
+
+
+@implementer(ICancellationChanger)
+class CancellationChanger(object):
+    name = 'Cancellation Changer'
+    validators = []
+    initializator = CancellationChangerInitializator
+
+    def __init__(self, request, context):
+        self._request = request
+        self._context = context
+        self._auction = context.__parent__
+        self._initializator = self.initializator(self._request, self._auction, self._context)
+
+    def validate(self):
+        for validator in self.validators:
+            if not validator(self._request, auction=self._auction, item=self._context):
+                return
+        return True
+
+    def _change(self):
+        modified = apply_patch(self._request, save=False, src=self._context.serialize())
+        return modified
+
+    def _initialize(self):
+        self._initializator.initialize()
+
+    def change(self):
+        if self.validate():
+            self._auction.modified = self._change()
+            if self._auction.modified:
+                self._initialize()
             return self._auction.modified

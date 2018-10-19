@@ -19,6 +19,10 @@ from openprocurement.auctions.geb.tests.fixtures.common import (
 from openprocurement.auctions.geb.tests.fixtures.items import (
     TEST_ITEM
 )
+from openprocurement.auctions.geb.tests.fixtures.cancellations import (
+    CANCELLATION,
+    CANCELLATION_WITH_DOCUMENTS
+)
 
 now = get_now()
 
@@ -66,3 +70,18 @@ auction['auctionPeriod'] = {
 }
 
 AUCTION_WITH_INVALID_AUCTON_PERIOD = auction
+
+auction = deepcopy(AUCTION)
+auction['_id'] = uuid4().hex
+auction['cancellations'] = [
+    CANCELLATION
+]
+AUCTION_WITH_CANCELLATION = auction
+
+
+auction = deepcopy(AUCTION_WITH_CANCELLATION)
+auction['_id'] = uuid4().hex
+auction['cancellations'] = [
+    CANCELLATION_WITH_DOCUMENTS
+]
+AUCTION_WITH_CANCELLATION_WITH_DOCUMENTS = auction

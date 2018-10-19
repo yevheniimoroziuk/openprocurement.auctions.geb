@@ -15,7 +15,17 @@ from openprocurement.auctions.geb.tests.states import (
 )
 
 from openprocurement.auctions.geb.tests.fixtures.active_rectification import (
-    ACTIVE_RECTIFICATION_AUCTION_FIXTURE_WITH_QUESTION
+    AUCTION_WITH_QUESTIONS,
+    AUCTION_WITH_CANCELLATION,
+    AUCTION_WITH_CANCELLATION_WITH_DOCUMENTS
+)
+
+from openprocurement.auctions.geb.tests.blanks.cancellations import (
+    cancellation_post
+)
+from openprocurement.auctions.geb.tests.blanks.mixins import (
+    CancellationWorkFlowMixin,
+    CancellationDocumentsWorkFlowMixin
 )
 
 from openprocurement.auctions.geb.tests.blanks.active_rectification import (
@@ -28,27 +38,29 @@ from openprocurement.auctions.geb.tests.blanks.active_rectification import (
     change_contractTerms,
     change_desctiption,
     change_guarantee,
-    change_items_collections,
-    change_items_singly,
     change_lotHolder,
     change_lotIdentifier,
+    change_minNumberOfQualifiedBids,
     change_minimalStep,
     change_one_field_rest_same,
     change_procuringEntity,
-    change_minNumberOfQualifiedBids,
     change_registrationFee,
     change_tenderAttempts,
     change_title,
     change_value,
-    get_items_collection,
     get_question,
+    item_patch,
+    item_get,
+    items_get_listing,
+    items_patch_collections,
     patch_document
 )
 
 
-class StatusActiveRectificationChangeFieldTest(BaseWebTest):
+class StatusActiveRectificationTest(BaseWebTest):
 
     test_add_question = snitch(add_question)
+    test_cancellation_post = snitch(cancellation_post)
     test_change_title = snitch(change_title)
     test_change_description = snitch(change_desctiption)
     test_change_tenderAttempts = snitch(change_tenderAttempts)
@@ -66,22 +78,25 @@ class StatusActiveRectificationChangeFieldTest(BaseWebTest):
     test_change_one_field_rest_same = snitch(change_one_field_rest_same)
 
     def setUp(self):
-        super(StatusActiveRectificationChangeFieldTest, self).setUp()
+        super(StatusActiveRectificationTest, self).setUp()
 
         procedure = ProcedureMachine()
         procedure.set_db_connector(self.db)
         change_machine_state(procedure, 'active.rectification')
         context = procedure.snapshot()
-        self.auction = context['auction']
-        self.items = context['items']
+        auction = context['auction']
+        items = context['items']
 
         entrypoints = {}
 
-        entrypoints['patch_auction'] = '/auctions/{}?acc_token={}'.format(self.auction['data']['id'],
-                                                                          self.auction['access']['token'])
-        entrypoints['post_question'] = '/auctions/{}/questions'.format(self.auction['data']['id'])
-        entrypoints['get_auction'] = '/auctions/{}'.format(self.auction['data']['id'])
-
+        entrypoints['patch_auction'] = '/auctions/{}?acc_token={}'.format(auction['data']['id'],
+                                                                          auction['access']['token'])
+        entrypoints['post_question'] = '/auctions/{}/questions'.format(auction['data']['id'])
+        entrypoints['get_auction'] = '/auctions/{}'.format(auction['data']['id'])
+        entrypoints['post_cancellation'] = '/auctions/{}/cancellations?acc_token={}'.format(auction['data']['id'],
+                                                                                            auction['access']['token'])
+        self.auction = auction
+        self.items = items
         self.ENTRYPOINTS = entrypoints
 
 
@@ -96,7 +111,7 @@ class StatusActiveRectificationQuestionsTest(BaseWebTest):
         procedure = ProcedureMachine()
         procedure.set_db_connector(self.db)
         procedure.toggle('active.rectification')
-        context = procedure.snapshot(fixture=ACTIVE_RECTIFICATION_AUCTION_FIXTURE_WITH_QUESTION)
+        context = procedure.snapshot(fixture=AUCTION_WITH_QUESTIONS)
 
         self.auction = context['auction']
         self.question = context['questions'][0]
@@ -114,9 +129,10 @@ class StatusActiveRectificationQuestionsTest(BaseWebTest):
 
 class StatusActiveRectificationItemsTest(BaseWebTest):
 
-    test_change_items_collections = snitch(change_items_collections)
-    test_change_items_singly = snitch(change_items_singly)
-    test_get_items_collection = snitch(get_items_collection)
+    test_item_get = snitch(item_get)
+    test_item_patch = snitch(item_patch)
+    test_items_get_listing = snitch(items_get_listing)
+    test_items_patch_collections = snitch(items_patch_collections)
 
     def setUp(self):
         super(StatusActiveRectificationItemsTest, self).setUp()
@@ -167,12 +183,81 @@ class StatusActiveRectificationDocumentTest(BaseWebTest):
         self.procedure = procedure
 
 
+class StatusActiveRectificationCancellationsTest(BaseWebTest, CancellationWorkFlowMixin):
+    docservice = True
+
+    def setUp(self):
+        super(StatusActiveRectificationCancellationsTest, self).setUp()
+
+        procedure = ProcedureMachine()
+        procedure.set_db_connector(self.db)
+        procedure.toggle('active.rectification')
+        context = procedure.snapshot(fixture=AUCTION_WITH_CANCELLATION)
+
+        auction = context['auction']
+        cancellation = context['cancellations'][0]
+
+        entrypoints = {}
+        entrypoints['get_auction'] = '/auctions/{}'.format(auction['data']['id'])
+
+        entrypoints['patch_cancellation'] = '/auctions/{}/cancellations/{}?acc_token={}'.format(auction['data']['id'],
+                                                                                                cancellation['data']['id'],
+                                                                                                auction['access']['token'])
+
+        entrypoints['get_cancellation'] = '/auctions/{}/cancellations/{}'.format(auction['data']['id'],
+                                                                                 cancellation['data']['id'])
+
+        entrypoints['cancellation_document_post'] = '/auctions/{}/cancellations/{}/documents?acc_token={}'.format(auction['data']['id'],
+                                                                                                                  cancellation['data']['id'],
+                                                                                                                  auction['access']['token'])
+        entrypoints['get_cancellations_listing'] = '/auctions/{}/cancellations'.format(auction['data']['id'])
+
+        self.auction = auction
+        self.cancellation = cancellation
+        self.cancellations = context['cancellations']
+        self.ENTRYPOINTS = entrypoints
+
+
+class StatusActiveRectificationCancellationsDocumentsTest(BaseWebTest, CancellationDocumentsWorkFlowMixin):
+    docservice = True
+
+    def setUp(self):
+        super(StatusActiveRectificationCancellationsDocumentsTest, self).setUp()
+
+        procedure = ProcedureMachine()
+        procedure.set_db_connector(self.db)
+        procedure.toggle('draft')
+        context = procedure.snapshot(fixture=AUCTION_WITH_CANCELLATION_WITH_DOCUMENTS)
+
+        auction = context['auction']
+        cancellation = context['cancellations'][0]
+        document = cancellation['data']['documents'][0]
+        documents = cancellation['data']['documents']
+
+        entrypoints = {}
+        entrypoints['cancellation_document_listing'] = '/auctions/{}/cancellations/{}/documents?acc_token={}'.format(auction['data']['id'],
+                                                                                                                     cancellation['data']['id'],
+                                                                                                                     auction['access']['token'])
+
+        entrypoints['cancellation_document'] = '/auctions/{}/cancellations/{}/documents/{}?acc_token={}'.format(auction['data']['id'],
+                                                                                                                cancellation['data']['id'],
+                                                                                                                document['id'],
+                                                                                                                auction['access']['token'])
+
+        self.auction = auction
+        self.cancellation = cancellation
+        self.documents = documents
+        self.ENTRYPOINTS = entrypoints
+
+
 def suite():
     suite = unittest.TestSuite()
-    suite.addTest(unittest.makeSuite(StatusActiveRectificationChangeFieldTest))
+    suite.addTest(unittest.makeSuite(StatusActiveRectificationTest))
     suite.addTest(unittest.makeSuite(StatusActiveRectificationDocumentTest))
     suite.addTest(unittest.makeSuite(StatusActiveRectificationQuestionsTest))
     suite.addTest(unittest.makeSuite(StatusActiveRectificationItemsTest))
+    suite.addTest(unittest.makeSuite(StatusActiveRectificationCancellationsTest))
+    suite.addTest(unittest.makeSuite(StatusActiveRectificationCancellationsDocumentsTest))
     return suite
 
 

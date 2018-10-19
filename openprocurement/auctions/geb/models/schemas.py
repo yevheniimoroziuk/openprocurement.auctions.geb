@@ -27,6 +27,7 @@ from openprocurement.auctions.core.models import (
     Value,
     dgfCDB2Item as BaseItem,
     dgfDocument as BaseDocument,
+    dgfCancellation as BaseCancellation,
     validate_items_uniq
 )
 from openprocurement.auctions.core.plugins.awarding.v2_1.models import Award
@@ -44,6 +45,8 @@ from openprocurement.auctions.core.validation import (
 from openprocurement.auctions.geb.interfaces import (
     IAuction,
     IBid,
+    ICancellation,
+    ICancellationDocument,
     IDocument,
     IBidDocument,
     IItem,
@@ -54,6 +57,7 @@ from openprocurement.auctions.geb.utils import get_auction
 
 from openprocurement.auctions.geb.constants import (
     AUCTION_DOCUMENT_TYPES,
+    CANCELLATION_DOCUMENT_TYPES,
     AUCTION_STATUSES,
     BID_DOCUMENT_TYPES,
     BID_STATUSES,
@@ -101,11 +105,24 @@ class AuctionDocument(BaseDocument):
     documentType = StringType(choices=AUCTION_DOCUMENT_TYPES)
 
 
+@implementer(ICancellationDocument)
+class CancellationDocument(BaseDocument):
+
+    documentOf = StringType(required=True, choices=['cancellation'], default='cancellation')
+
+    documentType = StringType(choices=CANCELLATION_DOCUMENT_TYPES)
+
+
 @implementer(IBidDocument)
 class BidDocument(BaseDocument):
     documentOf = StringType(required=True, choices=['bid'], default='bid')
 
     documentType = StringType(choices=BID_DOCUMENT_TYPES)
+
+
+@implementer(ICancellation)
+class Cancellation(BaseCancellation):
+    documents = ListType(ModelType(CancellationDocument), default=list())
 
 
 @implementer(IQuestion)
@@ -329,6 +346,8 @@ class Auction(BaseAuction):
 
     contractTerms = ModelType(ContractTerms,
                               required=True)
+
+    cancellations = ListType(ModelType(Cancellation), default=list())
 
     lotIdentifier = StringType(required=True)
 

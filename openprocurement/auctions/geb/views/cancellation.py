@@ -1,7 +1,20 @@
 # -*- coding: utf-8 -*-
-from openprocurement.auctions.core.utils import opresource
-from openprocurement.auctions.core.views.mixins import AuctionCancellationResource
-from openprocurement.auctions.core.interfaces import IAuctionManager
+from zope.interface import implementedBy
+from openprocurement.auctions.core.utils import (
+    APIResource,
+    json_view,
+    opresource
+)
+from openprocurement.auctions.core.interfaces import (
+    IAuctionManager,
+    ICancellationManager
+)
+from openprocurement.auctions.core.validation import (
+    validate_cancellation_data,
+)
+from openprocurement.auctions.geb.validation import (
+    validate_patch_auction_data
+)
 
 
 @opresource(name='geb:Auction Cancellations',
@@ -9,25 +22,53 @@ from openprocurement.auctions.core.interfaces import IAuctionManager
             path='/auctions/{auction_id}/cancellations/{cancellation_id}',
             auctionsprocurementMethodType="geb",
             description="Auction cancellations")
-class AuctionCancellationResource(AuctionCancellationResource):
+class AuctionCancellationResource(APIResource):
 
-    def cancel_lot(self, cancellation=None):                                    # TODO check and implement
+    @json_view(content_type="application/json", validators=(validate_cancellation_data,), permission='edit_auction')
+    def collection_post(self):
+        """
+        Auction Cancellations
+        """
+        save = None
 
-        if not cancellation:
-            cancellation = self.context
-        auction = self.request.validated['auction']
-        adapter = self.request.registry.getAdapter(auction, IAuctionManager)
-        [setattr(i, 'status', 'cancelled') for i in auction.lots if i.id == cancellation.relatedLot]
-        statuses = set([lot.status for lot in auction.lots])
-        if statuses == set(['cancelled']):
-            self.cancel_auction()
-        elif not statuses.difference(set(['unsuccessful', 'cancelled'])):
-            adapter.pendify_auction_status('unsuccessful')
-        elif not statuses.difference(set(['complete', 'unsuccessful', 'cancelled'])):
-            adapter.pendify_auction_status('complete')
-        if auction.status == 'active.auction' and all([
-            i.auctionPeriod and i.auctionPeriod.endDate
-            for i in self.request.validated['auction'].lots
-            if i.numberOfBids > 1 and i.status == 'active'
-        ]):
-            self.request.content_configurator.start_awarding()
+        manager = self.request.registry.queryMultiAdapter((self.request, self.context), IAuctionManager)
+
+        cancellation = manager.cancel()
+        save = manager.save()
+
+        if save:
+            msg = 'Create auction cancellation {}'.format(cancellation['id'])
+            manager.log_action('auction_cancellation_create', msg)
+            return manager.represent_subresource_created(cancellation)
+
+    @json_view(permission='view_auction')
+    def collection_get(self):
+        """Auction Cancellations List"""
+
+        manager = self.request.registry.queryMultiAdapter((self.request, self.context), IAuctionManager)
+        cancellation_type = type(manager.context).cancellations.model_class
+        return manager.represent_subresources_listing(implementedBy(cancellation_type))
+
+    @json_view(permission='view_auction')
+    def get(self):
+        """
+        Auction Cancellation Get
+        """
+        manager = self.request.registry.queryMultiAdapter((self.request, self.context), ICancellationManager)
+        return manager.represent(self.request.method)
+
+    @json_view(content_type="application/json", validators=(validate_patch_auction_data,),
+               permission='edit_auction')
+    def patch(self):
+        """
+        Patch the cancellation
+        """
+        manager = self.request.registry.queryMultiAdapter((self.request, self.context), ICancellationManager)
+
+        manager.change()
+        save = manager.save()
+
+        if save:
+            msg = 'Updated auction cancellation {}'.format(manager.context.id)
+            manager.log_action('auction_cancellation_patch', msg)
+            return manager.represent(self.request.method)

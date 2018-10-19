@@ -37,7 +37,7 @@ from openprocurement.auctions.geb.tests.states import (
 )
 
 from openprocurement.auctions.geb.tests.fixtures.active_tendering import (
-    ACTIVE_TENDERING_AUCTION_DEFAULT_FIXTURE_WITH_QUESTION,
+    AUCTION_WITH_QUESTIONS as ACTIVE_TENDERING_AUCTION_WITH_QUESTION,
     AUCTION_WITH_DRAFT_BID,
     AUCTION_WITH_PENDING_BID
 )
@@ -134,7 +134,7 @@ class TenderingAuctionQuestionsDumpTest(BaseWebDocsTest):
         procedure = ProcedureMachine()
         procedure.set_db_connector(self.db)
         procedure.toggle('active.tendering')
-        context = procedure.snapshot(fixture=ACTIVE_TENDERING_AUCTION_DEFAULT_FIXTURE_WITH_QUESTION)
+        context = procedure.snapshot(fixture=ACTIVE_TENDERING_AUCTION_WITH_QUESTION)
 
         self.auction = context['auction']
         self.questions = context['questions']

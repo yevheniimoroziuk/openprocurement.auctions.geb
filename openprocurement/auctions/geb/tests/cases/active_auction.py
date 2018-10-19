@@ -7,12 +7,24 @@ from openprocurement.auctions.geb.tests.base import (
 from openprocurement.auctions.geb.tests.states import (
     ProcedureMachine
 )
+from openprocurement.auctions.geb.tests.blanks.mixins import (
+    CancellationWorkFlowMixin,
+    CancellationDocumentsWorkFlowMixin
+)
+from openprocurement.auctions.geb.tests.fixtures.active_enquiry import (
+    AUCTION_WITH_CANCELLATION,
+    AUCTION_WITH_CANCELLATION_WITH_DOCUMENTS,
+    AUCTION_WITH_BIDS_WITH_CANCELLATION
+)
 from openprocurement.auctions.geb.tests.blanks.active_auction import (
     get_auction_auction,
     update_auction_urls,
     switch_to_qualification,
     switch_to_unsuccessful,
     get_participation_urls
+)
+from openprocurement.auctions.geb.tests.blanks.cancellations import (
+    cancellation_make_clean_bids
 )
 
 
@@ -35,9 +47,107 @@ class StatusActiveAuctionTest(BaseWebTest):
         self.app.authorization = ('Basic', ('auction', ''))
 
 
+class StatusActiveAuctionCancellationsTest(BaseWebTest, CancellationWorkFlowMixin):
+    docservice = True
+
+    def setUp(self):
+        super(StatusActiveAuctionCancellationsTest, self).setUp()
+
+        procedure = ProcedureMachine()
+        procedure.set_db_connector(self.db)
+        procedure.toggle('active.auction')
+        context = procedure.snapshot(fixture=AUCTION_WITH_CANCELLATION)
+
+        auction = context['auction']
+        cancellation = context['cancellations'][0]
+
+        entrypoints = {}
+        entrypoints['get_auction'] = '/auctions/{}'.format(auction['data']['id'])
+
+        entrypoints['patch_cancellation'] = '/auctions/{}/cancellations/{}?acc_token={}'.format(auction['data']['id'],
+                                                                                                cancellation['data']['id'],
+                                                                                                auction['access']['token'])
+
+        entrypoints['get_cancellation'] = '/auctions/{}/cancellations/{}'.format(auction['data']['id'],
+                                                                                 cancellation['data']['id'])
+
+        entrypoints['cancellation_document_post'] = '/auctions/{}/cancellations/{}/documents?acc_token={}'.format(auction['data']['id'],
+                                                                                                                  cancellation['data']['id'],
+                                                                                                                  auction['access']['token'])
+        entrypoints['get_cancellations_listing'] = '/auctions/{}/cancellations'.format(auction['data']['id'])
+
+        self.auction = auction
+        self.cancellation = cancellation
+        self.cancellations = context['cancellations']
+        self.ENTRYPOINTS = entrypoints
+
+
+class StatusActiveAuctionWithBidsCancellationsTest(BaseWebTest):
+    test_cancellation_make_clean_bids = snitch(cancellation_make_clean_bids)
+
+    def setUp(self):
+        super(StatusActiveAuctionWithBidsCancellationsTest, self).setUp()
+
+        procedure = ProcedureMachine()
+        procedure.set_db_connector(self.db)
+        procedure.toggle('active.tendering')
+        context = procedure.snapshot(fixture=AUCTION_WITH_BIDS_WITH_CANCELLATION)
+
+        auction = context['auction']
+        bids = context['bids']
+        cancellation = context['cancellations'][0]
+
+        entrypoints = {}
+        entrypoints['get_auction'] = '/auctions/{}'.format(auction['data']['id'])
+        entrypoints['patch_cancellation'] = '/auctions/{}/cancellations/{}?acc_token={}'.format(auction['data']['id'],
+                                                                                                cancellation['data']['id'],
+                                                                                                auction['access']['token'])
+
+        self.auction = auction
+        self.bids = bids
+        self.cancellation = cancellation
+        self.cancellations = context['cancellations']
+        self.ENTRYPOINTS = entrypoints
+
+
+class StatusActiveAuctionCancellationsDocumentsTest(BaseWebTest, CancellationDocumentsWorkFlowMixin):
+    docservice = True
+
+    def setUp(self):
+        super(StatusActiveAuctionCancellationsDocumentsTest, self).setUp()
+
+        procedure = ProcedureMachine()
+        procedure.set_db_connector(self.db)
+        procedure.toggle('draft')
+        context = procedure.snapshot(fixture=AUCTION_WITH_CANCELLATION_WITH_DOCUMENTS)
+
+        auction = context['auction']
+        cancellation = context['cancellations'][0]
+        document = cancellation['data']['documents'][0]
+        documents = cancellation['data']['documents']
+
+        entrypoints = {}
+        entrypoints['cancellation_document_listing'] = '/auctions/{}/cancellations/{}/documents?acc_token={}'.format(auction['data']['id'],
+                                                                                                                     cancellation['data']['id'],
+                                                                                                                     auction['access']['token'])
+
+        entrypoints['cancellation_document'] = '/auctions/{}/cancellations/{}/documents/{}?acc_token={}'.format(auction['data']['id'],
+                                                                                                                cancellation['data']['id'],
+                                                                                                                document['id'],
+                                                                                                                auction['access']['token'])
+
+        self.auction = auction
+        self.cancellation = cancellation
+        self.documents = documents
+        self.ENTRYPOINTS = entrypoints
+
+
 def suite():
     suite = unittest.TestSuite()
     suite.addTest(unittest.makeSuite(StatusActiveAuctionTest))
+    suite.addTest(unittest.makeSuite(StatusActiveAuctionCancellationsTest))
+    suite.addTest(unittest.makeSuite(StatusActiveAuctionWithBidsCancellationsTest))
+    suite.addTest(unittest.makeSuite(StatusActiveAuctionCancellationsDocumentsTest))
     return suite
 
 

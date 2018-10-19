@@ -7,7 +7,7 @@ from openprocurement.auctions.core.interfaces import (
 
 @implementer(IAuctionItemer)
 class AuctionItemer(object):
-    name = 'Auction Questioner'
+    name = 'Auction Itemer'
     validators = []
 
     def __init__(self, request, context):

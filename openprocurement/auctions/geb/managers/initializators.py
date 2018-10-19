@@ -4,6 +4,7 @@ from datetime import timedelta
 
 from openprocurement.auctions.core.interfaces import (
     IAuctionInitializator,
+    ICancellationChangerInitializator,
     IBidInitializator
 )
 
@@ -18,6 +19,10 @@ from openprocurement.auctions.geb.constants import (
 )
 from openprocurement.auctions.geb.validation import (
     validate_bid_initialization,
+)
+
+from openprocurement.auctions.geb.constants import (
+    AUCTION_STATUSES_FOR_CLEAN_BIDS_IN_CANCELLATION
 )
 
 
@@ -157,3 +162,56 @@ class BidInitializator(object):
         if self._auction.modified and self.validate():
             self._initialize_qualified()
             self._initialize_date()
+
+
+@implementer(ICancellationChangerInitializator)
+class CancellationChangerInitializator(object):
+    name = 'Cancellation Changer Initializator'
+
+    def __init__(self, request, auction, context):
+        self._request = request
+        self._auction = auction
+        self._context = context
+
+    def _validate(self, status):
+        for validator in self.validators:
+            if validator.name == status:
+                break
+        else:
+            return True
+        for validator in validator.validators:
+            if not validator(self._request):
+                return False
+        return True
+
+    def _check_demand(self):
+        resource_src = self._request.validated['resource_src']
+        # activate cancellation
+        if self._context.status == 'active' and resource_src['status'] == 'pending':
+            return True
+        return False
+
+    def _pendify_auction_status(self, context, target_status):
+        pending_prefix = 'pending'
+
+        if (
+            getattr(self._context, 'merchandisingObject', False)  # indicates registry integration
+            and not self._context.merchandisingObject
+            and self.allow_pre_terminal_statuses  # allows to manage using of preterm statuses
+        ):
+            status = '{0}.{1}'.format(pending_prefix, target_status)
+        else:
+            status = target_status
+
+        context.status = status
+
+    def _clean_procedure(self):
+        auction_status = self._request.validated['auction_src']['status']
+
+        if auction_status in AUCTION_STATUSES_FOR_CLEAN_BIDS_IN_CANCELLATION:
+            self._auction.bids = []
+
+    def initialize(self):
+        if self._check_demand():
+            self._pendify_auction_status(self._auction, 'cancelled')
+            self._clean_procedure()

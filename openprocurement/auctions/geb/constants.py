@@ -39,6 +39,8 @@ BID_DOCUMENT_TYPES = [
     'qualificationDocuments',
     'eligibilityDocuments',
 ]
+
+CANCELLATION_DOCUMENT_TYPES = ['cancellationDetails']
 NUMBER_OF_BIDS_TO_BE_QUALIFIED = 2
 
 DEFAULT_LEVEL_OF_ACCREDITATION = {
@@ -70,7 +72,11 @@ AUCTION_STATUS_FOR_ACTIVATING_BIDS = [
     'active.tendering',
     'active.enquiry'
 ]
-
+AUCTION_STATUSES_FOR_CLEAN_BIDS_IN_CANCELLATION = [
+    'active.tendering',
+    'active.enquiry',
+    'active.auction'
+]
 AUCTION_STATUS_FOR_PATCHING_BIDS = [
     'active.tendering',
     'active.enquiry'
@@ -104,7 +110,6 @@ AUCTION_STATUS_FOR_ADDING_BID_DOCUMENTS = [
     'active.enquiry',
     'active.qualification'
 ]
-
 BID_STATUSES_FOR_PATCHING = [
     'pending',
     'active',
