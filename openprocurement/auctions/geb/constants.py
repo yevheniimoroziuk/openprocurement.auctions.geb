@@ -8,8 +8,6 @@ EDIT_AUCTION_DOCUMENT_STATUSES = ['active.rectification', 'active.tendering', 'a
 
 # duration of periods
 RECTIFICATION_PERIOD_DURATION = timedelta(hours=48)
-MIN_NUMBER_OF_TENDERING_DURATION = timedelta(days=6)
-MIN_NUMBER_OF_ENQUIRING_DURATION = timedelta(days=10)
 
 
 # documets
