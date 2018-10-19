@@ -11,7 +11,7 @@ Schema
 ------
 
 :name:
-  string, multilingual, optional
+  string, multilingual, required
     
   Name of the organization.
     
@@ -21,7 +21,7 @@ Schema
   The primary identifier for this organization. 
     
 :additionalIdentifiers:
-  List of :ref:`identifier` objects, optional
+  Array of :ref:`identifier` objects, optional
 
 :address:
   :ref:`Address`, required
@@ -30,7 +30,7 @@ Schema
   :ref:`ContactPoint`, required
 
 :additionalContactPoints:
-    Array of :ref:`ContactPoint` objects, optional
+  Array of :ref:`ContactPoint` objects, optional
 
 .. index:: Company, id
 

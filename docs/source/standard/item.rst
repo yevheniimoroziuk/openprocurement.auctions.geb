@@ -7,13 +7,11 @@
 Item
 ====
 
-Originates from `lot.items <http://lotsloki.api-docs.registry.ea2.openprocurement.io/en/latest/standard/item.html>`_.
-
 Schema
 ------
 
 :id:
-    uuid, auto-generated, required
+    uuid, auto-generated, read-only
 
     Internal identifier for this item.
 
@@ -34,7 +32,9 @@ Schema
     `classification.id` should be valid `CPV` or `CAV-PS` code.
 
 :additionalClassifications:
-   Array of :ref:`Classification` objects, optional
+    Array of :ref:`Classification` objects, optional (required for kvtspz & cadastralNumber)
+
+    An array of additional classifications for the item. Necessarily addition kvtspz & cadastralNumber.
 
     |ocdsDescription|
     An array of additional classifications for the item. See the
@@ -73,9 +73,6 @@ Schema
         string, optional, usually not used
 
     `location` usually takes precedence over `address` if both are present.
-
-:registrationDetails:
-    :ref:`registrationDetails`, required
 
 .. _Classification:
 
@@ -132,36 +129,3 @@ Schema
 
     |ocdsDescription|
     Name of the unit
-
-.. _registrationDetails:
-
-Registration Details
-====================
-
-Schema
-------
-
-:status:
-    string, required
-
-    Possible values are:
-
-    :`unknown`: 
-        default value;
-    :`registering`:
-        item is still registering;
-    :`complete`:
-        item has already been registered.
-
-:registrationID:
-    string, optional
-
-    The document identifier to refer to in the `paper` documentation.
-
-    Available for mentioning in status: complete.
-
-:registrationDate:
-    :ref:`Date`, optional
-
-    |ocdsDescription|
-    The date on which the document was first published.

@@ -38,7 +38,6 @@ Status Workflow
             "active.qualification" -> "unsuccessful" [color="0.0000 0.0000 0.3882"];
             edge[style=solid];
             "active.awarded" -> "unsuccessful" [color="0.0000 0.0000 0.3882"];
-    
     }
 
 Roles
@@ -78,8 +77,6 @@ Status Workflow
             "active.awarded" -> "complete" [color="0.7777 1.0000 0.5020"];         
         color=white;
         }
-
-
         edge[style=solid]
         "active.tendering" -> "unsuccessful" [color="0.0000 0.0000 0.3882"];
         edge[style=solid]
@@ -90,7 +87,6 @@ Status Workflow
         "active.qualification" -> "unsuccessful" [color="0.0000 0.0000 0.3882"];
         edge[style=solid];
         "active.awarded" -> "unsuccessful" [color="0.0000 0.0000 0.3882"];
-
     }
 
 Roles

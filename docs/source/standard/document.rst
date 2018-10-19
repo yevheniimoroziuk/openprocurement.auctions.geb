@@ -14,10 +14,10 @@ Schema
 :id:
     uuid, auto-generated, read-only
 
-    Internal identifier of the object within an array.
+    Internal identifier of document.
 
 :documentType:
-    string, required
+    string, optional
 
     Possible values for :ref:`auction` / :ref:`item`
 
@@ -37,10 +37,6 @@ Schema
 
       Including replies to issues raised in pre-bid conferences.
 
-    * `bidders` - **Information on bidders**
-
-      Information on bidders or participants, their validation documents and any procedural exemptions for which they qualify.
-
     * `illustration` - **Illustrations**
 
     * `x_PublicAssetCertificate` - **Public Asset Certificate**
@@ -54,10 +50,6 @@ Schema
     * `x_nda` - **Non-disclosure Agreement (NDA)**
 
       A non-disclosure agreement between a participant and a bank/Deposit Guarantee Fund.
-
-    * `x_PlatformLegalDetails` - **Platform Legal Details**
-
-      Place and application forms for participation in the auction as well as bank details for transferring guarantee deposits.
 
     * `x_dgfAssetFamiliarization` - **Asset Familiarization**
 
@@ -78,6 +70,16 @@ Schema
     * `x_qualificationDocuments` - **Qualification documents**
 
     List of documents that confirming the qualification of the participant.
+
+    * `cancellationDetails` - **Details of cancellation** 
+
+    Document containing information on the reasons for cancellation.
+
+    * `complaints` - **Complaints and decisions**
+
+    * `x_virtualDataRoom` - **Virtual Data Room**
+    
+    * `x_financialLicense` - **License**
 
     Possible values for :ref:`bid`
 
@@ -170,19 +172,19 @@ Schema
     The format of the document taken from the `IANA Media Types code list <http://www.iana.org/assignments/media-types/>`_, with the addition of one extra value for 'offline/print', used when this document entry is being used to describe the offline publication of a document.
 
 :url:
-    string, auto-generated
+    string, auto-generated, read-only
 
     |ocdsDescription|
     Direct link to the document or attachment.
 
 :datePublished:
-    string, :ref:`date`, auto-generated
+    string, :ref:`date`, auto-generated, read-only
 
     |ocdsDescription|
     The date on which the document was first published.
 
 :dateModified:
-    string, :ref:`date`, auto-generated
+    string, :ref:`date`, auto-generated, read-only
 
     |ocdsDescription|
     Date that the document was last modified

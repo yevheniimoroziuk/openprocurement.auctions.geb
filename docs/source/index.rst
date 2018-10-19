@@ -15,6 +15,7 @@ Contents:
 
    overview
    procedureWorkflow
+   bidworkflow
    standard/index
    upload
    tutorial

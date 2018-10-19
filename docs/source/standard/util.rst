@@ -10,13 +10,13 @@ Schema
 ------
 
 :startDate:
-    string, :ref:`date`
+    :ref:`date`
 
     |ocdsDescription|
     The start date for the period.
 
 :endDate:
-    string, :ref:`date`
+    :ref:`date`
 
     |ocdsDescription|
     The end date for the period.
@@ -28,7 +28,7 @@ Schema
 Date
 ====
 
-Date/time in :ref:`date-format`.
+Date/time in `ISO 8601 <http://en.wikipedia.org/wiki/ISO_8601>`_.
 
 .. index:: Value, Currency, VAT
 .. _value:
@@ -54,7 +54,9 @@ Schema
     The currency in 3-letter ISO 4217 format.
 
 :valueAddedTaxIncluded:
-    bool, required
+    bool, optional
+
+    The default value is ``true``.
 
 .. index:: Revision, Change Tracking
 
@@ -75,7 +77,7 @@ Schema
     Should be positive.
 
 :currency:
-    string, required, default = `UAH`
+    string, required
 
     |ocdsDescription|
-    The currency in 3-letter ISO 4217 format.
+    The currency in 3-letter ISO 4217 format. `UAH` by default.
