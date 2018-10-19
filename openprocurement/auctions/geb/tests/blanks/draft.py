@@ -55,16 +55,11 @@ def check_generated_tender_period(test_case):
     tender_period = response.json['data']['tenderPeriod']
     tender_period_start_date = parse_date(tender_period['startDate'])
     tender_period_end_date = parse_date(tender_period['endDate'])
-    tender_period_duration = tender_period_end_date - tender_period_start_date
 
     # check if start date is equal to rectification period endDate
     rectification_period = response.json['data']['rectificationPeriod']
     rectification_period_end_date = parse_date(rectification_period['endDate'])
     test_case.assertEqual(rectification_period_end_date, tender_period_start_date)
-
-    # check the minimum number of days
-    expected_min_number_days = timedelta(days=6)
-    test_case.assertLessEqual(expected_min_number_days.days, tender_period_duration.days)
 
     # check if end date ends in 20:00 hour
     expected_end_time = time(hour=20, minute=0)
@@ -93,16 +88,11 @@ def check_generated_enquiry_period(test_case):
     enquiry_period = response.json['data']['enquiryPeriod']
     enquiry_period_start_date = parse_date(enquiry_period['startDate'])
     enquiry_period_end_date = parse_date(enquiry_period['endDate'])
-    enquiry_period_duration = enquiry_period_end_date - enquiry_period_start_date
 
     # check if start date is equal to rectification period startDate
     rectification_period = response.json['data']['rectificationPeriod']
     rectification_period_start_date = parse_date(rectification_period['startDate'])
     test_case.assertEqual(rectification_period_start_date, enquiry_period_start_date)
-
-    # check the minimum number of days
-    expected_min_number_days = timedelta(days=10)
-    test_case.assertLessEqual(expected_min_number_days.days, enquiry_period_duration.days)
 
     # check if end date ends in 20:00 hour
     expected_end_time = time(hour=20, minute=0)
