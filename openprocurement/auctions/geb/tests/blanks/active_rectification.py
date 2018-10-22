@@ -193,7 +193,7 @@ def change_budgetSpent(test_case):
 
 
 def change_registrationFee(test_case):
-    new = {u'currency': u'UAH', u'amount': 800.0, u'valueAddedTaxIncluded': True}
+    new = {u'currency': u'UAH', u'amount': 800.0}
     field = "registrationFee"
 
     request_data = {"data": {field: new}}

@@ -357,7 +357,7 @@ class Auction(BaseAuction):
 
     rectificationPeriod = ModelType(RectificationPeriod)
 
-    registrationFee = ModelType(Value, required=True)
+    registrationFee = ModelType(Guarantee, required=True)
 
     status = StringType(choices=AUCTION_STATUSES, default='draft')
 
