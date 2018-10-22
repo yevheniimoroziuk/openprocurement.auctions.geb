@@ -48,10 +48,18 @@ class State(object):
         if bids:
             for bid in bids:
                 info = {}
+
                 info['data'] = {'id': bid['id'],
                                 'status': bid['status']}
                 info['access'] = {'token': bid['owner_token'],
                                   'owner': bid['owner']}
+                # add bid document context
+                if bid.get('documents', None):
+                    info['data']['documents'] = []
+                    for bid_document in bid['documents']:
+                        document_info = {'data': {'id': bid_document['id']}}
+                        info['data']['documents'].append(document_info)
+
                 context['bids'].append(info)
 
         # add documents context

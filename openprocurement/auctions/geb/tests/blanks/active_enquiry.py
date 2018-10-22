@@ -341,3 +341,66 @@ def bid_make_activate(test_case):
     response = test_case.app.get(test_case.ENTRYPOINTS['bid'])
     bid = response.json['data']
     test_case.assertEqual('active', bid['status'])
+
+
+def bid_draft_patch_document(test_case):
+    patch_field = 'documentType'
+    new = 'eligibilityDocuments'
+    expected_http_status = '200 OK'
+
+    auth = test_case.app.authorization
+
+    request_data = {'data': {patch_field: new}}
+    response = test_case.app.patch_json(test_case.ENTRYPOINTS['bid_document'], request_data)
+    test_case.assertEqual(expected_http_status, response.status)
+    response = test_case.app.get(test_case.ENTRYPOINTS['bid_document'], request_data)
+    bid_document = response.json['data']
+    test_case.assertEqual(bid_document[patch_field], new)
+
+    test_case.app.authorization = auth
+
+
+def bid_draft_get_document(test_case):
+    pass
+
+
+def bid_pending_patch_document(test_case):
+    patch_field = 'documentType'
+    new = 'eligibilityDocuments'
+    expected_http_status = '200 OK'
+
+    auth = test_case.app.authorization
+
+    request_data = {'data': {patch_field: new}}
+    response = test_case.app.patch_json(test_case.ENTRYPOINTS['bid_document'], request_data)
+    test_case.assertEqual(expected_http_status, response.status)
+    response = test_case.app.get(test_case.ENTRYPOINTS['bid_document'], request_data)
+    bid_document = response.json['data']
+    test_case.assertEqual(bid_document[patch_field], new)
+
+    test_case.app.authorization = auth
+
+
+def bid_pending_get_document(test_case):
+    pass
+
+
+def bid_active_patch_document(test_case):
+    patch_field = 'documentType'
+    new = 'eligibilityDocuments'
+    expected_http_status = '200 OK'
+
+    auth = test_case.app.authorization
+
+    request_data = {'data': {patch_field: new}}
+    response = test_case.app.patch_json(test_case.ENTRYPOINTS['bid_document'], request_data)
+    test_case.assertEqual(expected_http_status, response.status)
+    response = test_case.app.get(test_case.ENTRYPOINTS['bid_document'], request_data)
+    bid_document = response.json['data']
+    test_case.assertEqual(bid_document[patch_field], new)
+
+    test_case.app.authorization = auth
+
+
+def bid_active_get_document(test_case):
+    pass

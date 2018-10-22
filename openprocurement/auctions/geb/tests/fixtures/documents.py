@@ -27,4 +27,16 @@ ELIGIBILITY_DOCUMENT = {
     "dateModified": now.isoformat()
 }
 
+BID_DOCUMENT = {
+    "hash": "md5:00000000000000000000000000000000",
+    "format": "application/msword",
+    "url": "/auctions/d1bc378e15ae4e319a9154001a7c703b/bids/1775e5e75f924a879545379d4dc7b642/documents/ae4b1e94961742e4bacd4c695ecad43f?download=dd2c4773c24148bcafb37c15e48b788d",
+    "title": "укр.doc",
+    "documentOf": "bid",
+    "datePublished": now.isoformat(),
+    "documentType": "eligibilityDocuments",
+    "id": uuid4().hex,
+    "dateModified": now.isoformat()
+}
+
 test_document_service_url = 'http://localhost/get/6f63b414f958418082d22ec971424ca4?KeyID=172d32c8&Signature=2RWdpnpuy95Gn7E2vIDsHPPeRrtZUgtS75FsMxZBllnUUXNx%2BK7WvGeTtPvxHhcFAeW6UNfGtexCH2pNPPuzCA%3D%3D'

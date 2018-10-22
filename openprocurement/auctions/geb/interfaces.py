@@ -17,5 +17,9 @@ class IDocument(Interface):
     """Interface for Geb Document"""
 
 
+class IBidDocument(Interface):
+    """Interface for Geb Bid Document"""
+
+
 class IQuestion(Interface):
     """Interface for Geb Questions"""

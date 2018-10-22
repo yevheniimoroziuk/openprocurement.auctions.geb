@@ -8,7 +8,10 @@ from openprocurement.auctions.geb.tests.fixtures.questions import (
 from openprocurement.auctions.geb.tests.fixtures.bids import (
     PENDING_BID_FIRST,
     PENDING_BID_SECOND,
-    ACTIVE_BID_FIRST
+    ACTIVE_BID_FIRST,
+    DRAFT_BID_WITH_DOCUMENT,
+    PENDING_BID_FIRST_WITH_DOCUMENT,
+    ACTIVE_BID_FIRST_WITH_DOCUMENT
 )
 from openprocurement.auctions.core.utils import get_now
 from openprocurement.auctions.geb.tests.fixtures.calculator import (
@@ -61,6 +64,23 @@ auction = deepcopy(ACTIVE_ENQUIRY_AUCTION_DEFAULT_FIXTURE)
 auction['bids'] = [ACTIVE_BID_FIRST]
 
 AUCTION_WITH_ACTIVE_BID = auction
+
+# auction with bids with document
+
+auction = deepcopy(ACTIVE_ENQUIRY_AUCTION_DEFAULT_FIXTURE)
+auction['bids'] = [DRAFT_BID_WITH_DOCUMENT]
+
+AUCTION_WITH_DRAFT_BID_WITH_DOCUMENT = auction
+
+auction = deepcopy(ACTIVE_ENQUIRY_AUCTION_DEFAULT_FIXTURE)
+auction['bids'] = [PENDING_BID_FIRST_WITH_DOCUMENT]
+
+AUCTION_WITH_PENDING_BID_WITH_DOCUMENT = auction
+
+auction = deepcopy(ACTIVE_ENQUIRY_AUCTION_DEFAULT_FIXTURE)
+auction['bids'] = [ACTIVE_BID_FIRST_WITH_DOCUMENT]
+
+AUCTION_WITH_ACTIVE_BID_WITH_DOCUMENT = auction
 
 # end enquiry period fixtures
 

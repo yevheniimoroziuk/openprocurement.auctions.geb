@@ -46,6 +46,7 @@ from openprocurement.auctions.geb.interfaces import (
     IAuction,
     IBid,
     IDocument,
+    IBidDocument,
     IItem,
     IQuestion
 )
@@ -99,7 +100,7 @@ class AuctionDocument(BaseDocument):
     documentType = StringType(choices=AUCTION_DOCUMENT_TYPES)
 
 
-@implementer(IDocument)
+@implementer(IBidDocument)
 class BidDocument(BaseDocument):
     documentOf = StringType(required=True, choices=['bid'], default='bid')
 
