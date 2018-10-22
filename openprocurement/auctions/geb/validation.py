@@ -112,17 +112,10 @@ def validate_bid_patch_draft(request, **kwargs):
     if request.authenticated_role == 'Administrator':
         return True
 
-    # check if it is two-phase commit because in draft status only it is valid
-    new_data = request.validated['json_data']
-    if not new_data.get('status') or len(new_data) > 1:
-        err_msg = 'Can\'t update bid, in draft status are only valid change status to pending'
-        request.errors.add('body', 'data', err_msg)
-        request.errors.status = 403
-
     # check if it is valid two-phase commit
     new_status = request.validated['json_data'].get('status')
-    if new_status and new_status != 'pending':
-        err_msg = 'Can\'t update bid status, only from draft you can switch to pending'
+    if not new_status or new_status != 'pending':
+        err_msg = 'Can\'t update bid, in draft status are only valid change status to pending'
         request.errors.add('body', 'data', err_msg)
         request.errors.status = 403
         return False
