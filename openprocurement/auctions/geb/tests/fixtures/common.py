@@ -29,8 +29,7 @@ test_registrationFee = {
 test_registrationFee_created = {
     "currency": "UAH",
     "amount": 700.87,
-    "valueAddedTaxIncluded": True
-   }
+}
 
 test_auction_value = {
         "amount": 100,
