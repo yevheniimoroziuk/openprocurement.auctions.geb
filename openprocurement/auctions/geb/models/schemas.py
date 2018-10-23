@@ -116,7 +116,7 @@ class Question(BaseQuestion):
             'active.rectification': question_rectification_role
         }
 
-    questionOf = StringType(required=True, choices=['tender', 'item'], default='tender')
+    questionOf = StringType(required=True, choices=['tender'], default='tender')
 
     def validate_relatedItem(self, data, relatedItem):
         if not relatedItem and data.get('questionOf') in ['item']:
