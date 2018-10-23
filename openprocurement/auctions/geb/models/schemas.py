@@ -27,7 +27,6 @@ from openprocurement.auctions.core.models import (
     Value,
     dgfCDB2Item as BaseItem,
     dgfDocument as BaseDocument,
-    get_auction,
     validate_items_uniq
 )
 from openprocurement.auctions.core.plugins.awarding.v2_1.models import Award
@@ -49,6 +48,8 @@ from openprocurement.auctions.geb.interfaces import (
     IItem,
     IQuestion
 )
+
+from openprocurement.auctions.geb.utils import get_auction
 
 from openprocurement.auctions.geb.constants import (
     AUCTION_DOCUMENT_TYPES,
@@ -122,7 +123,7 @@ class Question(BaseQuestion):
             raise ValidationError(u'This field is required.')
 
         if relatedItem:
-            auction = get_auction(data['__parent__'])
+            auction = get_auction(data['__parent__'], IAuction)
             if data.get('questionOf') == 'item' and relatedItem not in [item.id for item in auction.items]:
                 raise ValidationError(u"relatedItem should be one of items")
 
