@@ -179,6 +179,14 @@ def add_question(test_case):
     test_case.assertEqual(response.status, '200 OK')
 
 
+def add_question_to_item(test_case):
+    request_data = deepcopy(test_question_data)
+
+    request_data['data']['questionOf'] = 'item'
+    response = test_case.app.post_json(test_case.ENTRYPOINTS['questions'], request_data, status=422)
+    test_case.assertEqual(response.json['errors'][0]['description'][0], "Value must be one of ['tender'].")
+
+
 def add_question_dump(test_case):
     request_data = test_question_data
     response = test_case.app.post_json(test_case.ENTRYPOINTS['questions'], request_data)

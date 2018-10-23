@@ -19,6 +19,7 @@ from openprocurement.auctions.geb.tests.blanks.active_enquiry import (
     add_document,
     add_offline_document,
     add_question,
+    add_question_to_item,
     answer_question,
     auction_change_fields,
     get_question,
@@ -39,6 +40,7 @@ class StatusActiveEnquiryTest(BaseWebTest):
 
     test_bid_add = snitch(bid_add)
     test_add_question = snitch(add_question)
+    test_add_question_to_item = snitch(add_question_to_item)
     test_auction_change_fields = snitch(auction_change_fields)
 
     def setUp(self):
