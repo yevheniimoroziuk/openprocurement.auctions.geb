@@ -116,6 +116,7 @@ BID_STATUSES_FOR_PATCHING = [
 ]
 
 BID_STATUSES_FOR_DELETING = [
+    'draft',
     'pending',
     'active',
 ]
