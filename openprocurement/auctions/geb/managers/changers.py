@@ -3,6 +3,7 @@ from zope.interface import implementer
 from openprocurement.auctions.core.interfaces import (
     IAuctionChanger,
     IBidChanger,
+    IBidDocumentChanger,
     IDocumentChanger,
     IItemChanger,
     IQuestionChanger,
@@ -104,6 +105,28 @@ class BidChanger(object):
 class DocumentChanger(object):
     name = 'Document Changer'
     validators = [validate_edit_auction_document_period]
+
+    def __init__(self, request, context):
+        self._request = request
+        self._context = context
+        self._auction = context.__parent__
+
+    def validate(self):
+        for validator in self.validators:
+            if not validator(self._request, auction=self._auction, document=self._context):
+                return
+        return True
+
+    def change(self):
+        if self.validate():
+            self._auction.modified = apply_patch(self._request, save=False, src=self._context.serialize())
+            return self._auction.modified
+
+
+@implementer(IBidDocumentChanger)
+class BidDocumentChanger(object):
+    name = 'Bid Document Changer'
+    validators = []
 
     def __init__(self, request, context):
         self._request = request

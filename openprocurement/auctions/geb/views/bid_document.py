@@ -8,9 +8,13 @@ from openprocurement.auctions.core.views.mixins import AuctionBidDocumentResourc
 from openprocurement.auctions.core.validation import (
     validate_file_upload
 )
+from openprocurement.auctions.core.validation import (
+    validate_patch_document_data
+)
 
 from openprocurement.auctions.core.interfaces import (
-    IBidManager
+    IBidManager,
+    IBidDocumentManager
 )
 
 
@@ -44,3 +48,19 @@ class AuctionBidDocumentResource(AuctionBidDocumentResource):
             locations = self.request.current_route_url(_route_name=route, document_id=document.id, _query={})
             self.request.response.headers['Location'] = locations
             return {'data': document.serialize("view")}
+
+    @json_view(content_type="application/json", validators=(validate_patch_document_data), permission='edit_bid')
+    def patch(self):
+        """Auction Bid Document Update"""
+        save = None
+
+        manager = self.request.registry.queryMultiAdapter((self.request, self.context), IBidDocumentManager)
+
+        manager.change()
+        save = manager.save()
+
+        if save:
+            extra = context_unpack(self.request, {'MESSAGE_ID': 'auction_bid_document_patch'})
+            msg = 'Updated auction bid document {}'.format(self.request.context.id)
+            self.LOGGER.info(msg, extra=extra)
+            return {'data': self.request.context.serialize("view")}

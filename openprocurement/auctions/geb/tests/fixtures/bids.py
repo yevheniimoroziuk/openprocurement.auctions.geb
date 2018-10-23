@@ -7,7 +7,8 @@ from openprocurement.auctions.geb.tests.fixtures.common import (
     test_procuringEntity
 )
 from openprocurement.auctions.geb.tests.fixtures.documents import (
-    ELIGIBILITY_DOCUMENT
+    ELIGIBILITY_DOCUMENT,
+    BID_DOCUMENT
 )
 from openprocurement.auctions.geb.tests.fixtures.calculator import (
     Calculator
@@ -32,12 +33,24 @@ DRAFT_BID = {
     "id": uuid4().hex
 }
 
+bid = deepcopy(DRAFT_BID)
+bid['id'] = uuid4().hex
+bid['documents'] = [BID_DOCUMENT]
+
+DRAFT_BID_WITH_DOCUMENT = bid
+
 # pending bids
 bid = deepcopy(DRAFT_BID)
 bid['status'] = 'pending'
 bid['id'] = uuid4().hex
 
 PENDING_BID_FIRST = bid
+
+bid = deepcopy(PENDING_BID_FIRST)
+bid['id'] = uuid4().hex
+bid['documents'] = [BID_DOCUMENT]
+
+PENDING_BID_FIRST_WITH_DOCUMENT = bid
 
 bid = deepcopy(PENDING_BID_FIRST)
 bid['id'] = uuid4().hex
@@ -58,3 +71,9 @@ auction = deepcopy(ACTIVE_BID_FIRST)
 auction['id'] = uuid4().hex
 auction['bidNumber'] = 2
 ACTIVE_BID_SECOND = auction
+
+bid = deepcopy(ACTIVE_BID_FIRST)
+bid['id'] = uuid4().hex
+bid['documents'] = [BID_DOCUMENT]
+
+ACTIVE_BID_FIRST_WITH_DOCUMENT = bid
