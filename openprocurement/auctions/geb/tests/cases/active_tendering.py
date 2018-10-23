@@ -9,14 +9,21 @@ from openprocurement.auctions.geb.tests.base import (
 from openprocurement.auctions.geb.tests.states import (
     ProcedureMachine
 )
+from openprocurement.auctions.geb.tests.blanks.mixins import (
+    CancellationWorkFlowMixin,
+    CancellationDocumentsWorkFlowMixin
+)
 from openprocurement.auctions.geb.tests.fixtures.active_tendering import (
-    ACTIVE_TENDERING_AUCTION_DEFAULT_FIXTURE_WITH_QUESTION,
-    AUCTION_WITH_DRAFT_BID,
-    AUCTION_WITH_PENDING_BID,
     AUCTION_WITH_ACTIVE_BID,
+    AUCTION_WITH_ACTIVE_BID_WITH_DOCUMENT,
+    AUCTION_WITH_BIDS_WITH_CANCELLATION,
+    AUCTION_WITH_CANCELLATION,
+    AUCTION_WITH_CANCELLATION_WITH_DOCUMENTS,
+    AUCTION_WITH_DRAFT_BID,
     AUCTION_WITH_DRAFT_BID_WITH_DOCUMENT,
+    AUCTION_WITH_PENDING_BID,
     AUCTION_WITH_PENDING_BID_WITH_DOCUMENT,
-    AUCTION_WITH_ACTIVE_BID_WITH_DOCUMENT
+    AUCTION_WITH_QUESTIONS
 )
 
 from openprocurement.auctions.geb.tests.blanks.active_tendering import (
@@ -49,6 +56,9 @@ from openprocurement.auctions.geb.tests.blanks.active_tendering import (
     bid_active_patch_document,
     bid_active_get_document,
     get_question
+)
+from openprocurement.auctions.geb.tests.blanks.cancellations import (
+    cancellation_make_clean_bids
 )
 
 
@@ -91,7 +101,7 @@ class StatusActiveTenderingQuestionsTest(BaseWebTest):
         procedure = ProcedureMachine()
         procedure.set_db_connector(self.db)
         procedure.toggle('active.tendering')
-        context = procedure.snapshot(fixture=ACTIVE_TENDERING_AUCTION_DEFAULT_FIXTURE_WITH_QUESTION)
+        context = procedure.snapshot(fixture=AUCTION_WITH_QUESTIONS)
 
         self.auction = context['auction']
         self.questions = context['questions']
@@ -311,6 +321,101 @@ class StatusActiveTenderingDocumentsTest(BaseWebTest):
         self.ENTRYPOINTS = entrypoints
 
 
+class StatusActiveTenderingCancellationsTest(BaseWebTest, CancellationWorkFlowMixin):
+    docservice = True
+
+    def setUp(self):
+        super(StatusActiveTenderingCancellationsTest, self).setUp()
+
+        procedure = ProcedureMachine()
+        procedure.set_db_connector(self.db)
+        procedure.toggle('active.tendering')
+        context = procedure.snapshot(fixture=AUCTION_WITH_CANCELLATION)
+
+        auction = context['auction']
+        cancellation = context['cancellations'][0]
+
+        entrypoints = {}
+        entrypoints['get_auction'] = '/auctions/{}'.format(auction['data']['id'])
+
+        entrypoints['patch_cancellation'] = '/auctions/{}/cancellations/{}?acc_token={}'.format(auction['data']['id'],
+                                                                                                cancellation['data']['id'],
+                                                                                                auction['access']['token'])
+
+        entrypoints['get_cancellation'] = '/auctions/{}/cancellations/{}'.format(auction['data']['id'],
+                                                                                 cancellation['data']['id'])
+
+        entrypoints['cancellation_document_post'] = '/auctions/{}/cancellations/{}/documents?acc_token={}'.format(auction['data']['id'],
+                                                                                                                  cancellation['data']['id'],
+                                                                                                                  auction['access']['token'])
+        entrypoints['get_cancellations_listing'] = '/auctions/{}/cancellations'.format(auction['data']['id'])
+
+        self.auction = auction
+        self.cancellation = cancellation
+        self.cancellations = context['cancellations']
+        self.ENTRYPOINTS = entrypoints
+
+
+class StatusActiveTenderingWithBidsCancellationsTest(BaseWebTest):
+    test_cancellation_make_active_clean_bids = snitch(cancellation_make_clean_bids)
+
+    def setUp(self):
+        super(StatusActiveTenderingWithBidsCancellationsTest, self).setUp()
+
+        procedure = ProcedureMachine()
+        procedure.set_db_connector(self.db)
+        procedure.toggle('active.tendering')
+        context = procedure.snapshot(fixture=AUCTION_WITH_BIDS_WITH_CANCELLATION)
+
+        auction = context['auction']
+        bids = context['bids']
+        cancellation = context['cancellations'][0]
+
+        entrypoints = {}
+        entrypoints['get_auction'] = '/auctions/{}'.format(auction['data']['id'])
+        entrypoints['patch_cancellation'] = '/auctions/{}/cancellations/{}?acc_token={}'.format(auction['data']['id'],
+                                                                                                cancellation['data']['id'],
+                                                                                                auction['access']['token'])
+
+        self.auction = auction
+        self.bids = bids
+        self.cancellation = cancellation
+        self.cancellations = context['cancellations']
+        self.ENTRYPOINTS = entrypoints
+
+
+class StatusActiveTenderingCancellationsDocumentsTest(BaseWebTest, CancellationDocumentsWorkFlowMixin):
+    docservice = True
+
+    def setUp(self):
+        super(StatusActiveTenderingCancellationsDocumentsTest, self).setUp()
+
+        procedure = ProcedureMachine()
+        procedure.set_db_connector(self.db)
+        procedure.toggle('draft')
+        context = procedure.snapshot(fixture=AUCTION_WITH_CANCELLATION_WITH_DOCUMENTS)
+
+        auction = context['auction']
+        cancellation = context['cancellations'][0]
+        document = cancellation['data']['documents'][0]
+        documents = cancellation['data']['documents']
+
+        entrypoints = {}
+        entrypoints['cancellation_document_listing'] = '/auctions/{}/cancellations/{}/documents?acc_token={}'.format(auction['data']['id'],
+                                                                                                                     cancellation['data']['id'],
+                                                                                                                     auction['access']['token'])
+
+        entrypoints['cancellation_document'] = '/auctions/{}/cancellations/{}/documents/{}?acc_token={}'.format(auction['data']['id'],
+                                                                                                                cancellation['data']['id'],
+                                                                                                                document['id'],
+                                                                                                                auction['access']['token'])
+
+        self.auction = auction
+        self.cancellation = cancellation
+        self.documents = documents
+        self.ENTRYPOINTS = entrypoints
+
+
 def suite():
     suite = unittest.TestSuite()
     suite.addTest(unittest.makeSuite(StatusActiveTenderingTest))
@@ -322,6 +427,9 @@ def suite():
     suite.addTest(unittest.makeSuite(StatusActiveTenderingPendingBidsWithDocumentTest))
     suite.addTest(unittest.makeSuite(StatusActiveTenderingActiveBidsWithDocumentTest))
     suite.addTest(unittest.makeSuite(StatusActiveTenderingDocumentsTest))
+    suite.addTest(unittest.makeSuite(StatusActiveTenderingCancellationsTest))
+    suite.addTest(unittest.makeSuite(StatusActiveTenderingCancellationsDocumentsTest))
+    suite.addTest(unittest.makeSuite(StatusActiveTenderingWithBidsCancellationsTest))
     return suite
 
 

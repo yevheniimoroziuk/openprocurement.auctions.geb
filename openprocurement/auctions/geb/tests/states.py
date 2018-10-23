@@ -7,20 +7,20 @@ from openprocurement.auctions.geb.tests.fixtures.draft import (
     AUCTION as DRAFT_AUCTION
 )
 from openprocurement.auctions.geb.tests.fixtures.active_rectification import (
-    ACTIVE_RECTIFICATION_AUCTION_DEFAULT_FIXTURE,
-    END_ACTIVE_RECTIFICATION_AUCTION_DEFAULT_FIXTURE
+    AUCTION as ACTIVE_RECTIFICATION_AUCTION,
+    END_ACTIVE_RECTIFICATION_AUCTION
 )
 from openprocurement.auctions.geb.tests.fixtures.active_tendering import (
-    ACTIVE_TENDERING_AUCTION_DEFAULT_FIXTURE,
-    END_ACTIVE_TENDERING_AUCTION_DEFAULT_FIXTURE
+    AUCTION as ACTIVE_TENDERING_AUCTION,
+    END_ACTIVE_TENDERING_AUCTION
 )
 from openprocurement.auctions.geb.tests.fixtures.active_enquiry import (
-    ACTIVE_ENQUIRY_AUCTION_DEFAULT_FIXTURE,
-    END_ACTIVE_ENQUIRY_AUCTION_DEFAULT_FIXTURE
+    AUCTION as ACTIVE_ENQUIRY_AUCTION,
+    END_ACTIVE_ENQUIRY_AUCTION
 )
 from openprocurement.auctions.geb.tests.fixtures.active_auction import (
-    ACTIVE_AUCTION_DEFAULT_FIXTURE,
-    END_AUCTION_AUCTION_DEFAULT_FIXTURE
+    AUCTION as ACTIVE_AUCTION_AUCTION,
+    END_ACTIVE_AUCTION_AUCTION
 )
 
 
@@ -79,18 +79,27 @@ class State(object):
                 info = {}
                 info['data'] = deepcopy(item)
                 context['items'].append(info)
+
+        # add cancellations context
+        context['cancellations'] = []
+        cancellations = fixture.get('cancellations', None)
+        if cancellations:
+            for cancellation in cancellations:
+                info = {}
+                info['data'] = deepcopy(cancellation)
+                context['cancellations'].append(info)
         return context
 
 # Auction States
 
 
 class EndActiveAuction(State):
-    fixture = END_AUCTION_AUCTION_DEFAULT_FIXTURE
+    fixture = END_ACTIVE_AUCTION_AUCTION
     status = 'active.auction'
 
 
 class ActiveAuction(State):
-    fixture = ACTIVE_AUCTION_DEFAULT_FIXTURE
+    fixture = ACTIVE_AUCTION_AUCTION
     status = 'active.auction'
 
     def context(self, fixture):
@@ -112,6 +121,14 @@ class ActiveAuction(State):
                 info['access'] = {'token': bid['owner_token'],
                                   'owner': bid['owner']}
                 context['bids'].append(info)
+        # add cancellations context
+        context['cancellations'] = []
+        cancellations = fixture.get('cancellations', None)
+        if cancellations:
+            for cancellation in cancellations:
+                info = {}
+                info['data'] = deepcopy(cancellation)
+                context['cancellations'].append(info)
 
         return context
 
@@ -119,12 +136,12 @@ class ActiveAuction(State):
 
 
 class EndActiveEnquiry(State):
-    fixture = END_ACTIVE_ENQUIRY_AUCTION_DEFAULT_FIXTURE
+    fixture = END_ACTIVE_ENQUIRY_AUCTION
     status = 'active.enquiry'
 
 
 class ActiveEnquiry(State):
-    fixture = ACTIVE_ENQUIRY_AUCTION_DEFAULT_FIXTURE
+    fixture = ACTIVE_ENQUIRY_AUCTION
     status = 'active.enquiry'
 
     def _next(self, end=False):
@@ -134,12 +151,12 @@ class ActiveEnquiry(State):
 
 
 class EndActiveTendering(State):
-    fixture = END_ACTIVE_TENDERING_AUCTION_DEFAULT_FIXTURE
+    fixture = END_ACTIVE_TENDERING_AUCTION
     status = 'active.tendering'
 
 
 class ActiveTendering(State):
-    fixture = ACTIVE_TENDERING_AUCTION_DEFAULT_FIXTURE
+    fixture = ACTIVE_TENDERING_AUCTION
     status = 'active.tendering'
 
     def _next(self, end=False):
@@ -149,12 +166,12 @@ class ActiveTendering(State):
 
 
 class EndActiveRectification(State):
-    fixture = END_ACTIVE_RECTIFICATION_AUCTION_DEFAULT_FIXTURE
+    fixture = END_ACTIVE_RECTIFICATION_AUCTION
     status = 'active.rectification'
 
 
 class ActiveRetification(State):
-    fixture = ACTIVE_RECTIFICATION_AUCTION_DEFAULT_FIXTURE
+    fixture = ACTIVE_RECTIFICATION_AUCTION
     status = 'active.rectification'
 
     def _next(self, end=False):

@@ -9,8 +9,8 @@ from openprocurement.auctions.geb.tests.fixtures.common import (
     test_question_data
 )
 from openprocurement.auctions.geb.tests.fixtures.active_rectification import (
-    ACTIVE_RECTIFICATION_AUCTION_DEFAULT_FIXTURE,
-    ACTIVE_RECTIFICATION_AUCTION_WITH_DOCUMENTS
+    AUCTION,
+    AUCTION_WITH_DOCUMENTS
 )
 
 from openprocurement.auctions.core.tests.base import (
@@ -43,7 +43,7 @@ def change_one_field_rest_same(test_case):
     new_title = 'Test'
     field = "title"
 
-    all_data = deepcopy(ACTIVE_RECTIFICATION_AUCTION_DEFAULT_FIXTURE)
+    all_data = deepcopy(AUCTION)
     request_data = {"data": all_data}
     request_data['data'][field] = new_title
     response = test_case.app.patch_json(test_case.ENTRYPOINTS['patch_auction'], request_data)
@@ -134,7 +134,25 @@ def change_guarantee(test_case):
     test_case.assertEqual(new, response.json['data'][field])
 
 
-def change_items_singly(test_case):
+def item_get(test_case):
+    expected_http_status = '200 OK'
+    expected_data = [
+        'description',
+        'classification',
+        'additionalClassifications',
+        'address',
+        'id',
+        'unit',
+        'quantity'
+    ]
+    response = test_case.app.get(test_case.ENTRYPOINTS['get_item'])
+    cancellation = response.json['data']
+
+    test_case.assertEqual(response.status, expected_http_status)
+    test_case.assertEqual(cancellation.keys(), expected_data)
+
+
+def item_patch(test_case):
     field = "quantity"
     new_value = 42
 
@@ -150,7 +168,7 @@ def change_items_singly(test_case):
     test_case.assertEqual(item[field], new_value)
 
 
-def get_items_collection(test_case):
+def items_get_listing(test_case):
     response = test_case.app.get(test_case.ENTRYPOINTS['get_auction'])
     auction = response.json['data']
     auction_items = [item['id'] for item in auction['items']]
@@ -161,7 +179,7 @@ def get_items_collection(test_case):
         test_case.assertIn(item['id'], auction_items)
 
 
-def change_items_collections(test_case):
+def items_patch_collections(test_case):
     items_data = [deepcopy(item['data']) for item in test_case.items]
     order = 0
     field = "quantity"
@@ -314,7 +332,7 @@ def add_document(test_case):
 
 
 def patch_document(test_case):
-    context = test_case.procedure.snapshot(fixture=ACTIVE_RECTIFICATION_AUCTION_WITH_DOCUMENTS)
+    context = test_case.procedure.snapshot(fixture=AUCTION_WITH_DOCUMENTS)
     auction = context['auction']
     document = context['documents'][0]
     field = 'documentType'

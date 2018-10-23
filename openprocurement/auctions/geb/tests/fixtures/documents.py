@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+from copy import deepcopy
 from datetime import datetime
 from uuid import uuid4
 
@@ -14,6 +15,10 @@ DOCUMENT = {
     "id": uuid4().hex,
     "dateModified": now.isoformat()
 }
+document = deepcopy(DOCUMENT)
+document['documentOf'] = 'cancellation'
+CANCELLATION_DOCUMENT = document
+
 
 ELIGIBILITY_DOCUMENT = {
     "hash": "md5:00000000000000000000000000000000",

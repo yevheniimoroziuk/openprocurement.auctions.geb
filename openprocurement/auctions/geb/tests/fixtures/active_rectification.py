@@ -27,6 +27,10 @@ from openprocurement.auctions.geb.tests.fixtures.items import (
 from openprocurement.auctions.geb.tests.fixtures.documents import (
     DOCUMENT
 )
+from openprocurement.auctions.geb.tests.fixtures.cancellations import (
+    CANCELLATION,
+    CANCELLATION_WITH_DOCUMENTS
+)
 from openprocurement.auctions.geb.tests.fixtures.questions import (
     TEST_QESTION_IN_RECTIFICATION_PERIOD
 )
@@ -36,7 +40,7 @@ from openprocurement.auctions.geb.tests.fixtures.questions import (
 now = get_now()
 calculator = Calculator(now, 'rectificationPeriod', 'start')
 
-ACTIVE_RECTIFICATION_AUCTION_DEFAULT_FIXTURE = {
+AUCTION = {
     "_id": uuid4().hex,
     "procurementMethod": "open",
     "auctionID": "UA-EA-2018-09-20-000001",
@@ -89,7 +93,7 @@ ACTIVE_RECTIFICATION_AUCTION_DEFAULT_FIXTURE = {
 
 calculator = Calculator(now, 'rectificationPeriod', 'end')
 
-auction = deepcopy(ACTIVE_RECTIFICATION_AUCTION_DEFAULT_FIXTURE)
+auction = deepcopy(AUCTION)
 
 auction["enquiryPeriod"] = {
     "startDate": calculator.enquiryPeriod.startDate.isoformat(),
@@ -109,17 +113,35 @@ auction["auctionPeriod"] = {
 auction["next_check"] = calculator.rectificationPeriod.endDate.isoformat()
 auction["date"] = calculator.auctionDate.date.isoformat()
 
-END_ACTIVE_RECTIFICATION_AUCTION_DEFAULT_FIXTURE = auction
+END_ACTIVE_RECTIFICATION_AUCTION = auction
 
-auction = deepcopy(ACTIVE_RECTIFICATION_AUCTION_DEFAULT_FIXTURE)
+auction = deepcopy(AUCTION)
 
 auction['documents'] = [DOCUMENT]
 
-ACTIVE_RECTIFICATION_AUCTION_WITH_DOCUMENTS = auction
+AUCTION_WITH_DOCUMENTS = auction
 
 # auction with questions fixture
 
-auction = deepcopy(ACTIVE_RECTIFICATION_AUCTION_DEFAULT_FIXTURE)
+auction = deepcopy(AUCTION)
 auction['questions'] = [TEST_QESTION_IN_RECTIFICATION_PERIOD]
 
-ACTIVE_RECTIFICATION_AUCTION_FIXTURE_WITH_QUESTION = auction
+AUCTION_WITH_QUESTIONS = auction
+
+# auction with cancellations fixture
+
+auction = deepcopy(AUCTION)
+auction['_id'] = uuid4().hex
+auction['cancellations'] = [
+    CANCELLATION
+]
+AUCTION_WITH_CANCELLATION = auction
+
+# auction with cancellations with document fixture
+
+auction = deepcopy(AUCTION)
+auction['_id'] = uuid4().hex
+auction['cancellations'] = [
+    CANCELLATION_WITH_DOCUMENTS
+]
+AUCTION_WITH_CANCELLATION_WITH_DOCUMENTS = auction

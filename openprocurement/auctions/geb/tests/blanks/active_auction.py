@@ -1,13 +1,13 @@
 
 from openprocurement.auctions.geb.tests.fixtures.active_auction import (
-    ACTIVE_AUCTION_DEFAULT_FIXTURE,
-    ACTIVE_AUCTION_DEFAULT_FIXTURE_WITH_URLS
+    AUCTION as ACTIVE_AUCTION_AUCTION,
+    AUCTION_WITH_URLS
 )
 
 
 def get_auction_auction(test_case):
     expected_http_status = '200 OK'
-    context = test_case.procedure.snapshot(fixture=ACTIVE_AUCTION_DEFAULT_FIXTURE)
+    context = test_case.procedure.snapshot(fixture=ACTIVE_AUCTION_AUCTION)
     auction = context['auction']
     auction_url = '/auctions/{}/auction'.format(auction['data']['id'])
 
@@ -17,7 +17,7 @@ def get_auction_auction(test_case):
 
 
 def get_auction_urls_dump(test_case):
-    context = test_case.procedure.snapshot(fixture=ACTIVE_AUCTION_DEFAULT_FIXTURE_WITH_URLS)
+    context = test_case.procedure.snapshot(fixture=AUCTION_WITH_URLS)
     auction = context['auction']
     bid = context['bids'][0]
     auction_url = '/auctions/{}'.format(auction['data']['id'])
@@ -40,7 +40,7 @@ def get_auction_urls_dump(test_case):
 
 def switch_to_qualification(test_case):
     expected_http_status = '200 OK'
-    context = test_case.procedure.snapshot(fixture=ACTIVE_AUCTION_DEFAULT_FIXTURE_WITH_URLS)
+    context = test_case.procedure.snapshot(fixture=AUCTION_WITH_URLS)
     auction = context['auction']
     bids = context['bids']
     auction_url = '/auctions/{}/auction'.format(auction['data']['id'])
@@ -75,7 +75,7 @@ def switch_to_qualification(test_case):
 
 def switch_to_unsuccessful(test_case):
     expected_http_status = '200 OK'
-    context = test_case.procedure.snapshot(fixture=ACTIVE_AUCTION_DEFAULT_FIXTURE_WITH_URLS)
+    context = test_case.procedure.snapshot(fixture=AUCTION_WITH_URLS)
     auction = context['auction']
     bids = context['bids']
     auction_url = '/auctions/{}/auction'.format(auction['data']['id'])
@@ -109,7 +109,7 @@ def switch_to_unsuccessful(test_case):
 
 
 def update_auction_urls(test_case):
-    context = test_case.procedure.snapshot(fixture=ACTIVE_AUCTION_DEFAULT_FIXTURE)
+    context = test_case.procedure.snapshot(fixture=ACTIVE_AUCTION_AUCTION)
     expected_http_status = '200 OK'
     request_data = {}
     auction = context['auction']
@@ -131,7 +131,7 @@ def update_auction_urls(test_case):
 
 
 def get_participation_urls(test_case):
-    context = test_case.procedure.snapshot(fixture=ACTIVE_AUCTION_DEFAULT_FIXTURE_WITH_URLS)
+    context = test_case.procedure.snapshot(fixture=AUCTION_WITH_URLS)
     auction = context['auction']
     bids = context['bids']
 

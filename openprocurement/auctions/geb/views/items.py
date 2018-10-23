@@ -1,3 +1,4 @@
+from zope.interface import implementedBy
 from openprocurement.auctions.core.utils import (
     json_view,
     opresource,
@@ -26,10 +27,11 @@ class AuctionItemResource(APIResource):
         """Auction Item List"""
 
         manager = self.request.registry.queryMultiAdapter((self.request, self.context), IAuctionManager)
-        return manager.represent_subresources_listing(type(manager.context).items.model_class)
+        item_type = type(manager.context).items.model_class
+        return manager.represent_subresources_listing(implementedBy(item_type))
 
     @json_view(content_type="application/json", permission='create_item', validators=(validate_item_data))
-    def collection_post(self):
+    def collection_post(self):  # TODO
         """
         Auction Item Upload
         """

@@ -57,6 +57,8 @@ def impose_patch(contexture, patch):
 
 def _validate_patch_data(request, model, data):
     contexture = _get_contexture_to_patch(request, model)
+    request.validated['resource_src'] = contexture.serialize()
+
     contexture_to_patch = _get_contexture_to_patch(request, model)
     method = contexture_to_patch.to_patch
     role = _get_role_to_patch(contexture)
@@ -223,7 +225,7 @@ def validate_bid_delete_period(request, **kwargs):
 
 def validate_patch_auction_data(request, **kwargs):
     data = validate_json_data(request)
-    validate_patch_data(request, request.auction.__class__, data)
+    validate_patch_data(request, request.context.__class__, data)
 
 
 def validate_document_adding_period(request):

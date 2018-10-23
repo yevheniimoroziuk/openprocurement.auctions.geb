@@ -23,3 +23,11 @@ class IBidDocument(Interface):
 
 class IQuestion(Interface):
     """Interface for Geb Questions"""
+
+
+class ICancellation(Interface):
+    """Interface for Geb Cancellations"""
+
+
+class ICancellationDocument(Interface):
+    """Interface for Geb Cancellation Document"""
