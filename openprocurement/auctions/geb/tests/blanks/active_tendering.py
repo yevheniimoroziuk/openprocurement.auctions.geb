@@ -365,10 +365,12 @@ def bid_active_get_document(test_case):
 
 
 def bid_delete_in_draft_status(test_case):
-    expected_http_status = '403 Forbidden'
+    expected_http_status = '200 OK'
+    response = test_case.app.delete_json(test_case.ENTRYPOINTS['bid'])
+    test_case.assertEqual(expected_http_status, response.status)
 
-    response = test_case.app.delete_json(test_case.ENTRYPOINTS['bid'], status=403)
-
+    expected_http_status = '404 Not Found'
+    response = test_case.app.get(test_case.ENTRYPOINTS['bid'], status=404)
     test_case.assertEqual(expected_http_status, response.status)
 
 
