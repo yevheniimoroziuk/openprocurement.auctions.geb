@@ -24,6 +24,7 @@ from openprocurement.auctions.geb.tests.blanks.active_tendering import (
     add_invalid_bid,
     add_offline_document,
     add_question,
+    add_question_to_item,
     answer_question,
     auction_change_fields,
     bid_add,
@@ -54,6 +55,7 @@ from openprocurement.auctions.geb.tests.blanks.active_tendering import (
 class StatusActiveTenderingTest(BaseWebTest):
 
     test_add_question = snitch(add_question)
+    test_add_question_to_item = snitch(add_question_to_item)
     test_bid_add = snitch(bid_add)
     test_auction_change_fields = snitch(auction_change_fields)
     test_add_invalid_bid = snitch(add_invalid_bid)

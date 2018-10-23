@@ -39,3 +39,11 @@ def get_file(request):
 
 
 calculate_certainly_business_date = partial(calculate_business_date, context=None)
+
+
+def get_auction(model, interface):
+    while not interface.providedBy(model):
+        model = getattr(model, '__parent__', None)
+        if model is None:
+            return None
+    return model
