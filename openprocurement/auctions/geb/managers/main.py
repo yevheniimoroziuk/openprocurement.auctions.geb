@@ -21,20 +21,6 @@ from openprocurement.auctions.geb.managers.changers import (
     CancellationChanger,
     QuestionChanger
 )
-from openprocurement.auctions.geb.managers.documenters import (
-    AuctionDocumenter,
-    BidDocumenter,
-    CancellationDocumenter
-)
-from openprocurement.auctions.geb.managers.questioners import (
-    AuctionQuestioner
-)
-from openprocurement.auctions.geb.managers.itemers import (
-    AuctionItemer
-)
-from openprocurement.auctions.geb.managers.cancellers import (
-    AuctionCanceller
-)
 from openprocurement.auctions.geb.managers.checkers import (
     AuctionChecker
 )
@@ -47,7 +33,7 @@ from openprocurement.auctions.geb.managers.representers import (
 )
 
 from openprocurement.auctions.geb.managers.creators import (
-    AuctionCreator
+    Creator
 )
 from openprocurement.auctions.geb.managers.auctioneers import (
     Auctioneer
@@ -68,24 +54,22 @@ class AuctionManager(AuctionManager):
     Auctioneer = Auctioneer
     Changer = AuctionChanger
     Checker = AuctionChecker
-    Creator = AuctionCreator
-    Documenter = AuctionDocumenter
+    Creator = Creator
     Initializator = AuctionInitializator
-    Questioner = AuctionQuestioner
-    Itemer = AuctionItemer
     Logger = AuctionLogger
-    Canceller = AuctionCanceller
     SubResourceRepresenter = AuctionSubResourceRepresenter
 
 
 class BidManager(BidManager):
     Changer = BidChanger
     Deleter = BidDeleter
-    Documenter = BidDocumenter
     Initializator = BidInitializator
+    Creator = Creator
+
 
 class BidDocumentManager(BidDocumentManager):
     Changer = BidDocumentChanger
+
 
 class QuestionManager(QuestionManager):
     Changer = QuestionChanger
@@ -95,13 +79,14 @@ class ItemManager(ItemManager):
     Changer = ItemChanger
     Representer = ItemRepresenter
     Logger = ItemLogger
+    Creator = Creator
 
 
 class CancellationManager(CancellationManager):
+    Creator = Creator
     Changer = CancellationChanger
     Representer = CancellationRepresenter
     Logger = CancellationLogger
-    Documenter = CancellationDocumenter
     SubResourceRepresenter = CancellationSubResourceRepresenter
 
 

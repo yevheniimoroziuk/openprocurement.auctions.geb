@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
-
+from uuid import uuid4
+from copy import deepcopy
 from openprocurement.auctions.geb.constants import (
     DEFAULT_PROCUREMENT_METHOD_TYPE
 )
@@ -19,7 +20,7 @@ from openprocurement.auctions.geb.tests.fixtures.items import (
     INITIAL_TEST_ITEM
 )
 
-CREATE_AUCTION_DEFAULT_FIXTURE = {
+AUCTION = {
         "status": "draft",
         "auctionPeriod": test_auctionPeriod,
         "budgetSpent": test_auction_budgetSpent,
@@ -38,3 +39,11 @@ CREATE_AUCTION_DEFAULT_FIXTURE = {
         "title": u"футляри до державних нагород",
         "value": test_auction_value,
 }
+
+# auction without items
+auction = deepcopy(AUCTION)
+
+auction['_id'] = uuid4().hex
+auction.pop('items')
+
+AUCTION_WITHOUT_ITEMS = auction

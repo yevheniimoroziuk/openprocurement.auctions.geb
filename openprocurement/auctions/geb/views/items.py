@@ -37,9 +37,9 @@ class AuctionItemResource(APIResource):
         """
         save = None
 
+        applicant = self.request.validated['item']
         manager = self.request.registry.queryMultiAdapter((self.request, self.context), IAuctionManager)
-
-        item = manager.add_item()
+        item = manager.create(applicant)
         save = manager.save()
 
         if save:

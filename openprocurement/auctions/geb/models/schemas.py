@@ -364,9 +364,8 @@ class Auction(BaseAuction):
     guarantee = ModelType(Guarantee, required=True)
 
     items = ListType(ModelType(Item),
-                     required=True,
-                     min_size=1,
-                     validators=[validate_items_uniq])
+                     validators=[validate_items_uniq],
+                     default=list())
 
     minNumberOfQualifiedBids = IntType(choices=[1, 2], default=2)
 

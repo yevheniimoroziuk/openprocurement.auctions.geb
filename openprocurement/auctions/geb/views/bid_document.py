@@ -31,10 +31,9 @@ class AuctionBidDocumentResource(AuctionBidDocumentResource):
         """
         save = None
 
+        applicant = self.request.validated['document']
         manager = self.request.registry.queryMultiAdapter((self.request, self.context), IBidManager)
-
-        document = manager.upload_document()
-
+        document = manager.create(applicant)
         save = manager.save()
 
         if save:

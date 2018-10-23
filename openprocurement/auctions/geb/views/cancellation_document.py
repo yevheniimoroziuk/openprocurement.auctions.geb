@@ -40,8 +40,9 @@ class AuctionCancellationDocumentResource(AuctionCancellationDocumentResource):
         """
         save = None
 
+        applicant = self.request.validated['document']
         manager = self.request.registry.queryMultiAdapter((self.request, self.context), ICancellationManager)
-        document = manager.upload_document()
+        document = manager.create(applicant)
         save = manager.save()
 
         if save:

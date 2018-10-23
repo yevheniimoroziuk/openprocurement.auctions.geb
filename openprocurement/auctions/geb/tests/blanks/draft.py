@@ -6,6 +6,9 @@ from openprocurement.auctions.core.utils import (
 from openprocurement.auctions.geb.utils import (
     calculate_certainly_business_date as ccbd
 )
+from openprocurement.auctions.geb.tests.fixtures.items import (
+    TEST_ITEM
+)
 
 
 def check_generated_rectification_period(test_case):
@@ -163,3 +166,16 @@ def phase_commit_dump(test_case):
     filename = 'docs/source/tutorial/phase_commit.http'
     test_case.dump(response.request, response, filename)
     test_case.app.authorization = auth
+
+
+def item_post(test_case):
+    expected_http_status = '201 Created'
+
+    request_data = {'data': TEST_ITEM}
+    response = test_case.app.post_json(test_case.ENTRYPOINTS['item_post'], request_data)
+    test_case.assertEqual(response.status, expected_http_status)
+    item = response.json['data']
+
+    entrypoint = '/auctions/{}/items/{}'.format(test_case.auction['data']['id'], item['id'])
+    response = test_case.app.get(entrypoint, request_data)
+    test_case.assertEqual(response.status, '200 OK')

@@ -1,7 +1,7 @@
 from copy import deepcopy
 
 from openprocurement.auctions.geb.tests.fixtures.create import (
-    CREATE_AUCTION_DEFAULT_FIXTURE as CREATE_AUCTION
+    AUCTION as CREATE_AUCTION
 )
 from openprocurement.auctions.geb.tests.fixtures.draft import (
     AUCTION as DRAFT_AUCTION

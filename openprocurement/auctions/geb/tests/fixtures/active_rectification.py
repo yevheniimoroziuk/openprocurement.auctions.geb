@@ -89,6 +89,14 @@ AUCTION = {
     "procuringEntity": test_procuringEntity
 }
 
+# auction without items
+auction = deepcopy(AUCTION)
+
+auction['_id'] = uuid4().hex
+auction.pop('items')
+
+AUCTION_WITHOUT_ITEMS = auction
+
 # end active rectification default fixture
 
 calculator = Calculator(now, 'rectificationPeriod', 'end')

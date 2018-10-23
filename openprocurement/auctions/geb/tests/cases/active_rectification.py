@@ -16,6 +16,7 @@ from openprocurement.auctions.geb.tests.states import (
 
 from openprocurement.auctions.geb.tests.fixtures.active_rectification import (
     AUCTION_WITH_QUESTIONS,
+    AUCTION_WITHOUT_ITEMS,
     AUCTION_WITH_CANCELLATION,
     AUCTION_WITH_CANCELLATION_WITH_DOCUMENTS
 )
@@ -50,6 +51,7 @@ from openprocurement.auctions.geb.tests.blanks.active_rectification import (
     change_value,
     get_question,
     item_patch,
+    item_post,
     item_get,
     items_get_listing,
     items_patch_collections,
@@ -167,6 +169,27 @@ class StatusActiveRectificationItemsTest(BaseWebTest):
         self.ENTRYPOINTS = entrypoints
 
 
+class StatusDraftWithoutItemsTest(BaseWebTest):
+    test_item_post = snitch(item_post)
+
+    def setUp(self):
+        super(StatusDraftWithoutItemsTest, self).setUp()
+        procedure = ProcedureMachine()
+        procedure.set_db_connector(self.db)
+        change_machine_state(procedure, 'active.rectification')
+        context = procedure.snapshot(fixture=AUCTION_WITHOUT_ITEMS)
+
+        auction = context['auction']
+
+        entrypoints = {}
+
+        entrypoints['get_auction'] = '/auctions/{}'.format(auction['data']['id'])
+        entrypoints['item_post'] = '/auctions/{}/items?acc_token={}'.format(auction['data']['id'],
+                                                                            auction['access']['token'])
+        self.auction = auction
+        self.ENTRYPOINTS = entrypoints
+
+
 class StatusActiveRectificationDocumentTest(BaseWebTest):
     docservice = True
 
@@ -256,6 +279,7 @@ def suite():
     suite.addTest(unittest.makeSuite(StatusActiveRectificationDocumentTest))
     suite.addTest(unittest.makeSuite(StatusActiveRectificationQuestionsTest))
     suite.addTest(unittest.makeSuite(StatusActiveRectificationItemsTest))
+    suite.addTest(unittest.makeSuite(StatusDraftWithoutItemsTest))
     suite.addTest(unittest.makeSuite(StatusActiveRectificationCancellationsTest))
     suite.addTest(unittest.makeSuite(StatusActiveRectificationCancellationsDocumentsTest))
     return suite

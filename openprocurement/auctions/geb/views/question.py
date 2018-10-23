@@ -35,7 +35,8 @@ class AuctionQuestionResource(AuctionQuestionResource):
 
         manager = self.request.registry.queryMultiAdapter((self.request, self.context), IAuctionManager)
 
-        question = manager.add_question()
+        applicant = self.request.validated['question']
+        question = manager.create(applicant)
         if question:
             save = manager.save()
 
