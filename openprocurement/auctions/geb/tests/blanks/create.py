@@ -1,10 +1,43 @@
 def create_auction(test_case):
     expected_http_status = '201 Created'
+    expected_data = [
+        'auctionID',
+        'auctionParameters',
+        'auctionPeriod',
+        'contractTerms',
+        'date',
+        'dateModified',
+        'description',
+        'guarantee',
+        'id',
+        'items',
+        'lotHolder',
+        'lotIdentifier',
+        'minNumberOfQualifiedBids',
+        'minimalStep',
+        'mode',
+        'owner',
+        'procurementMethod',
+        'procurementMethodDetails',
+        'procurementMethodType',
+        'procuringEntity',
+        'registrationFee',
+        'status',
+        'submissionMethod',
+        'submissionMethodDetails',
+        'tenderAttempts',
+        'title',
+        'value'
+    ]
     request_data = {"data": test_case.auction}
 
     entrypoint = '/auctions'
     response = test_case.app.post_json(entrypoint, request_data)
     test_case.assertEqual(response.status, expected_http_status)
+
+    auction = response.json['data']
+    for auction_data in auction.keys():
+        test_case.assertIn(auction_data, expected_data)
 
 
 def auction_create_without_items(test_case):
