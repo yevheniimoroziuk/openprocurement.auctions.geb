@@ -4,7 +4,14 @@ from uuid import uuid4
 
 from schematics.exceptions import ValidationError
 from schematics.transforms import whitelist
-from schematics.types import StringType, IntType, MD5Type, BooleanType, URLType
+from schematics.types import (
+    StringType,
+    IntType,
+    MD5Type,
+    BooleanType,
+    URLType,
+)
+
 from schematics.types.compound import ModelType
 from schematics.types.serializable import serializable
 from pyramid.security import Allow
@@ -18,6 +25,7 @@ from openprocurement.auctions.core.models import (
     BaseOrganization,
     Classification,
     Guarantee,
+    DecimalType,
     IsoDateTimeType,
     IsoDurationType,
     ListType,
@@ -289,6 +297,7 @@ class Item(BaseItem):
     classification = ModelType(GebClassification,
                                required=True)
     additionalClassifications = ListType(ModelType(GebAdditionalClassification), required=True)
+    quantity = DecimalType(precision=-4)
 
     def validate_additionalClassifications(self, data, classificator):
         classificators = data['additionalClassifications']
