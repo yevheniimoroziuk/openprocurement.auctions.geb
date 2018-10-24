@@ -29,7 +29,8 @@ from openprocurement.auctions.geb.tests.fixtures.documents import (
 )
 from openprocurement.auctions.geb.tests.fixtures.cancellations import (
     CANCELLATION,
-    CANCELLATION_WITH_DOCUMENTS
+    CANCELLATION_WITH_DOCUMENTS,
+    CANCELLATION_ACTIVE_WITH_DOCUMENTS
 )
 from openprocurement.auctions.geb.tests.fixtures.questions import (
     TEST_QESTION_IN_RECTIFICATION_PERIOD
@@ -67,7 +68,7 @@ AUCTION = {
     "description": "test procuredure",
     "lotIdentifier": "219560",
     "auctionPeriod": {
-        "shouldStartAfter": calculator.auctionPeriod.shouldStartAfter.isoformat()
+        "startDate": calculator.auctionPeriod.startDate.isoformat()
     },
     "procurementMethodType": "landlease",
     "tenderPeriod": {
@@ -116,7 +117,7 @@ auction["rectificationPeriod"] = {
     "endDate": calculator.rectificationPeriod.endDate.isoformat()
 }
 auction["auctionPeriod"] = {
-    "shouldStartAfter": calculator.auctionPeriod.shouldStartAfter.isoformat()
+    "startDate": calculator.auctionPeriod.startDate.isoformat()
 }
 auction["next_check"] = calculator.rectificationPeriod.endDate.isoformat()
 auction["date"] = calculator.auctionDate.date.isoformat()
@@ -153,3 +154,13 @@ auction['cancellations'] = [
     CANCELLATION_WITH_DOCUMENTS
 ]
 AUCTION_WITH_CANCELLATION_WITH_DOCUMENTS = auction
+
+# auction with cancellations fixture
+
+auction = deepcopy(AUCTION)
+auction['_id'] = uuid4().hex
+auction['cancellations'] = [
+    CANCELLATION_ACTIVE_WITH_DOCUMENTS
+]
+auction['status'] = 'cancelled'
+AUCTION_CANCELLED = auction

@@ -86,6 +86,7 @@ from openprocurement.auctions.geb.models.roles import (
     bid_edit_pending_role,
     bid_pending_role,
     bid_view_role,
+    chronograph_view_role,
     item_edit_role,
     item_view_role,
     question_enquiry_role,
@@ -311,6 +312,9 @@ class Auction(BaseAuction):
 
             'active.tendering': auction_tendering_role,
             'edit_active.tendering': auction_edit_tendering_role,
+
+            'chronograph_view': chronograph_view_role,
+
 
             'active.enquiry': auction_enquiry_role,
             'edit_active.enquiry': auction_edit_enquiry_role,

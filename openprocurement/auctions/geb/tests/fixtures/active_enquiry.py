@@ -43,7 +43,7 @@ auction["enquiryPeriod"] = {
                   "endDate": calculator.enquiryPeriod.endDate.isoformat()
 }
 auction["auctionPeriod"] = {
-    "shouldStartAfter": calculator.auctionPeriod.shouldStartAfter.isoformat()
+    "startDate": calculator.auctionPeriod.startDate.isoformat()
 }
 auction["next_check"] = calculator.enquiryPeriod.endDate.isoformat()
 auction["date"] = calculator.auctionDate.date.isoformat()
@@ -107,7 +107,7 @@ auction["enquiryPeriod"] = {
     "endDate": calculator.enquiryPeriod.endDate.isoformat()
 }
 auction["auctionPeriod"] = {
-    "shouldStartAfter": calculator.auctionPeriod.shouldStartAfter.isoformat()
+    "startDate": calculator.auctionPeriod.startDate.isoformat()
 }
 auction["next_check"] = None
 auction["date"] = calculator.auctionDate.date.isoformat()
