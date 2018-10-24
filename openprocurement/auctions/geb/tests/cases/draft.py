@@ -10,6 +10,7 @@ from openprocurement.auctions.geb.tests.blanks.draft import (
     check_generated_rectification_period,
     check_generated_tender_period,
     check_generated_enquiry_period,
+    item_post,
     invalid_phase_commit,
     phase_commit_invalid_auctionPeriod,
 )
@@ -28,6 +29,7 @@ from openprocurement.auctions.geb.tests.states import (
 )
 
 from openprocurement.auctions.geb.tests.fixtures.draft import (
+    AUCTION_WITHOUT_ITEMS,
     AUCTION_WITH_INVALID_AUCTON_PERIOD,
     AUCTION_WITH_CANCELLATION,
     AUCTION_WITH_CANCELLATION_WITH_DOCUMENTS
@@ -59,6 +61,27 @@ class StatusDraftTest(BaseWebTest):
                                                                           auction['access']['token'])
         entrypoints['post_cancellation'] = '/auctions/{}/cancellations?acc_token={}'.format(auction['data']['id'],
                                                                                             auction['access']['token'])
+        self.auction = auction
+        self.ENTRYPOINTS = entrypoints
+
+
+class StatusDraftWithoutItemsTest(BaseWebTest):
+    test_item_post = snitch(item_post)
+
+    def setUp(self):
+        super(StatusDraftWithoutItemsTest, self).setUp()
+        procedure = ProcedureMachine()
+        procedure.set_db_connector(self.db)
+        change_machine_state(procedure, 'draft')
+        context = procedure.snapshot(fixture=AUCTION_WITHOUT_ITEMS)
+
+        auction = context['auction']
+
+        entrypoints = {}
+
+        entrypoints['get_auction'] = '/auctions/{}'.format(auction['data']['id'])
+        entrypoints['item_post'] = '/auctions/{}/items?acc_token={}'.format(auction['data']['id'],
+                                                                            auction['access']['token'])
         self.auction = auction
         self.ENTRYPOINTS = entrypoints
 
@@ -161,6 +184,7 @@ def suite():
     suite.addTest(unittest.makeSuite(StatusDraftInvalidAuctionPeriodTest))
     suite.addTest(unittest.makeSuite(StatusDraftCancellationsTest))
     suite.addTest(unittest.makeSuite(StatusDraftCancellationsDocumentsTest))
+    suite.addTest(unittest.makeSuite(StatusDraftWithoutItemsTest))
     return suite
 
 

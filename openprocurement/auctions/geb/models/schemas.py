@@ -364,9 +364,8 @@ class Auction(BaseAuction):
     guarantee = ModelType(Guarantee, required=True)
 
     items = ListType(ModelType(Item),
-                     required=True,
-                     min_size=1,
-                     validators=[validate_items_uniq])
+                     validators=[validate_items_uniq],
+                     default=list())
 
     minNumberOfQualifiedBids = IntType(choices=[1, 2], default=2)
 
@@ -412,12 +411,12 @@ class Auction(BaseAuction):
         if value.currency != u'UAH':
             raise ValidationError(u"currency should be only UAH")
 
-    def validate_minimalStep(self, data, value):
-        if value.amount > data['value'].amount:
-            raise ValidationError(u"minimalStep amount must be should be more then value amount")
-        if value.valueAddedTaxIncluded != data['value'].valueAddedTaxIncluded:
-            raise ValidationError(u"minimalStep.valueAddedTaxIncluded must be the same as value.valueAddedTaxIncluded")
-        if value.currency != u'UAH':
+    def validate_minimalStep(self, data, minimalStep):
+        if minimalStep.amount >= data['value'].amount:
+            raise ValidationError(u"miniamalStep.amount should be less than value.amount")
+        if minimalStep.valueAddedTaxIncluded != data['value'].valueAddedTaxIncluded:
+            raise ValidationError(u"minimalStep.valueAddedTaxIncluded should be the same as value.valueAddedTaxIncluded")
+        if minimalStep.currency != u'UAH':
             raise ValidationError(u"currency should be only UAH")
 
     @serializable(serialize_when_none=False)

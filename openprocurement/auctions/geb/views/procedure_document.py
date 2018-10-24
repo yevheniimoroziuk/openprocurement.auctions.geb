@@ -34,7 +34,8 @@ class AuctionDocumentResource(AuctionDocumentResource):
 
         manager = self.request.registry.queryMultiAdapter((self.request, self.context), IAuctionManager)
 
-        document = manager.upload_document()
+        applicant = self.request.validated['document']
+        document = manager.create(applicant)
 
         if document:
             save = manager.save()

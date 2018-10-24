@@ -33,7 +33,8 @@ class AuctionCancellationResource(APIResource):
 
         manager = self.request.registry.queryMultiAdapter((self.request, self.context), IAuctionManager)
 
-        cancellation = manager.cancel()
+        applicant = self.request.validated['cancellation']
+        cancellation = manager.create(applicant)
         save = manager.save()
 
         if save:

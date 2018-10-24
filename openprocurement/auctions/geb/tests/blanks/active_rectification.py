@@ -12,6 +12,9 @@ from openprocurement.auctions.geb.tests.fixtures.active_rectification import (
     AUCTION,
     AUCTION_WITH_DOCUMENTS
 )
+from openprocurement.auctions.geb.tests.fixtures.items import (
+    TEST_ITEM
+)
 
 from openprocurement.auctions.core.tests.base import (
     test_document_data
@@ -196,6 +199,19 @@ def items_patch_collections(test_case):
     response = test_case.app.get(test_case.ENTRYPOINTS['get_auction'], request_data)
     auction = response.json['data']
     test_case.assertEqual(auction['items'][order][field], new_value)
+
+
+def item_post(test_case):
+    expected_http_status = '201 Created'
+
+    request_data = {'data': TEST_ITEM}
+    response = test_case.app.post_json(test_case.ENTRYPOINTS['item_post'], request_data)
+    test_case.assertEqual(response.status, expected_http_status)
+    item = response.json['data']
+
+    entrypoint = '/auctions/{}/items/{}'.format(test_case.auction['data']['id'], item['id'])
+    response = test_case.app.get(entrypoint, request_data)
+    test_case.assertEqual(response.status, '200 OK')
 
 
 def change_budgetSpent(test_case):

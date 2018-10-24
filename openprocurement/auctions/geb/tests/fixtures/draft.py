@@ -68,8 +68,15 @@ auction['_id'] = uuid4().hex
 auction['auctionPeriod'] = {
     "startDate": (now + timedelta(days=3)).isoformat()
 }
-
 AUCTION_WITH_INVALID_AUCTON_PERIOD = auction
+
+# auction without items
+auction = deepcopy(AUCTION)
+
+auction['_id'] = uuid4().hex
+auction.pop('items')
+
+AUCTION_WITHOUT_ITEMS = auction
 
 auction = deepcopy(AUCTION)
 auction['_id'] = uuid4().hex
