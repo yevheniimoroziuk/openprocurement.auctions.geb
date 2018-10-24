@@ -133,7 +133,7 @@ def validate_bid_patch_pending(request, **kwargs):
     # check if it is patch status, only to active can switch
     new_status = request.validated['json_data'].get('status')
     if new_status and new_status != 'active':
-        err_msg = 'Can\'t update bid status, only from pending you can switch to active'
+        err_msg = 'Can`t update bid status. You can only switch from pending to active.'
         request.errors.add('body', 'data', err_msg)
         request.errors.status = 403
         return False

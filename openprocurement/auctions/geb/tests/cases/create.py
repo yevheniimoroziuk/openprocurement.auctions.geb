@@ -10,6 +10,7 @@ from openprocurement.auctions.geb.tests.blanks.create import (
     auction_create_without_items,
     create_auction,
     create_auction_invalid_auctionPeriod,
+    create_auction_invalid_minimalStep,
     create_auction_check_minNumberOfQualifiedBids,
     create_auction_check_auctionParameters
 )
@@ -29,6 +30,7 @@ class CreateAuctionResourceTest(BaseWebTest):
     test_create_auction = snitch(create_auction)
     test_create_auction_check_minNumberOfQualifiedBids = snitch(create_auction_check_minNumberOfQualifiedBids)
     test_create_auction_invalid_auctionPeriod = snitch(create_auction_invalid_auctionPeriod)
+    test_create_auction_invalid_minimalStep = snitch(create_auction_invalid_minimalStep)
     test_create_auction_check_auctionParameters = snitch(create_auction_check_auctionParameters)
 
     def setUp(self):
