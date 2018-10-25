@@ -311,3 +311,18 @@ item_view_role = whitelist(
         'quantity',
         'unit'
 )
+chronograph_view_role = whitelist(
+    'auctionPeriod',
+    'awardPeriod',
+    'awards',
+    'complaints',
+    'doc_id',
+    'enquiryPeriod',
+    'mode',
+    'numberOfBids',
+    'procurementMethodType',
+    'status',
+    'submissionMethodDetails',
+    'tenderPeriod',
+    'rectificationPeriod'
+)

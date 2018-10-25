@@ -23,3 +23,12 @@ CANCELLATION_WITH_DOCUMENTS = {
     "cancellationOf": "tender",
     "id": uuid4().hex
 }
+
+CANCELLATION_ACTIVE_WITH_DOCUMENTS = {
+    "date": "2018-10-18T20:16:42.428581+03:00",
+    "status": "active",
+    "reason": "Cancel reason",
+    "documents": [CANCELLATION_DOCUMENT],
+    "cancellationOf": "tender",
+    "id": uuid4().hex
+}

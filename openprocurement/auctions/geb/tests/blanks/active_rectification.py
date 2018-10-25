@@ -149,10 +149,10 @@ def item_get(test_case):
         'quantity'
     ]
     response = test_case.app.get(test_case.ENTRYPOINTS['get_item'])
-    cancellation = response.json['data']
+    item = response.json['data']
 
     test_case.assertEqual(response.status, expected_http_status)
-    test_case.assertEqual(cancellation.keys(), expected_data)
+    test_case.assertEqual(item.keys(), expected_data)
 
 
 def item_patch(test_case):

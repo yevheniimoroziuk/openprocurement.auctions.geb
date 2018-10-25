@@ -24,12 +24,10 @@ class AuctionResource(AuctionResource):
     def patch(self):
         save = False
         manager = self.request.registry.queryMultiAdapter((self.request, self.context), IAuctionManager)
-
+        manager.change()
         if self.request.authenticated_role == 'chronograph':
-            manager.change()
             manager.check()
         else:
-            manager.change()
             manager.initialize(manager.context.status)
 
         save = manager.save()

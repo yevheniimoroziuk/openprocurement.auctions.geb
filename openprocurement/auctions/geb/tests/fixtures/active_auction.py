@@ -17,7 +17,7 @@ from openprocurement.auctions.geb.tests.fixtures.calculator import (
 )
 
 now = get_now()
-calculator = Calculator(now, 'auctionPeriod', 'shouldStartAfter')
+calculator = Calculator(now, 'auctionPeriod', 'start')
 
 auction = deepcopy(ACTIVE_ENQUIRY_AUCTION)
 
@@ -35,7 +35,7 @@ auction["enquiryPeriod"] = {
                   "endDate": calculator.enquiryPeriod.endDate.isoformat()
 }
 auction["auctionPeriod"] = {
-    "shouldStartAfter": calculator.auctionPeriod.shouldStartAfter.isoformat()
+    "startDate": calculator.auctionPeriod.startDate.isoformat()
 }
 auction["next_check"] = calculator.enquiryPeriod.endDate.isoformat()
 auction["date"] = calculator.auctionDate.date.isoformat()

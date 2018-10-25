@@ -25,7 +25,7 @@ INITIAL_TEST_ITEM = {
         "name": u"item",
         "code": u"44617100-9"
     },
-    "quantity": 5.001,
+    "quantity": 5.0001,
     "address": {
         "countryName": u"Україна",
         "postalCode": "79000",
