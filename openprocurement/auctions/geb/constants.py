@@ -32,6 +32,7 @@ AUCTION_DOCUMENT_TYPES = [
     'x_nda',
     'x_qualificationDocuments',
     'cancellationDetails',
+    'contractProforma'
     ]
 
 BID_DOCUMENT_TYPES = [
