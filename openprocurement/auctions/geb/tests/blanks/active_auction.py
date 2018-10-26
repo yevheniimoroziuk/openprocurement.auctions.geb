@@ -1,7 +1,12 @@
 from copy import deepcopy
+from iso8601 import parse_date
+from datetime import timedelta
 from openprocurement.auctions.geb.tests.fixtures.active_auction import (
     AUCTION as ACTIVE_AUCTION_AUCTION,
     AUCTION_WITH_URLS
+)
+from openprocurement.auctions.geb.utils import (
+    calculate_certainly_business_date as ccbd
 )
 
 
@@ -73,9 +78,22 @@ def switch_to_qualification(test_case):
     award = awards[0]
     test_case.assertIsNotNone(award.get('verificationPeriod'))
     test_case.assertIsNotNone(award.get('signingPeriod'))
-
     test_case.assertEqual(award['bid_id'], winner['id'])
     test_case.assertEqual(award['status'], 'pending')
+
+    # check generated verificationPeriod
+    entrypoint = '/auctions/{}'.format(auction['data']['id'])
+    response = test_case.app.get(entrypoint)
+    auction = response.json['data']
+    enquiryPeriod_end_date = parse_date(auction['enquiryPeriod']['endDate'])
+    expected_end_date = ccbd(enquiryPeriod_end_date, timedelta(days=1), specific_hour=18, working_days=True)
+    verification_end_date = parse_date(award['verificationPeriod']['endDate'])
+    test_case.assertEqual(verification_end_date, expected_end_date)
+
+    # check generated signing
+    signing_end_date = parse_date(award['signingPeriod']['endDate'])
+    expected_end_date = ccbd(verification_end_date, timedelta(days=0), specific_hour=23) + timedelta(minutes=59)
+    test_case.assertEqual(signing_end_date, expected_end_date)
 
 
 def switch_to_unsuccessful(test_case):
