@@ -21,6 +21,9 @@ from openprocurement.auctions.geb.managers.changers import (
     CancellationChanger,
     QuestionChanger
 )
+from openprocurement.auctions.geb.managers.awarding import (
+    Awarding
+)
 from openprocurement.auctions.geb.managers.checkers import (
     AuctionChecker
 )
@@ -57,6 +60,7 @@ class AuctionManager(AuctionManager):
     Creator = Creator
     Initializator = AuctionInitializator
     Logger = AuctionLogger
+    Awarding = Awarding
     SubResourceRepresenter = AuctionSubResourceRepresenter
 
 

@@ -4,6 +4,7 @@ from datetime import timedelta
 
 from openprocurement.auctions.core.interfaces import (
     IAuctionInitializator,
+    IAuctionReportInitializator,
     ICancellationChangerInitializator,
     IBidInitializator
 )
@@ -107,17 +108,15 @@ class AuctionInitializator(object):
         elif self._context.status == 'active.rectification':
             if auction_src['status'] == 'draft':                                # two-phase commit
                 return True
-        elif self._context.status == 'active.auction':                          # chronograph switch to active.auction
-            return True
         return False
 
-    def _invalidate_bids(self):
+    def _invalidate_bids_after_auction(self):
         context = self._context
 
-        value = context.value.amount
-        unsuccessful_bids = [bid for bid in context.bids if bid.value.amount == value]
-        for bid in unsuccessful_bids:
-            bid.status = 'unsuccessful'
+        auction_value = context.value.amount
+        invalid_bids = [bid for bid in context.bids if bid.value.amount == auction_value]
+        for bid in invalid_bids:
+            bid.status = 'invalid'
 
     def initialize(self, status):
         if self._check_demand():
@@ -130,8 +129,6 @@ class AuctionInitializator(object):
                     self._initialize_tenderPeriod()
                     self._initialize_enquiryPeriod()
                     self._clean_auctionPeriod()
-                elif status == 'active.auction' and self._validate(status):
-                    self._invalidate_bids()
             else:
                 self._context.modified = False
 
@@ -215,3 +212,22 @@ class CancellationChangerInitializator(object):
         if self._check_demand():
             self._pendify_auction_status(self._auction, 'cancelled')
             self._clean_procedure()
+
+
+@implementer(IAuctionReportInitializator)
+class AuctionReportInitializator(object):
+    name = 'Auction Report Initializator'
+
+    def __init__(self, request, context):
+        self._request = request
+        self._context = context
+
+    def _invalidate_bids_after_auction(self):
+        context = self._context
+        auction_value = context.value.amount
+        invalid_bids = [bid for bid in context.bids if bid.value.amount == auction_value]
+        for bid in invalid_bids:
+            bid.status = 'invalid'
+
+    def initialize(self):
+            self._invalidate_bids_after_auction()

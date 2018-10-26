@@ -103,6 +103,7 @@ BID_STATUSES = [
     'pending',
     'active',
     'unsuccessful',
+    'invalid',
 ]
 
 AUCTION_STATUS_FOR_ADDING_BID_DOCUMENTS = [
