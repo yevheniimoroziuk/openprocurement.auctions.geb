@@ -10,6 +10,9 @@ from openprocurement.auctions.geb.tests.fixtures.cancellations import (
     CANCELLATION,
     CANCELLATION_WITH_DOCUMENTS
 )
+from openprocurement.auctions.geb.tests.fixtures.documents import (
+    DOCUMENT
+)
 from openprocurement.auctions.geb.tests.fixtures.bids import (
     PENDING_BID_FIRST,
     PENDING_BID_SECOND,
@@ -57,6 +60,14 @@ auction['questions'] = [TEST_QESTION_IN_TENDERING_PERIOD]
 
 AUCTION_WITH_QUESTIONS = auction
 
+
+# auction with documents
+
+auction = deepcopy(AUCTION)
+
+auction['documents'] = [DOCUMENT]
+
+AUCTION_WITH_DOCUMENTS = auction
 
 # auction with bids
 

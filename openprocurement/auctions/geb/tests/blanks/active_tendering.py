@@ -111,7 +111,7 @@ def auction_change_fields(test_case):
         test_case.assertNotEqual(recieve_field, new_data[field])
 
 
-def add_offline_document(test_case):
+def auction_document_post_offline(test_case):
     expected_http_status = '201 Created'
     document = deepcopy(test_document_data)
     document.pop('hash')
@@ -123,7 +123,7 @@ def add_offline_document(test_case):
     test_case.assertEqual(expected_http_status, response.status)
 
 
-def add_document(test_case):
+def auction_document_post(test_case):
     expected_http_status = '201 Created'
     document = deepcopy(test_document_data)
     auction_documents_type = [
@@ -154,6 +154,41 @@ def add_document(test_case):
         request_data = {'data': document}
     response = test_case.app.post_json(test_case.ENTRYPOINTS['documents'], request_data)
     test_case.assertEqual(expected_http_status, response.status)
+
+
+def auction_document_patch(test_case):
+    field = 'documentType'
+    new = 'technicalSpecifications'
+
+    request_data = {'data': {field: new}}
+
+    response = test_case.app.patch_json(test_case.ENTRYPOINTS['document_patch'], request_data)
+    document = response.json['data']
+
+    test_case.assertEqual(response.status, '200 OK')
+    test_case.assertEqual(document[field], new)
+
+    response = test_case.app.get(test_case.ENTRYPOINTS['document_get'])
+    document = response.json['data']
+    test_case.assertEqual(document[field], new)
+
+
+def auction_document_put(test_case):
+    new_document = deepcopy(test_document_data)
+    new_title = 'Title for new Document'
+    url = test_case.generate_docservice_url(),
+    new_document['url'] = url[0]
+    new_document['title'] = new_title
+
+    request_data = {'data': new_document}
+
+    response = test_case.app.put_json(test_case.ENTRYPOINTS['document_put'], request_data)
+
+    test_case.assertEqual(response.status, '200 OK')
+
+    response = test_case.app.get(test_case.ENTRYPOINTS['document_get'])
+    document = response.json['data']
+    test_case.assertEqual(document['title'], new_title)
 
 
 def add_question(test_case):

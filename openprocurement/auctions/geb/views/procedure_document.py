@@ -6,7 +6,8 @@ from openprocurement.auctions.core.utils import (
 )
 from openprocurement.auctions.core.validation import (
     validate_file_upload,
-    validate_patch_document_data,
+    validate_file_update,
+    validate_patch_document_data
 )
 from openprocurement.auctions.core.views.mixins import AuctionDocumentResource
 
@@ -83,3 +84,18 @@ class AuctionDocumentResource(AuctionDocumentResource):
             msg = 'Updated auction document {}'.format(self.request.context.id)
             self.LOGGER.info(msg, extra=extra)
             return {'data': self.request.context.serialize("view")}
+
+    @json_view(permission='upload_auction_documents', validators=(validate_file_update,))
+    def put(self):
+        save = None
+
+        manager = self.request.registry.queryMultiAdapter((self.request, self.context), IDocumentManager)
+
+        document = manager.put()
+        save = manager.save()
+
+        if save:
+            extra = context_unpack(self.request, {'MESSAGE_ID': 'auction_document_put'})
+            msg = 'Updated auction document {}'.format(document.id)
+            self.LOGGER.info(msg, extra=extra)
+            return {'data': document.serialize("view")}

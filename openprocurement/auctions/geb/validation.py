@@ -27,6 +27,7 @@ from openprocurement.auctions.geb.constants import (
     BID_STATUSES_FOR_DELETING,
     CAV_PS_CODES,
     EDIT_AUCTION_DOCUMENT_STATUSES,
+    PUT_AUCTION_DOCUMENT_STATUSES,
     PROCEDURE_DOCUMENT_STATUSES,
     AUCTION_STATUS_FOR_PATCHING_BIDS
 )
@@ -375,6 +376,17 @@ def validate_edit_auction_document_period(request, **kwargs):
     auction = kwargs['auction']
 
     if auction.status not in EDIT_AUCTION_DOCUMENT_STATUSES:
+        return False
+    return True
+
+
+def validate_put_auction_document_period(request, **kwargs):
+    """
+    Validate period in which can put auction document
+    """
+    auction = kwargs['auction']
+
+    if auction.status not in PUT_AUCTION_DOCUMENT_STATUSES:
         return False
     return True
 

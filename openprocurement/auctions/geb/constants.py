@@ -5,6 +5,7 @@ AUCTION_DOCUMENT_STATUSES = ['active.auction', 'active.qualification']
 
 # statuses in which can edit auction document
 EDIT_AUCTION_DOCUMENT_STATUSES = ['active.rectification', 'active.tendering', 'active.enquiry']
+PUT_AUCTION_DOCUMENT_STATUSES = ['active.rectification', 'active.tendering', 'active.enquiry']
 
 # duration of periods
 RECTIFICATION_PERIOD_DURATION = timedelta(hours=48)
