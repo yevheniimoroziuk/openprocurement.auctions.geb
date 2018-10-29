@@ -28,13 +28,9 @@ from openprocurement.auctions.core.interfaces import (
     IBidManager,
     IBidDocumentManager,
     ICancellationManager,
-    IContentConfigurator,
     IDocumentManager,
     IItemManager,
     IQuestionManager
-)
-from openprocurement.auctions.geb.adapters import (
-    AuctionConfigurator
 )
 from openprocurement.auctions.geb.interfaces import (
     IAuction,
@@ -69,7 +65,6 @@ def includeme(config, plugin_map):
     config.registry.registerAdapter(ItemManager, (IRequest, IItem), IItemManager)
     config.registry.registerAdapter(CancellationManager, (IRequest, ICancellation), ICancellationManager)
     config.registry.registerAdapter(DocumentManager, (IRequest, IDocument), IDocumentManager)
-    config.registry.registerAdapter(AuctionConfigurator, (IAuction, IRequest), IContentConfigurator)
 
     LOGGER.info("Included openprocurement.auctions.geb plugin",
                 extra={'MESSAGE_ID': 'included_plugin'})

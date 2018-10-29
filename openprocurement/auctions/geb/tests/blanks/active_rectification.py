@@ -334,6 +334,7 @@ def add_document(test_case):
         'x_nda',
         'x_qualificationDocuments',
         'cancellationDetails',
+        'contractProforma'
     ]
     init_document = deepcopy(test_document_data)
     url = test_case.generate_docservice_url(),

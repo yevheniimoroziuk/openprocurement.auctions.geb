@@ -24,9 +24,8 @@ class AuctionAuctionResource(APIResource):
     def post(self):
         manager = self.request.registry.queryMultiAdapter((self.request, self.context), IAuctionManager)
 
-        manager.bring_auction_result()
-        manager.initialize(manager.context.status)
-        manager.decide_procedure()
+        manager.auction_report()
+        manager.award()
 
         save = manager.save()
         if save:

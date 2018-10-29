@@ -32,6 +32,7 @@ AUCTION_DOCUMENT_TYPES = [
     'x_nda',
     'x_qualificationDocuments',
     'cancellationDetails',
+    'contractProforma'
     ]
 
 BID_DOCUMENT_TYPES = [
@@ -103,6 +104,7 @@ BID_STATUSES = [
     'pending',
     'active',
     'unsuccessful',
+    'invalid',
 ]
 
 AUCTION_STATUS_FOR_ADDING_BID_DOCUMENTS = [
