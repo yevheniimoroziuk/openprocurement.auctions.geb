@@ -13,6 +13,7 @@ from openprocurement.auctions.core.interfaces import (
 
 from openprocurement.auctions.core.utils import (
     apply_patch,
+    upload_file
 )
 
 from openprocurement.auctions.geb.managers.utils import (
@@ -24,6 +25,7 @@ from openprocurement.auctions.geb.validation import (
     validate_item_changing_period,
     validate_phase_commit,
     validate_edit_auction_document_period,
+    validate_put_auction_document_period,
     # patch bids validators
     validate_bid_patch_draft,
     validate_bid_patch_pending,
@@ -109,23 +111,31 @@ class BidChanger(object):
 @implementer(IDocumentChanger)
 class DocumentChanger(object):
     name = 'Document Changer'
-    validators = [validate_edit_auction_document_period]
+    patch_validators = [validate_edit_auction_document_period]
+    put_validators = [validate_put_auction_document_period]
 
     def __init__(self, request, context):
         self._request = request
         self._context = context
         self._auction = context.__parent__
 
-    def validate(self):
-        for validator in self.validators:
+    def validate(self, validators):
+        for validator in validators:
             if not validator(self._request, auction=self._auction, document=self._context):
                 return
         return True
 
     def change(self):
-        if self.validate():
+        if self.validate(self.patch_validators):
             self._auction.modified = apply_patch(self._request, save=False, src=self._context.serialize())
             return self._auction.modified
+
+    def put(self):
+        if self.validate(self.put_validators):
+            document = upload_file(self._request)
+            self._auction.documents.append(document)
+            self._auction.modified = True
+            return document
 
 
 @implementer(IBidDocumentChanger)

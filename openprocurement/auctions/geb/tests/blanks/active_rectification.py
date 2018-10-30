@@ -370,6 +370,25 @@ def patch_document(test_case):
     test_case.assertEqual(document[field], new)
 
 
+def put_document(test_case):
+    new_document = deepcopy(test_document_data)
+    url = test_case.generate_docservice_url(),
+    new_document['url'] = url[0]
+
+    context = test_case.procedure.snapshot(fixture=AUCTION_WITH_DOCUMENTS)
+    auction = context['auction']
+    document = context['documents'][0]
+
+    entrypoint_pattern = '/auctions/{}/documents/{}?acc_token={}'
+    entrypoint = entrypoint_pattern.format(auction['data']['id'], document['data']['id'], auction['access']['token'])
+    request_data = {'data': new_document}
+
+    response = test_case.app.put_json(entrypoint, request_data)
+    document = response.json['data']
+
+    test_case.assertEqual(response.status, '200 OK')
+
+
 def add_document_dump(test_case):
     document = deepcopy(test_document_data)
     url = test_case.generate_docservice_url(),

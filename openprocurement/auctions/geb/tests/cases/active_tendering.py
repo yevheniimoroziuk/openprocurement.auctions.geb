@@ -14,6 +14,7 @@ from openprocurement.auctions.geb.tests.blanks.mixins import (
     CancellationDocumentsWorkFlowMixin
 )
 from openprocurement.auctions.geb.tests.fixtures.active_tendering import (
+    AUCTION_WITH_DOCUMENTS,
     AUCTION_WITH_ACTIVE_BID,
     AUCTION_WITH_ACTIVE_BID_WITH_DOCUMENT,
     AUCTION_WITH_BIDS_WITH_CANCELLATION,
@@ -27,9 +28,11 @@ from openprocurement.auctions.geb.tests.fixtures.active_tendering import (
 )
 
 from openprocurement.auctions.geb.tests.blanks.active_tendering import (
-    add_document,
+    auction_document_patch,
+    auction_document_put,
+    auction_document_post,
+    auction_document_post_offline,
     add_invalid_bid,
-    add_offline_document,
     add_question,
     add_question_to_item,
     answer_question,
@@ -63,7 +66,10 @@ from openprocurement.auctions.geb.tests.blanks.cancellations import (
 
 
 class StatusActiveTenderingTest(BaseWebTest):
+    docservice = True
 
+    test_auction_document_post_offline = snitch(auction_document_post_offline)
+    test_auction_document_post = snitch(auction_document_post)
     test_add_question = snitch(add_question)
     test_add_question_to_item = snitch(add_question_to_item)
     test_bid_add = snitch(bid_add)
@@ -86,6 +92,8 @@ class StatusActiveTenderingTest(BaseWebTest):
         entrypoints['get_auction'] = '/auctions/{}'.format(self.auction['data']['id'])
         entrypoints['questions'] = '/auctions/{}/questions'.format(self.auction['data']['id'])
         entrypoints['bids'] = '/auctions/{}/bids'.format(self.auction['data']['id'])
+        entrypoints['documents'] = '/auctions/{}/documents?acc_token={}'.format(self.auction['data']['id'],
+                                                                                self.auction['access']['token'])
 
         self.ENTRYPOINTS = entrypoints
 
@@ -301,8 +309,8 @@ class StatusActiveTenderingActiveBidsWithDocumentTest(BaseWebTest):
 class StatusActiveTenderingDocumentsTest(BaseWebTest):
     docservice = True
 
-    test_add_offline_document = snitch(add_offline_document)
-    test_add_document = snitch(add_document)
+    test_auction_document_patch = snitch(auction_document_patch)
+    test_auction_document_put = snitch(auction_document_put)
 
     def setUp(self):
         super(StatusActiveTenderingDocumentsTest, self).setUp()
@@ -310,14 +318,22 @@ class StatusActiveTenderingDocumentsTest(BaseWebTest):
         procedure = ProcedureMachine()
         procedure.set_db_connector(self.db)
         procedure.toggle('active.tendering')
-        context = procedure.snapshot()
+        context = procedure.snapshot(fixture=AUCTION_WITH_DOCUMENTS)
 
-        self.auction = context['auction']
+        auction = context['auction']
+        document = context['documents'][0]
 
         entrypoints = {}
-        entrypoints['documents'] = '/auctions/{}/documents?acc_token={}'.format(self.auction['data']['id'],
-                                                                                self.auction['access']['token'])
+        entrypoints['document_patch'] = '/auctions/{}/documents/{}?acc_token={}'.format(auction['data']['id'],
+                                                                                        document['data']['id'],
+                                                                                        auction['access']['token'])
 
+        entrypoints['document_get'] = '/auctions/{}/documents/{}'.format(auction['data']['id'],
+                                                                         document['data']['id'])
+        entrypoints['document_put'] = entrypoints['document_patch']
+
+        self.document = document
+        self.auction = auction
         self.ENTRYPOINTS = entrypoints
 
 
