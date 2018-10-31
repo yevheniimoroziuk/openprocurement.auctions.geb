@@ -44,7 +44,7 @@ class Awarding(BaseAwarding):
         verification_end_date = self.verification_period['endDate']
         end_date = cbd(verification_end_date, timedelta(days=0), self.context, specific_hour=23) + timedelta(minutes=59)
         singing_period = {
-            'startDate': verification_end_date,
+            'startDate': self._start_awarding,
             'endDate': end_date
         }
 

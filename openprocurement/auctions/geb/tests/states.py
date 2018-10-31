@@ -23,6 +23,10 @@ from openprocurement.auctions.geb.tests.fixtures.active_auction import (
     END_ACTIVE_AUCTION_AUCTION
 )
 
+from openprocurement.auctions.geb.tests.fixtures.active_qualification import (
+    AUCTION as ACTIVE_QUALIFICATION_AUCTION
+)
+
 
 class State(object):
 
@@ -88,7 +92,24 @@ class State(object):
                 info = {}
                 info['data'] = deepcopy(cancellation)
                 context['cancellations'].append(info)
+
+        # add awards context
+        context['awards'] = []
+        awards = fixture.get('awards', None)
+        if awards:
+            for award in awards:
+                info = {}
+                info['data'] = deepcopy(award)
+                context['awards'].append(info)
+
         return context
+
+
+# Active Qualification
+
+class ActiveQualification(State):
+    fixture = ACTIVE_QUALIFICATION_AUCTION
+    status = 'active.qualification'
 
 # Auction States
 
@@ -131,6 +152,9 @@ class ActiveAuction(State):
                 context['cancellations'].append(info)
 
         return context
+
+    def _next(self, end=False):
+        return ActiveQualification()
 
 # Enquiry States
 

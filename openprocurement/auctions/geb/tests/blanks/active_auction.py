@@ -86,14 +86,24 @@ def switch_to_qualification(test_case):
     response = test_case.app.get(entrypoint)
     auction = response.json['data']
     enquiryPeriod_end_date = parse_date(auction['enquiryPeriod']['endDate'])
-    expected_end_date = ccbd(enquiryPeriod_end_date, timedelta(days=1), specific_hour=18, working_days=True)
+    verification_start_date = parse_date(award['verificationPeriod']['startDate'])
     verification_end_date = parse_date(award['verificationPeriod']['endDate'])
+
+    expected_end_date = ccbd(enquiryPeriod_end_date, timedelta(days=1), specific_hour=18, working_days=True)
     test_case.assertEqual(verification_end_date, expected_end_date)
 
     # check generated signing
     signing_end_date = parse_date(award['signingPeriod']['endDate'])
+    signing_start_date = parse_date(award['signingPeriod']['startDate'])
+
     expected_end_date = ccbd(verification_end_date, timedelta(days=0), specific_hour=23) + timedelta(minutes=59)
     test_case.assertEqual(signing_end_date, expected_end_date)
+    test_case.assertEqual(signing_start_date, verification_start_date)
+
+    # check generated awardPeriod
+    auction = response.json['data']
+    award_period_start = parse_date(auction['awardPeriod']['startDate'])
+    test_case.assertEqual(award_period_start, verification_start_date)
 
 
 def switch_to_unsuccessful(test_case):
