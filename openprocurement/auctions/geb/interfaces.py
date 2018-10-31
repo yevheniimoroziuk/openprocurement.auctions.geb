@@ -1,7 +1,8 @@
 from zope.interface import Interface
+from openprocurement.auctions.core.interfaces import IAuction as BaseIAuction
 
 
-class IAuction(Interface):
+class IAuction(BaseIAuction):
     """Interface for Geb Auction"""
 
 
@@ -11,6 +12,10 @@ class IBid(Interface):
 
 class IItem(Interface):
     """Interface for Geb Item"""
+
+
+class IContract(Interface):
+    """Interface for Geb Contract"""
 
 
 class IDocument(Interface):

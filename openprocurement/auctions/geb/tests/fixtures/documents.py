@@ -45,3 +45,16 @@ BID_DOCUMENT = {
 }
 
 test_document_service_url = 'http://localhost/get/6f63b414f958418082d22ec971424ca4?KeyID=172d32c8&Signature=2RWdpnpuy95Gn7E2vIDsHPPeRrtZUgtS75FsMxZBllnUUXNx%2BK7WvGeTtPvxHhcFAeW6UNfGtexCH2pNPPuzCA%3D%3D'
+
+AUCTION_PROTOCOL_DOCUMENT = {
+    "hash": "md5:00000000000000000000000000000000",
+    "author": "auction_owner",
+    "url": "http://localhost/get/ec59520826574794a52ab4e1e2768d4f?KeyID=172d32c8&Signature=YNMV1qHNv2Jys3OhHPlrX44eio8qLm5nW7AOuasefwQiV03CKhIeoIesXmxub7jF1PT8oQGMFtr%252ByocDj%2FrKCg%253D%253D",
+    "format": "application/msword",
+    "title": "Auction Protocol",
+    "documentOf": "auction",
+    "datePublished": now.isoformat(),
+    "documentType": "auctionProtocol",
+    "id": uuid4().hex,
+    "dateModified": now.isoformat()
+}

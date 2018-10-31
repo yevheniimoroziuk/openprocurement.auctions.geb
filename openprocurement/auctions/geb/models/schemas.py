@@ -38,8 +38,8 @@ from openprocurement.auctions.core.models import (
     dgfCancellation as BaseCancellation,
     validate_items_uniq
 )
-from openprocurement.auctions.core.plugins.awarding.v2_1.models import Award
-from openprocurement.auctions.core.plugins.contracting.v2_1.models import Contract
+from openprocurement.auctions.core.plugins.awarding.v3_1.models import Award
+from openprocurement.auctions.core.plugins.contracting.v3_1.models import Contract as BaseContract
 from openprocurement.auctions.core.utils import (
     SANDBOX_MODE,
     TZ,
@@ -58,6 +58,7 @@ from openprocurement.auctions.geb.interfaces import (
     IDocument,
     IBidDocument,
     IItem,
+    IContract,
     IQuestion
 )
 
@@ -307,6 +308,12 @@ class Item(BaseItem):
 
         if not need_schemas.issubset(schemas):
             raise ValidationError(err_msg)
+
+
+@implementer(IContract)
+class Contract(BaseContract):
+
+    items = ListType(ModelType(Item))
 
 
 @implementer(IAuction)
