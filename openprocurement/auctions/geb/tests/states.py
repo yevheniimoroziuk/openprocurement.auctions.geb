@@ -26,6 +26,9 @@ from openprocurement.auctions.geb.tests.fixtures.active_auction import (
 from openprocurement.auctions.geb.tests.fixtures.active_qualification import (
     AUCTION as ACTIVE_QUALIFICATION_AUCTION
 )
+from openprocurement.auctions.geb.tests.fixtures.active_awarded import (
+    AUCTION as ACTIVE_AWARDED_AUCTION
+)
 
 
 class State(object):
@@ -102,16 +105,37 @@ class State(object):
                 info['data'] = deepcopy(award)
                 context['awards'].append(info)
 
+        # add contracts context
+        context['contracts'] = []
+        contracts = fixture.get('contracts', None)
+        if contracts:
+            for contract in contracts:
+                info = {}
+                info['data'] = deepcopy(contract)
+                context['contracts'].append(info)
+
         return context
 
 
+# Auction States
+
+# Active Awarded
+
+class ActiveAwarded(State):
+    fixture = ACTIVE_AWARDED_AUCTION
+    status = 'active.awarded'
+
 # Active Qualification
+
 
 class ActiveQualification(State):
     fixture = ACTIVE_QUALIFICATION_AUCTION
     status = 'active.qualification'
 
-# Auction States
+    def _next(self, end=False):
+        return ActiveAwarded()
+
+# Active Auction
 
 
 class EndActiveAuction(State):

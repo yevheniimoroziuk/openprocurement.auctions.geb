@@ -51,3 +51,40 @@ award['id'] = uuid4().hex
 
 award['documents'] = [AUCTION_PROTOCOL_DOCUMENT]
 AWARD_PENDING_WITH_PROTOCOL = award
+
+# active award
+
+award = deepcopy(AWARD_PENDING_WITH_PROTOCOL)
+award['id'] = uuid4().hex
+award['status'] = 'active'
+
+verification_period_end = ccbd(get_now(), -timedelta(days=1), specific_hour=17)
+
+calculator = Calculator(verification_period_end, 'verificationPeriod', 'end')
+award = {
+    "status": "pending",
+    "verificationPeriod": {
+        "startDate": calculator.verificationPeriod.startDate.isoformat(),
+        "endDate": calculator.verificationPeriod.endDate.isoformat()
+    },
+    "complaintPeriod": {
+        "startDate": calculator.complaintPeriod.startDate.isoformat(),
+        "endDate": calculator.complaintPeriod.endDate.isoformat(),
+    },
+    "suppliers": [
+        test_organization
+    ],
+    "signingPeriod": {
+        "startDate": calculator.signingPeriod.startDate.isoformat(),
+        "endDate": calculator.signingPeriod.endDate.isoformat()
+    },
+    "value": {
+        "currency": "UAH",
+        "amount": 200,
+        "valueAddedTaxIncluded": True
+    },
+    "date": calculator.date.isoformat(),
+    "id": uuid4().hex
+}
+
+AWARD_ACTIVE = award
