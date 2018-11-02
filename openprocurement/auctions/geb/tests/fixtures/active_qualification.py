@@ -5,12 +5,16 @@ from openprocurement.auctions.geb.tests.fixtures.active_enquiry import (
 )
 
 from openprocurement.auctions.core.utils import get_now
+
 from openprocurement.auctions.geb.tests.fixtures.calculator import (
     Calculator
 )
 from openprocurement.auctions.geb.tests.fixtures.awards import (
     AWARD_PENDING,
     AWARD_PENDING_WITH_PROTOCOL
+)
+from openprocurement.auctions.geb.tests.fixtures.documents import (
+    AUCTION_DOCUMENT_AUDIT
 )
 from openprocurement.auctions.geb.tests.fixtures.bids import (
     BID_ACTIVE_FIRST
@@ -27,6 +31,7 @@ calculator = Calculator(qualification_period_start, 'qualificationPeriod', 'star
 auction = deepcopy(ACTIVE_ENQUIRY_AUCTION)
 
 auction['status'] = 'active.qualification'
+auction['documents'] = [AUCTION_DOCUMENT_AUDIT]
 auction["rectificationPeriod"] = {
     "startDate": calculator.rectificationPeriod.startDate.isoformat(),
     "endDate": calculator.rectificationPeriod.endDate.isoformat()

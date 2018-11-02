@@ -1,6 +1,11 @@
 from copy import deepcopy
 from iso8601 import parse_date
 from datetime import timedelta
+
+from openprocurement.auctions.core.tests.base import (
+    test_document_data
+)
+
 from openprocurement.auctions.geb.tests.fixtures.active_auction import (
     AUCTION as ACTIVE_AUCTION_AUCTION,
     AUCTION_WITH_URLS
@@ -8,6 +13,29 @@ from openprocurement.auctions.geb.tests.fixtures.active_auction import (
 from openprocurement.auctions.geb.utils import (
     calculate_certainly_business_date as ccbd
 )
+
+
+def post_auction_document_audit(test_case):
+    context = test_case.procedure.snapshot(fixture=ACTIVE_AUCTION_AUCTION)
+    auction = context['auction']
+
+    entrypoint = '/auctions/{}/documents'.format(auction['data']['id'])
+    expected_http_status = '201 Created'
+    document = deepcopy(test_document_data)
+    url = test_case.generate_docservice_url(),
+    document['url'] = url[0]
+    request_data = {'data': document}
+
+    response = test_case.app.post_json(entrypoint, request_data)
+    test_case.assertEqual(expected_http_status, response.status)
+
+    document = response.json['data']
+
+    pattern = '/auctions/{}/documents/{}'
+    entrypoint = pattern.format(auction['data']['id'], document['id'])
+    response = test_case.app.get(entrypoint)
+
+    test_case.assertEqual(response.status, '200 OK')
 
 
 def get_auction_auction(test_case):

@@ -348,35 +348,31 @@ class Auction(BaseAuction):
     _internal_type = "geb"
     modified = False
 
-    auctionPeriod = ModelType(AuctionAuctionPeriod, required=True, default={})
     auctionParameters = ModelType(AuctionParameters)
-    awardCriteria = StringType(choices=['highestCost'],
-                               default='highestCost')
+
+    auctionPeriod = ModelType(AuctionAuctionPeriod, required=True, default={})
+
+    awardCriteria = StringType(choices=['highestCost'], default='highestCost')
 
     awards = ListType(ModelType(Award), default=list())
 
-    bids = ListType(ModelType(Bid), default=list())
-
-    questions = ListType(ModelType(Question), default=list())
-
     bankAccount = ModelType(BankAccount)
+
+    bids = ListType(ModelType(Bid), default=list())
 
     budgetSpent = ModelType(Value, required=True)
 
-    contracts = ListType(ModelType(Contract), default=list())
-
-    contractTerms = ModelType(ContractTerms,
-                              required=True)
-
     cancellations = ListType(ModelType(Cancellation), default=list())
 
-    lotIdentifier = StringType(required=True)
+    complaints = ListType(ModelType(BaseComplaint), default=list())
 
-    lotHolder = ModelType(BaseOrganization, required=True)
+    contractTerms = ModelType(ContractTerms, required=True)
 
-    description = StringType(required=True)
+    contracts = ListType(ModelType(Contract), default=list())
 
     dateModified = IsoDateTimeType()
+
+    description = StringType(required=True)
 
     documents = ListType(ModelType(AuctionDocument), default=list())
 
@@ -384,19 +380,21 @@ class Auction(BaseAuction):
 
     guarantee = ModelType(Guarantee, required=True)
 
-    items = ListType(ModelType(Item),
-                     validators=[validate_items_uniq],
-                     default=list())
+    items = ListType(ModelType(Item), validators=[validate_items_uniq], default=list())
+
+    lotHolder = ModelType(BaseOrganization, required=True)
+
+    lotIdentifier = StringType(required=True)
 
     minNumberOfQualifiedBids = IntType(choices=[1, 2], default=2)
 
     mode = StringType()
 
-    complaints = ListType(ModelType(BaseComplaint), default=list())
-
     procurementMethod = StringType(choices=['open'], default='open')
 
     procurementMethodType = StringType(required=True)
+
+    questions = ListType(ModelType(Question), default=list())
 
     rectificationPeriod = ModelType(RectificationPeriod)
 
@@ -404,8 +402,7 @@ class Auction(BaseAuction):
 
     status = StringType(choices=AUCTION_STATUSES, default='draft')
 
-    submissionMethod = StringType(choices=['electronicAuction'],
-                                  default='electronicAuction')
+    submissionMethod = StringType(choices=['electronicAuction'], default='electronicAuction')
 
     tenderAttempts = IntType(choices=range(1, 11))
 
