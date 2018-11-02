@@ -43,12 +43,12 @@ test_auction_value_created = {
 }
 
 test_auction_minimalStep = {
-    "amount": 35,
+    "amount": 42,
     "currency": u"UAH"
 }
 
 test_auction_minimalStep_created = {
-    "amount": 35,
+    "amount": 42,
     "currency": u"UAH",
     "valueAddedTaxIncluded": True
 

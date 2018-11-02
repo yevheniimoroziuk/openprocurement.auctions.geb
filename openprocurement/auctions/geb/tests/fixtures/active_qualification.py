@@ -13,7 +13,7 @@ from openprocurement.auctions.geb.tests.fixtures.awards import (
     AWARD_PENDING_WITH_PROTOCOL
 )
 from openprocurement.auctions.geb.tests.fixtures.bids import (
-    ACTIVE_BID_FIRST
+    BID_ACTIVE_FIRST
 )
 from openprocurement.auctions.geb.utils import (
     calculate_certainly_business_date as ccbd
@@ -48,7 +48,7 @@ auction["awardPeriod"] = {
 }
 
 auction["next_check"] = None
-auction['bids'] = [ACTIVE_BID_FIRST]
+auction['bids'] = [BID_ACTIVE_FIRST]
 auction["awards"] = [AWARD_PENDING]
 auction["awards"][0]['bid_id'] = auction['bids'][0]['id']
 auction["date"] = calculator.auctionDate.date.isoformat()

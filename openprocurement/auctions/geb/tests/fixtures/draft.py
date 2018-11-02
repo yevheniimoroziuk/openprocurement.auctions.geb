@@ -2,7 +2,10 @@
 from uuid import uuid4
 from copy import deepcopy
 from datetime import timedelta
-from openprocurement.auctions.core.utils import get_now
+from openprocurement.auctions.core.utils import (
+    get_now,
+    SANDBOX_MODE
+)
 from openprocurement.auctions.geb.tests.fixtures.common import (
     test_auctionParameters,
     test_auction_budgetSpent_created,
@@ -26,44 +29,47 @@ from openprocurement.auctions.geb.tests.fixtures.cancellations import (
 
 now = get_now()
 
+# draft default auction
 AUCTION = {
     "_id": uuid4().hex,
-    "procurementMethod": "open",
     "auctionID": "UA-EA-2018-09-20-000001",
-    "minNumberOfQualifiedBids": 2,
-    "submissionMethod": "electronicAuction",
-    "awardCriteria": "highestCost",
-    "owner": "broker",
-    "transfer_token": test_transfer_token,
-    "title": "футляри до державних нагород",
-    "tenderAttempts": 1,
-    'bankAccount': test_bankAccount,
-    "registrationFee": test_registrationFee_created,
-    "owner_token": uuid4().hex,
     "auctionParameters": test_auctionParameters,
-    "guarantee": test_auction_guarantee,
-    "dateModified": now.isoformat(),
-    "status": "draft",
-    "lotHolder": test_lotHolder,
-    "description": "test procuredure",
-    "lotIdentifier": "219560",
-    "auctionPeriod": {
-        "startDate": (now + timedelta(days=14)).isoformat()
-    },
-    "procurementMethodType": "landlease",
-    "date": now.isoformat(),
+    "auctionPeriod": {"startDate": (now + timedelta(days=14)).isoformat()},
+    "awardCriteria": "highestCost",
     "budgetSpent": test_auction_budgetSpent_created,
-    "doc_type": "Auction",
     "contractTerms": test_contractTerms,
-    "minimalStep": test_auction_minimalStep_created,
+    "date": now.isoformat(),
+    "dateModified": now.isoformat(),
+    "description": "test procuredure",
+    "doc_type": "Auction",
+    "guarantee": test_auction_guarantee,
     "items": [TEST_ITEM],
-    "value": test_auction_value_created,
+    "lotHolder": test_lotHolder,
+    "lotIdentifier": "219560",
+    "minNumberOfQualifiedBids": 2,
+    "minimalStep": test_auction_minimalStep_created,
     "numberOfBids": 0,
-    "procuringEntity": test_procuringEntity
+    "owner": "broker",
+    "owner_token": uuid4().hex,
+    "procurementMethod": "open",
+    "procurementMethodType": "landlease",
+    "procuringEntity": test_procuringEntity,
+    "registrationFee": test_registrationFee_created,
+    "status": "draft",
+    "submissionMethod": "electronicAuction",
+    "tenderAttempts": 1,
+    "title": "футляри до державних нагород",
+    "transfer_token": test_transfer_token,
+    "value": test_auction_value_created,
+    'bankAccount': test_bankAccount,
 }
 
-auction = deepcopy(AUCTION)
+if SANDBOX_MODE:
+    AUCTION['procurementMethodDetails'] = 'quick, accelerator=1440'
+    AUCTION['submissionMethodDetails'] = 'test submissionMethodDetails'
 
+# auction with invalid auction period
+auction = deepcopy(AUCTION)
 auction['_id'] = uuid4().hex
 auction['auctionPeriod'] = {
     "startDate": (now + timedelta(days=3)).isoformat()
@@ -72,23 +78,18 @@ AUCTION_WITH_INVALID_AUCTON_PERIOD = auction
 
 # auction without items
 auction = deepcopy(AUCTION)
-
 auction['_id'] = uuid4().hex
 auction.pop('items')
-
 AUCTION_WITHOUT_ITEMS = auction
 
+# auction with cancellation
 auction = deepcopy(AUCTION)
 auction['_id'] = uuid4().hex
-auction['cancellations'] = [
-    CANCELLATION
-]
+auction['cancellations'] = [CANCELLATION]
 AUCTION_WITH_CANCELLATION = auction
 
-
+# auction with cancellation with documents
 auction = deepcopy(AUCTION_WITH_CANCELLATION)
 auction['_id'] = uuid4().hex
-auction['cancellations'] = [
-    CANCELLATION_WITH_DOCUMENTS
-]
+auction['cancellations'] = [CANCELLATION_WITH_DOCUMENTS]
 AUCTION_WITH_CANCELLATION_WITH_DOCUMENTS = auction

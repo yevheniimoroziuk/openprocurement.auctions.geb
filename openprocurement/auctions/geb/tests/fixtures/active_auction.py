@@ -9,7 +9,7 @@ from openprocurement.auctions.geb.tests.fixtures.cancellations import (
     CANCELLATION_WITH_DOCUMENTS
 )
 from openprocurement.auctions.geb.tests.fixtures.bids import (
-    ACTIVE_BID_FIRST
+    BID_ACTIVE_FIRST
 )
 from openprocurement.auctions.core.utils import get_now
 from openprocurement.auctions.geb.tests.fixtures.calculator import (
@@ -68,7 +68,7 @@ auction['_id'] = uuid4().hex
 auction['cancellations'] = [
     CANCELLATION
 ]
-auction['bids'] = [ACTIVE_BID_FIRST]
+auction['bids'] = [BID_ACTIVE_FIRST]
 
 AUCTION_WITH_BIDS_WITH_CANCELLATION = auction
 
