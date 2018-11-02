@@ -59,3 +59,5 @@ CONTRACT_PENDING = contract
 contract = deepcopy(CONTRACT_PENDING)
 contract['id'] = uuid4().hex
 contract['documents'] = [CONTRACT_DOCUMENT]
+
+CONTRACT_PENDING_WITH_DOCUMENT = contract

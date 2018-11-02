@@ -31,13 +31,28 @@ def organizer_uploads_the_contract(test_case):
 
 def organizer_activate_contract(test_case):
 
+    # check contract activation conditions
+
     request_data = {"data": {"status": "active"}}
     response = test_case.app.patch_json(test_case.ENTRYPOINTS['contract_patch'], request_data, status=403)
-    test_case.assertEqual('Forbidden 403', response.status)
+    test_case.assertEqual('403 Forbidden', response.status)
 
     now = get_now()
-    request_data = {"data": {"dateSigned": now}}
+    request_data = {"data": {"dateSigned": now.isoformat()}}
     response = test_case.app.patch_json(test_case.ENTRYPOINTS['contract_patch'], request_data)
     test_case.assertEqual('200 OK', response.status)
 
+    request_data = {"data": {"status": "active"}}
+    response = test_case.app.patch_json(test_case.ENTRYPOINTS['contract_patch'], request_data)
+
+    # check contract after activation
     response = test_case.app.get(test_case.ENTRYPOINTS['contract_get'])
+    contract = response.json['data']
+
+    # check contract status
+    test_case.assertEqual(contract['status'], 'active')
+
+    # check auction after contract activation
+    response = test_case.app.get(test_case.ENTRYPOINTS['auction_get'])
+    contract = response.json['data']
+    test_case.assertEqual(contract['status'], 'complete')

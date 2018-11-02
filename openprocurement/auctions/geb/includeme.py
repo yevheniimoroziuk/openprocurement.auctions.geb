@@ -8,6 +8,7 @@ from openprocurement.auctions.core.includeme import (
 
 from openprocurement.auctions.geb.managers.main import (
     AuctionManager,
+    AuctionPartialManager,
     BidManager,
     BidDocumentManager,
     DocumentManager,
@@ -59,6 +60,7 @@ def includeme(config, plugin_map):
 
     # register adapters
     config.registry.registerAdapter(AuctionManager, (IRequest, IAuction), IAuctionManager)
+    config.registry.registerAdapter(AuctionPartialManager, (IAuction,), IAuctionManager)
     config.registry.registerAdapter(BidManager, (IRequest, IBid), IBidManager)
     config.registry.registerAdapter(BidDocumentManager, (IRequest, IBidDocument), IBidDocumentManager)
     config.registry.registerAdapter(QuestionManager, (IRequest, IQuestion), IQuestionManager)

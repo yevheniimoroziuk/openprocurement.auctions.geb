@@ -51,6 +51,9 @@ from openprocurement.auctions.geb.managers.loggers import (
     CancellationLogger,
     ItemLogger
 )
+from openprocurement.auctions.core.adapters import (
+    AuctionManagerAdapter
+)
 
 
 class AuctionManager(AuctionManager):
@@ -96,3 +99,7 @@ class CancellationManager(CancellationManager):
 
 class DocumentManager(DocumentManager):
     Changer = DocumentChanger
+
+
+class AuctionPartialManager(AuctionManagerAdapter):
+    pass

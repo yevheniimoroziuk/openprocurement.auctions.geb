@@ -11,7 +11,7 @@ from openprocurement.auctions.geb.tests.blanks.active_awarded import (
     organizer_uploads_the_contract,
     organizer_activate_contract
 )
-from openprocurement.auctions.geb.tests.fixtures.active_qualification import (
+from openprocurement.auctions.geb.tests.fixtures.active_awarded import (
     AUCTION_WITH_CONTRACT_WITH_DOCUMENT
 )
 
@@ -57,7 +57,7 @@ class ContractWithContractDocumentTest(BaseWebTest):
         procedure.toggle('active.qualification')
         context = procedure.snapshot(fixture=AUCTION_WITH_CONTRACT_WITH_DOCUMENT)
 
-        award = context['awards'][0]
+        contract = context['contracts'][0]
         bid = context['bids'][0]
         auction = context['auction']
         entrypoints = {}
@@ -65,20 +65,17 @@ class ContractWithContractDocumentTest(BaseWebTest):
         pattern = '/auctions/{}'
         entrypoints['auction_get'] = pattern.format(auction['data']['id'])
 
-        pattern = '/auctions/{}/contracts'
-        entrypoints['contracts_get'] = pattern.format(auction['data']['id'])
+        pattern = '/auctions/{}/contracts/{}'
+        entrypoints['contract_get'] = pattern.format(auction['data']['id'],
+                                                     contract['data']['id'])
 
-        pattern = '/auctions/{}/awards/{}'
-        entrypoints['award_get'] = pattern.format(auction['data']['id'],
-                                                  award['data']['id'])
-
-        pattern = '/auctions/{}/awards/{}?acc_token={}'
-        entrypoints['award_patch'] = pattern.format(auction['data']['id'],
-                                                    award['data']['id'],
-                                                    auction['access']['token'])
+        pattern = '/auctions/{}/contracts/{}?acc_token={}'
+        entrypoints['contract_patch'] = pattern.format(auction['data']['id'],
+                                                       contract['data']['id'],
+                                                       auction['access']['token'])
         self.ENTRYPOINTS = entrypoints
         self.auction = auction
-        self.award = award
+        self.contract = contract
         self.bid = bid
 
 
