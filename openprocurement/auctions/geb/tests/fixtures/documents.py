@@ -58,3 +58,16 @@ AUCTION_PROTOCOL_DOCUMENT = {
     "id": uuid4().hex,
     "dateModified": now.isoformat()
 }
+
+CONTRACT_DOCUMENT = {
+    "hash": "md5:00000000000000000000000000000000",
+    "author": "auction_owner",
+    "url": "http://localhost/get/ec59520826574794a52ab4e1e2768d4f?KeyID=172d32c8&Signature=YNMV1qHNv2Jys3OhHPlrX44eio8qLm5nW7AOuasefwQiV03CKhIeoIesXmxub7jF1PT8oQGMFtr%252ByocDj%2FrKCg%253D%253D",
+    "format": "application/msword",
+    "title": "Auction Contract",
+    "documentOf": "auction",
+    "datePublished": now.isoformat(),
+    "documentType": "contractSigned",
+    "id": uuid4().hex,
+    "dateModified": now.isoformat()
+}

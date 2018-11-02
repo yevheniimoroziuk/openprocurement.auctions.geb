@@ -14,16 +14,16 @@ from openprocurement.auctions.geb.tests.blanks.mixins import (
     CancellationDocumentsWorkFlowMixin
 )
 from openprocurement.auctions.geb.tests.fixtures.active_tendering import (
-    AUCTION_WITH_DOCUMENTS,
-    AUCTION_WITH_ACTIVE_BID,
-    AUCTION_WITH_ACTIVE_BID_WITH_DOCUMENT,
     AUCTION_WITH_BIDS_WITH_CANCELLATION,
+    AUCTION_WITH_BID_ACTIVE,
+    AUCTION_WITH_BID_ACTIVE_WITH_DOCUMENT,
+    AUCTION_WITH_BID_DRAFT,
+    AUCTION_WITH_BID_DRAFT_WITH_DOCUMENT,
+    AUCTION_WITH_BID_PENDING,
+    AUCTION_WITH_BID_PENDING_WITH_DOCUMENT,
     AUCTION_WITH_CANCELLATION,
     AUCTION_WITH_CANCELLATION_WITH_DOCUMENTS,
-    AUCTION_WITH_DRAFT_BID,
-    AUCTION_WITH_DRAFT_BID_WITH_DOCUMENT,
-    AUCTION_WITH_PENDING_BID,
-    AUCTION_WITH_PENDING_BID_WITH_DOCUMENT,
+    AUCTION_WITH_DOCUMENTS,
     AUCTION_WITH_QUESTIONS
 )
 
@@ -131,7 +131,7 @@ class StatusActiveTenderingDraftBidsTest(BaseWebTest):
         procedure = ProcedureMachine()
         procedure.set_db_connector(self.db)
         procedure.toggle('active.tendering')
-        context = procedure.snapshot(fixture=AUCTION_WITH_DRAFT_BID)
+        context = procedure.snapshot(fixture=AUCTION_WITH_BID_DRAFT)
 
         auction = context['auction']
         bid = context['bids'][0]
@@ -168,7 +168,7 @@ class StatusActiveTenderingPendingBidsTest(BaseWebTest):
         procedure = ProcedureMachine()
         procedure.set_db_connector(self.db)
         procedure.toggle('active.tendering')
-        context = procedure.snapshot(fixture=AUCTION_WITH_PENDING_BID)
+        context = procedure.snapshot(fixture=AUCTION_WITH_BID_PENDING)
 
         auction = context['auction']
         bid = context['bids'][0]
@@ -204,7 +204,7 @@ class StatusActiveTenderingActiveBidsTest(BaseWebTest):
         procedure = ProcedureMachine()
         procedure.set_db_connector(self.db)
         procedure.toggle('active.tendering')
-        context = procedure.snapshot(fixture=AUCTION_WITH_ACTIVE_BID)
+        context = procedure.snapshot(fixture=AUCTION_WITH_BID_ACTIVE)
 
         auction = context['auction']
         bid = context['bids'][0]
@@ -236,7 +236,7 @@ class StatusActiveTenderingDraftBidsWithDocumentTest(BaseWebTest):
         procedure = ProcedureMachine()
         procedure.set_db_connector(self.db)
         procedure.toggle('active.tendering')
-        context = procedure.snapshot(fixture=AUCTION_WITH_DRAFT_BID_WITH_DOCUMENT)
+        context = procedure.snapshot(fixture=AUCTION_WITH_BID_DRAFT_WITH_DOCUMENT)
         auction = context['auction']
         bid = context['bids'][0]
         bid_document = bid['data']['documents'][0]
@@ -263,7 +263,7 @@ class StatusActiveTenderingPendingBidsWithDocumentTest(BaseWebTest):
         procedure = ProcedureMachine()
         procedure.set_db_connector(self.db)
         procedure.toggle('active.tendering')
-        context = procedure.snapshot(fixture=AUCTION_WITH_PENDING_BID_WITH_DOCUMENT)
+        context = procedure.snapshot(fixture=AUCTION_WITH_BID_PENDING_WITH_DOCUMENT)
         auction = context['auction']
         bid = context['bids'][0]
         bid_document = bid['data']['documents'][0]
@@ -290,7 +290,7 @@ class StatusActiveTenderingActiveBidsWithDocumentTest(BaseWebTest):
         procedure = ProcedureMachine()
         procedure.set_db_connector(self.db)
         procedure.toggle('active.tendering')
-        context = procedure.snapshot(fixture=AUCTION_WITH_ACTIVE_BID_WITH_DOCUMENT)
+        context = procedure.snapshot(fixture=AUCTION_WITH_BID_ACTIVE_WITH_DOCUMENT)
         auction = context['auction']
         bid = context['bids'][0]
         bid_document = bid['data']['documents'][0]

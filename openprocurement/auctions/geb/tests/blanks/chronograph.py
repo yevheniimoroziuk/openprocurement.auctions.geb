@@ -8,7 +8,7 @@ from openprocurement.auctions.geb.tests.fixtures.active_tendering import (
 from openprocurement.auctions.geb.tests.fixtures.active_enquiry import (
     END_ACTIVE_ENQUIRY_AUCTION,
     END_ACTIVE_ENQUIRY_AUCTION_QUALIFICATION,
-    END_ACTIVE_ENQUIRY_UNSUCCESSFUL_NO_ACTIVE_BIDS
+    END_ACTIVE_ENQUIRY_UNSUCCESSFUL_NO_BIDS_ACTIVE
 )
 from openprocurement.auctions.geb.utils import (
     calculate_certainly_business_date as ccbd
@@ -69,7 +69,7 @@ def check_tender_period_end_successful(test_case):
 
 def check_enquiry_period_end_unsuccessful(test_case):
 
-    context = test_case.procedure.snapshot(fixture=END_ACTIVE_ENQUIRY_UNSUCCESSFUL_NO_ACTIVE_BIDS)
+    context = test_case.procedure.snapshot(fixture=END_ACTIVE_ENQUIRY_UNSUCCESSFUL_NO_BIDS_ACTIVE)
 
     auction = context['auction']
 
@@ -139,7 +139,7 @@ def check_enquiry_period_end_active_auction(test_case):
 
 
 def check_enquiry_period_end_set_unsuccessful_bids(test_case):
-    context = test_case.procedure.snapshot(fixture=END_ACTIVE_ENQUIRY_UNSUCCESSFUL_NO_ACTIVE_BIDS)
+    context = test_case.procedure.snapshot(fixture=END_ACTIVE_ENQUIRY_UNSUCCESSFUL_NO_BIDS_ACTIVE)
 
     auction = context['auction']
     bids = context['bids']

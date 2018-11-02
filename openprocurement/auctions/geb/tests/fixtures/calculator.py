@@ -82,6 +82,11 @@ class TenderPeriod(Period):
                 self._startDate = ccbd(instance.time, -timedelta(days=15))
 
                 self._endDate = ccbd(instance.time, -timedelta(days=4))
+
+        elif instance.period == 'awardPeriod':
+                self._startDate = ccbd(instance.time, -timedelta(days=15))
+
+                self._endDate = ccbd(instance.time, -timedelta(days=4))
         return self
 
     @property
@@ -108,20 +113,30 @@ class RectificationPeriod(Period):
             elif instance.state == 'end':
                 self._endDate = instance.time
                 self._startDate = ccbd(self._endDate, -self.duration)
+
         elif instance.period == 'tenderPeriod':
                 self._endDate = instance.tenderPeriod.startDate
                 self._startDate = ccbd(self._endDate, -self.duration)
+
         elif instance.period == 'enquiryPeriod':
                 self._endDate = instance.tenderPeriod.startDate
                 self._startDate = ccbd(self._endDate, -self.duration)
+
         elif instance.period == 'auctionDate':
                 self._startDate = ccbd(instance.auctionDate.date, timedelta(days=3))
                 self._endDate = ccbd(self._startDate, self.duration)
+
         elif instance.period == 'auctionPeriod':
                 self._startDate = ccbd(instance.time, -timedelta(days=18))
 
                 self._endDate = ccbd(instance.time, -timedelta(days=14))
+
         elif instance.period == 'qualificationPeriod':
+                self._startDate = ccbd(instance.time, -timedelta(days=19))
+
+                self._endDate = ccbd(instance.time, -timedelta(days=15))
+
+        elif instance.period == 'awardPeriod':
                 self._startDate = ccbd(instance.time, -timedelta(days=19))
 
                 self._endDate = ccbd(instance.time, -timedelta(days=15))
@@ -169,6 +184,12 @@ class EnquiryPeriod(Period):
                                      working_days=self.working_days,
                                      specific_hour=self.specific_hour)
         elif instance.period == 'qualificationPeriod':
+                self._startDate = ccbd(instance.time, -timedelta(days=19))
+                self._endDate = ccbd(instance.time,
+                                     -timedelta(days=2),
+                                     specific_hour=self.specific_hour)
+
+        elif instance.period == 'awardPeriod':
                 self._startDate = ccbd(instance.time, -timedelta(days=19))
                 self._endDate = ccbd(instance.time,
                                      -timedelta(days=2),
@@ -227,6 +248,11 @@ class AuctionPeriod(Period):
                 self._startDate = ccbd(instance.time, -timedelta(days=0), specific_hour=10)
                 # auction ends day defore at 17 00 qualification Period start
                 self._endDate = ccbd(instance.time, -timedelta(days=0), specific_hour=16)
+        elif instance.period == 'awardPeriod':
+                # auction starts day defore qualification Period start
+                self._startDate = ccbd(instance.time, -timedelta(days=0), specific_hour=10)
+                # auction ends day defore at 17 00 qualification Period start
+                self._endDate = ccbd(instance.time, -timedelta(days=0), specific_hour=16)
         elif instance.period == 'auctionDate':
                 # Procedure starts 14 days after
                 self._startDate = ccbd(instance.time, timedelta(days=14))
@@ -246,13 +272,21 @@ class AwardPeriod(Period):
     name = 'awardPeriod'
 
     def __get__(self, instance, owner):
-        if instance.period == 'qualificationPeriod':
+        if instance.period == self.name:
+            if instance.state == 'end':
+                self._endDate = instance.time
+                self._startDate = ccbd(instance.time, -timedelta(days=0), specific_hour=16)
+        elif instance.period == 'qualificationPeriod':
                 self._startDate = instance.auctionPeriod.endDate
         return self
 
     @property
     def startDate(self):
         return self._startDate
+
+    @property
+    def endDate(self):
+        return self._endDate
 
 
 class QualificationPeriod(Period):
@@ -372,6 +406,47 @@ class AwardCalculator(object):
     signingPeriod = AwardSigningPeriod()
     complaintPeriod = AwardComplaintPeriod()
     date = AwardDate()
+
+    def __init__(self, time, period, state):
+        self.time = time
+        self.period = period
+        self.state = state
+
+
+class ContractSigningPeriod(Period):
+    name = 'signingPeriod'
+
+    def __get__(self, instance, owner):
+        if instance.period == self.name:
+            if instance.state == 'start':
+                self._startDate = instance.time
+                self._endDate = ccbd(instance.time, timedelta(days=0), specific_hour=23) + timedelta(minutes=59)
+            elif instance.state == 'end':
+                self._endDate = instance.time
+                self._startDate = ccbd(instance.time, -timedelta(days=0), specific_hour=16)
+        return self
+
+    @property
+    def startDate(self):
+        return self._startDate
+
+    @property
+    def endDate(self):
+        return self._endDate
+
+
+class ContractDate(Date):
+    name = 'date'
+
+    def __get__(self, instance, owner):
+        if instance.period == 'signingPeriod':
+            self._date = instance.signingPeriod.startDate
+        return self._date
+
+
+class ContractCalculator(object):
+    signingPeriod = ContractSigningPeriod()
+    date = ContractDate()
 
     def __init__(self, time, period, state):
         self.time = time

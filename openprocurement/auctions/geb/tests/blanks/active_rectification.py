@@ -102,7 +102,7 @@ def change_lotIdentifier(test_case):
 
 
 def change_value(test_case):
-    new = {u'currency': u'UAH', u'amount': 42.0, u'valueAddedTaxIncluded': True}
+    new = {u'currency': u'UAH', u'amount': 82.0, u'valueAddedTaxIncluded': True}
     field = "value"
 
     request_data = {"data": {field: new}}

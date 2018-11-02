@@ -1,28 +1,18 @@
 # -*- coding: utf-8 -*-
+from iso8601 import parse_date
 from copy import deepcopy
+from datetime import timedelta
 from uuid import uuid4
 
-from openprocurement.auctions.core.utils import get_now
+from openprocurement.auctions.core.utils import (
+    get_now
+)
 
 from openprocurement.auctions.geb.tests.fixtures.calculator import (
     Calculator
 )
-from openprocurement.auctions.geb.tests.fixtures.common import (
-    test_auctionParameters,
-    test_auction_budgetSpent_created,
-    test_auction_minimalStep_created,
-    test_auction_value_created,
-    test_contractTerms,
-    test_lotHolder,
-    test_bankAccount,
-    test_procuringEntity,
-    test_registrationFee_created,
-    test_transfer_token,
-    test_auction_guarantee,
-)
-
-from openprocurement.auctions.geb.tests.fixtures.items import (
-    TEST_ITEM
+from openprocurement.auctions.geb.tests.fixtures.draft import (
+    AUCTION as BASE_AUCTION
 )
 from openprocurement.auctions.geb.tests.fixtures.documents import (
     DOCUMENT
@@ -33,77 +23,83 @@ from openprocurement.auctions.geb.tests.fixtures.cancellations import (
     CANCELLATION_ACTIVE_WITH_DOCUMENTS
 )
 from openprocurement.auctions.geb.tests.fixtures.questions import (
-    TEST_QESTION_IN_RECTIFICATION_PERIOD
+    QUESTION
 )
-
-# active rectification default auction
 
 now = get_now()
 calculator = Calculator(now, 'rectificationPeriod', 'start')
-
-AUCTION = {
-    "_id": uuid4().hex,
-    "procurementMethod": "open",
-    "auctionID": "UA-EA-2018-09-20-000001",
-    "minNumberOfQualifiedBids": 2,
-    "enquiryPeriod": {
-        "startDate": calculator.enquiryPeriod.startDate.isoformat(),
-        "endDate": calculator.enquiryPeriod.endDate.isoformat()
-    },
-    "submissionMethod": "electronicAuction",
-    "next_check": calculator.rectificationPeriod.endDate.isoformat(),
-    "awardCriteria": "highestCost",
-    "owner": "broker",
-    "transfer_token": test_transfer_token,
-    "title": "футляри до державних нагород",
-    "tenderAttempts": 1,
-    "registrationFee": test_registrationFee_created,
-    "owner_token": uuid4().hex,
-    "auctionParameters": test_auctionParameters,
-    "guarantee": test_auction_guarantee,
-    "dateModified": now.isoformat(),
-    "status": "active.rectification",
-    "lotHolder": test_lotHolder,
-    'bankAccount': test_bankAccount,
-    "description": "test procuredure",
-    "lotIdentifier": "219560",
-    "auctionPeriod": {
-        "startDate": calculator.auctionPeriod.startDate.isoformat()
-    },
-    "procurementMethodType": "landlease",
-    "tenderPeriod": {
-        "startDate": calculator.tenderPeriod.startDate.isoformat(),
-        "endDate": calculator.tenderPeriod.endDate.isoformat()
-    },
-    "date": calculator.auctionDate.date.isoformat(),
-    "budgetSpent": test_auction_budgetSpent_created,
-    "doc_type": "Auction",
-    "rectificationPeriod": {
-        "startDate": calculator.rectificationPeriod.startDate.isoformat(),
-        "endDate": calculator.rectificationPeriod.endDate.isoformat()
-    },
-    "contractTerms": test_contractTerms,
-    "minimalStep": test_auction_minimalStep_created,
-    "items": [TEST_ITEM],
-    "value": test_auction_value_created,
-    "numberOfBids": 0,
-    "procuringEntity": test_procuringEntity
+auction = deepcopy(BASE_AUCTION)
+auction["_id"] = uuid4().hex
+auction["enquiryPeriod"] = {
+    "startDate": calculator.enquiryPeriod.startDate.isoformat(),
+    "endDate": calculator.enquiryPeriod.endDate.isoformat()
 }
+auction["next_check"] = calculator.rectificationPeriod.endDate.isoformat()
+auction["dateModified"] = now.isoformat()
+auction["status"] = "active.rectification"
+auction["auctionPeriod"] = {
+    "startDate": calculator.auctionPeriod.startDate.isoformat()
+}
+auction["tenderPeriod"] = {
+    "startDate": calculator.tenderPeriod.startDate.isoformat(),
+    "endDate": calculator.tenderPeriod.endDate.isoformat()
+}
+auction["date"] = calculator.auctionDate.date.isoformat()
+auction["rectificationPeriod"] = {
+    "startDate": calculator.rectificationPeriod.startDate.isoformat(),
+    "endDate": calculator.rectificationPeriod.endDate.isoformat()
+}
+
+# auction in 'active.rectification' status.
+# description:
+# - has item
+# - minNumberOfQualifiedBids = 2
+# - value.amount = 100
+# - owner = 'broker'
+
+AUCTION = auction
 
 # auction without items
 auction = deepcopy(AUCTION)
-
 auction['_id'] = uuid4().hex
 auction.pop('items')
-
 AUCTION_WITHOUT_ITEMS = auction
 
-# end active rectification default fixture
-
-calculator = Calculator(now, 'rectificationPeriod', 'end')
-
+# auction with documents
 auction = deepcopy(AUCTION)
+auction['documents'] = [DOCUMENT]
+AUCTION_WITH_DOCUMENTS = auction
 
+# auction with question
+auction = deepcopy(AUCTION)
+rectificaton_start = parse_date(auction['rectificationPeriod']['startDate'])
+question_date = rectificaton_start + timedelta(minutes=42)
+QUESTION['date'] = question_date.isoformat()
+auction['questions'] = [QUESTION]
+AUCTION_WITH_QUESTIONS = auction
+
+# auction with cancellations
+auction = deepcopy(AUCTION)
+auction['_id'] = uuid4().hex
+auction['cancellations'] = [CANCELLATION]
+AUCTION_WITH_CANCELLATION = auction
+
+# auction with cancellations with document
+auction = deepcopy(AUCTION)
+auction['_id'] = uuid4().hex
+auction['cancellations'] = [CANCELLATION_WITH_DOCUMENTS]
+AUCTION_WITH_CANCELLATION_WITH_DOCUMENTS = auction
+
+# auction with active cancellation
+auction = deepcopy(AUCTION)
+auction['_id'] = uuid4().hex
+auction['cancellations'] = [CANCELLATION_ACTIVE_WITH_DOCUMENTS]
+auction['status'] = 'cancelled'
+AUCTION_CANCELLED = auction
+
+# auction in 'active.rectification' end
+calculator = Calculator(now, 'rectificationPeriod', 'end')
+auction = deepcopy(AUCTION)
 auction["enquiryPeriod"] = {
     "startDate": calculator.enquiryPeriod.startDate.isoformat(),
     "endDate": calculator.enquiryPeriod.endDate.isoformat()
@@ -121,46 +117,4 @@ auction["auctionPeriod"] = {
 }
 auction["next_check"] = calculator.rectificationPeriod.endDate.isoformat()
 auction["date"] = calculator.auctionDate.date.isoformat()
-
 END_ACTIVE_RECTIFICATION_AUCTION = auction
-
-auction = deepcopy(AUCTION)
-
-auction['documents'] = [DOCUMENT]
-
-AUCTION_WITH_DOCUMENTS = auction
-
-# auction with questions fixture
-
-auction = deepcopy(AUCTION)
-auction['questions'] = [TEST_QESTION_IN_RECTIFICATION_PERIOD]
-
-AUCTION_WITH_QUESTIONS = auction
-
-# auction with cancellations fixture
-
-auction = deepcopy(AUCTION)
-auction['_id'] = uuid4().hex
-auction['cancellations'] = [
-    CANCELLATION
-]
-AUCTION_WITH_CANCELLATION = auction
-
-# auction with cancellations with document fixture
-
-auction = deepcopy(AUCTION)
-auction['_id'] = uuid4().hex
-auction['cancellations'] = [
-    CANCELLATION_WITH_DOCUMENTS
-]
-AUCTION_WITH_CANCELLATION_WITH_DOCUMENTS = auction
-
-# auction with cancellations fixture
-
-auction = deepcopy(AUCTION)
-auction['_id'] = uuid4().hex
-auction['cancellations'] = [
-    CANCELLATION_ACTIVE_WITH_DOCUMENTS
-]
-auction['status'] = 'cancelled'
-AUCTION_CANCELLED = auction

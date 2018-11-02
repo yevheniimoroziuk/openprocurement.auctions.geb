@@ -33,6 +33,7 @@ from openprocurement.auctions.core.models import (
     Period,
     Question as BaseQuestion,
     Value,
+    dgfCDB2Complaint as BaseComplaint,
     dgfCDB2Item as BaseItem,
     dgfDocument as BaseDocument,
     dgfCancellation as BaseCancellation,
@@ -390,6 +391,8 @@ class Auction(BaseAuction):
     minNumberOfQualifiedBids = IntType(choices=[1, 2], default=2)
 
     mode = StringType()
+
+    complaints = ListType(ModelType(BaseComplaint), default=list())
 
     procurementMethod = StringType(choices=['open'], default='open')
 
