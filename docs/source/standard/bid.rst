@@ -6,18 +6,32 @@ Bid
 Schema
 ------
 
+:id:
+    uuid, auto-generated, read-only
+
+    Internal identifier of bid.
+
 :tenderers:
     Array of :ref:`Organization` objects, required
 
 :date:
-    string, :ref:`date`, auto-generated
+    string, :ref:`date`, auto-generated, read-only
     
     Date when bid has been submitted.
 
-:id:
-    uuid, auto-generated
+:owner:
+    string, auto-generated, read-only
 
-    Internal identifier of bid.
+    Broker_id of the platform from which the procedure has been created
+
+:value:
+    :ref:`Value`, required
+
+    Validation rules:
+
+    * `amount` should be less than `Auction.value.amout`
+    * `currency` should either be absent or match `Auction.value.currency`
+    * `valueAddedTaxIncluded` should either be absent or match `Auction.value.valueAddedTaxIncluded`
 
 :status:
     string, required
@@ -27,17 +41,7 @@ Schema
     * `draft`
     * `pending`
     * `active`
-    * `deleted`
     * `unsuccessful`
-    
-:value:
-    :ref:`Value`, required
-
-    Validation rules:
-
-    * `amount` should be less than `Auction.value.amout`
-    * `currency` should either be absent or match `Auction.value.currency`
-    * `valueAddedTaxIncluded` should either be absentuntitled or match `Auction.value.valueAddedTaxIncluded`
 
 :documents:
     Array of :ref:`Document`, optional
@@ -45,7 +49,7 @@ Schema
     All documents needed.
 
 :participationUrl:
-    URL, auto-generated
+    url, auto-generated, read-only
 
     A web address for participation in auction.
 
@@ -54,12 +58,7 @@ Schema
 
     The field fills owner. Сonfirms that the participant fulfilled all conditions.
 
-:eligible:
-    bool, optional 
-
-    Confirms compliance of eligibility criteria set by the customer in the tendering documents. CDB accepts only true value.
-
 :bidNumber:
-    integer, required
+    integer, optional
 
-    The field fills owner. Number of participant in the auction.
+    Order number of the bidder.

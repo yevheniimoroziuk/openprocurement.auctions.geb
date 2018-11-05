@@ -59,27 +59,19 @@ Schema
     The total value of this award.
     
 :suppliers:
-    List of :ref:`Organization` objects, auto-generated, read-only
+    Array of :ref:`Organization` objects, auto-generated, read-only
     
     |ocdsDescription|
     The suppliers awarded with this award.
     
 :items:
-    List of :ref:`Item` objects, auto-generated, read-only
+    Array of :ref:`Item` objects, auto-generated, read-only
     
     |ocdsDescription|
     The goods and services awarded in this award, broken into line items wherever possible. Items should not be duplicated, but the quantity should be specified instead. 
     
 :documents:
-    List of :ref:`Document` objects, required
+    Array of :ref:`Document` objects, required
     
     |ocdsDescription|
     All documents and attachments related to the award, including any notices. 
-    
-:complaints:
-    List of :ref:`Complaint` objects
-
-:complaintPeriod:
-    :ref:`period`, auto-generated, read-only
-
-    The time frame when complaints can be submitted.

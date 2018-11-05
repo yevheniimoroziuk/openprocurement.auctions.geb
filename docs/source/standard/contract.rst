@@ -16,7 +16,7 @@ Schema
     The identifier for this contract.
 
 :awardID:
-    string, required, auto-generated
+    string, auto-generated, read-only
 
     |ocdsDescription|
     The `Award.id` against which this contract is being issued.
@@ -37,13 +37,13 @@ Schema
     The total value of this contract.
 
 :items:
-    List of :ref:`Item` objects, auto-generated, read-only
+    Array of :ref:`Item` objects, auto-generated, read-only
 
     |ocdsDescription|
     The goods, services, and any intangible outcomes in this contract. Note: If the items are the same as the award, do not repeat.
 
 :suppliers:
-    List of :ref:`Organization` objects, auto-generated, read-only
+    Array of :ref:`Organization` objects, auto-generated, read-only
 
 :status:
     string, required
@@ -69,7 +69,7 @@ Schema
     The date the contract was signed. In the case of multiple signatures, the date of the last signature.
 
 :signingPeriod:
-    :ref:`Period`
+    :ref:`Period`, auto-generated, read-only
 
     |ocdsDescription|
     The start and end date for the contract signing.
@@ -80,7 +80,7 @@ Schema
     The date when the contract was changed or activated.
 
 :documents:
-    List of :ref:`Document` objects, required
+    Array of :ref:`Document` objects, required
 
     |ocdsDescription|
     All documents and attachments related to the contract, including any notices.

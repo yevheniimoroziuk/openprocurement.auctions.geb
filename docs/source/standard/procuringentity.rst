@@ -11,7 +11,7 @@ Schema
 ------
 
 :name:
-    string, multilingual, optional
+    string, multilingual, required
 
     |ocdsDescription|
     The common name of the organization.
