@@ -1,5 +1,11 @@
 from iso8601 import parse_date
+from mock import patch
 from datetime import timedelta
+
+from openprocurement.auctions.core.utils import (
+    set_specific_hour
+)
+
 from openprocurement.auctions.geb.tests.fixtures.active_tendering import (
     END_ACTIVE_TENDERING_AUCTION_WITH_ONE_BID,
     END_ACTIVE_TENDERING_AUCTION_WITH_TWO_BIDS,
@@ -252,3 +258,25 @@ def set_auctionPeriod_startDate_enquiring(test_case):
     response = test_case.app.get(entrypoint)
     auction = response.json['data']
     test_case.assertEqual(start_date, parse_date(auction['auctionPeriod']['startDate']))
+
+
+def replaning_auction(test_case):
+
+    # get auctionPeriod.startDate
+    response = test_case.app.get(test_case.ENTRYPOINTS['auction_get'])
+    auction = response.json['data']
+    auction_start_date = parse_date(auction['auctionPeriod']['startDate'])
+
+    # simulate outstanding auction time
+    # set 'now' to 19:00 day of auctionPeriod.startDate
+    outstanding_auction_time = set_specific_hour(auction_start_date, 19)
+    with patch('openprocurement.auctions.geb.models.schemas.get_now', return_value=outstanding_auction_time):
+        request_data = {'data': {'id': test_case.auction['data']['id']}}
+        response = test_case.app.patch_json(test_case.ENTRYPOINTS['auction_patch'], request_data)
+    auction = response.json['data']
+    should_start_after = parse_date(auction['auctionPeriod']['shouldStartAfter'])
+    auction_start_date = parse_date(auction['auctionPeriod']['startDate'])
+
+    # check new shouldStartAfter
+    should_start_after = parse_date(auction['auctionPeriod']['shouldStartAfter'])
+    test_case.assertLess(auction_start_date, should_start_after)

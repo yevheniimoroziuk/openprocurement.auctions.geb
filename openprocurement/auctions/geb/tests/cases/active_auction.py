@@ -21,6 +21,7 @@ from openprocurement.auctions.geb.tests.blanks.active_auction import (
     get_participation_urls,
     post_auction_document_audit,
     switch_to_qualification,
+    switch_to_qualification_outstanding,
     switch_to_unsuccessful,
     update_auction_urls
 )
@@ -35,6 +36,7 @@ class StatusActiveAuctionTest(BaseWebTest):
     test_get_auction_auction = snitch(get_auction_auction)
     test_update_auction_urls = snitch(update_auction_urls)
     test_switch_to_qualification = snitch(switch_to_qualification)
+    test_switch_to_qualification_outstanding = snitch(switch_to_qualification_outstanding)
     test_post_auction_document_audit = snitch(post_auction_document_audit)
     test_switch_to_unsuccessful = snitch(switch_to_unsuccessful)
     test_get_participation_urls = snitch(get_participation_urls)

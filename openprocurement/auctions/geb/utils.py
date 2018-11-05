@@ -4,6 +4,7 @@ from functools import partial
 from openprocurement.auctions.core.utils import (
     upload_file as base_upload_file,
     get_file as base_get_file,
+    set_specific_hour,
     API_DOCUMENT_BLACKLISTED_FIELDS as DOCUMENT_BLACKLISTED_FIELDS,
     calculate_business_date
 )
@@ -45,3 +46,8 @@ def get_auction(model, interface):
         if model is None:
             return None
     return model
+
+
+def calc_expected_auction_end_time(auction_start_date):
+    end_time = set_specific_hour(auction_start_date, 18)
+    return end_time

@@ -1,9 +1,14 @@
+from contextlib import nested
+from mock import patch
 from copy import deepcopy
 from iso8601 import parse_date
 from datetime import timedelta
 
 from openprocurement.auctions.core.tests.base import (
     test_document_data
+)
+from openprocurement.auctions.core.utils import (
+    set_specific_hour
 )
 
 from openprocurement.auctions.geb.tests.fixtures.active_auction import (
@@ -72,11 +77,12 @@ def get_auction_urls_dump(test_case):
 
 
 def switch_to_qualification(test_case):
-    expected_http_status = '200 OK'
     context = test_case.procedure.snapshot(fixture=AUCTION_WITH_URLS)
     auction = context['auction']
     bids = context['bids']
     auction_url = '/auctions/{}/auction'.format(auction['data']['id'])
+
+    # create module auction results
     bid_value = {
         "value": {
             "currency": "UAH",
@@ -92,13 +98,30 @@ def switch_to_qualification(test_case):
     winner['value']['amount'] = auction['data']['value']['amount'] + auction['data']['minimalStep']['amount']
 
     request_data = {'bids': [loser, winner]}
-    response = test_case.app.post_json(auction_url, {'data': request_data})
+
+    # get auctionPeriod.startDate
+    entrypoint = '/auctions/{}'.format(auction['data']['id'])
+    response = test_case.app.get(entrypoint)
+    data = response.json['data']
+    auction_start_date = parse_date(data['auctionPeriod']['startDate'])
+
+    # simulate valid auction time
+    # set 'now' to 14:00 day of auctionPeriod.startDate
+    valid_auction_time = set_specific_hour(auction_start_date, 14)
+    with nested(
+        patch('openprocurement.auctions.geb.managers.auctioneers.get_now', return_value=valid_auction_time),
+        patch('openprocurement.auctions.core.plugins.awarding.base.adapters.get_now', return_value=valid_auction_time),
+    ) as (auction_periond_end, award_period_start):
+        response = test_case.app.post_json(auction_url, {'data': request_data})
+    expected_http_status = '200 OK'
     test_case.assertEqual(response.status, expected_http_status)
 
+    # check generated auction status
     entrypoint = '/auctions/{}'.format(auction['data']['id'])
     response = test_case.app.get(entrypoint)
     test_case.assertEqual(response.json['data']['status'], 'active.qualification')
 
+    # check generated award
     response = test_case.app.get('/auctions/{}/awards'.format(auction['data']['id']))
     awards = response.json['data']
     test_case.assertEqual(len(awards), 1)
@@ -134,6 +157,61 @@ def switch_to_qualification(test_case):
     test_case.assertEqual(award_period_start, verification_start_date)
 
 
+def switch_to_qualification_outstanding(test_case):
+    context = test_case.procedure.snapshot(fixture=AUCTION_WITH_URLS)
+    auction = context['auction']
+    bids = context['bids']
+    auction_url = '/auctions/{}/auction'.format(auction['data']['id'])
+
+    # create module auction results
+    bid_value = {
+        "value": {
+            "currency": "UAH",
+            "valueAddedTaxIncluded": True
+        }
+    }
+    loser = deepcopy(bid_value)
+    loser['id'] = bids[0]['data']['id']
+    loser['value']['amount'] = auction['data']['value']['amount']
+
+    winner = deepcopy(bid_value)
+    winner['id'] = bids[1]['data']['id']
+    winner['value']['amount'] = auction['data']['value']['amount'] + auction['data']['minimalStep']['amount']
+
+    request_data = {'bids': [loser, winner]}
+
+    # get auctionPeriod.startDate
+    entrypoint = '/auctions/{}'.format(auction['data']['id'])
+    response = test_case.app.get(entrypoint)
+    data = response.json['data']
+    auction_start_date = parse_date(data['auctionPeriod']['startDate'])
+
+    # simulate valid auction time
+    # set 'now' to 14:00 day of auctionPeriod.startDate
+    outstanding_auction_time = set_specific_hour(auction_start_date, 19)
+    with nested(
+        patch('openprocurement.auctions.geb.managers.auctioneers.get_now', return_value=outstanding_auction_time),
+        patch('openprocurement.auctions.core.plugins.awarding.base.adapters.get_now', return_value=outstanding_auction_time),
+    ) as (auction_periond_end, award_period_start):
+        response = test_case.app.post_json(auction_url, {'data': request_data})
+
+    response = test_case.app.get('/auctions/{}/awards'.format(auction['data']['id']))
+    awards = response.json['data']
+    award = awards[0]
+
+    # check generated verificationPeriod
+    verification_start_date = parse_date(award['verificationPeriod']['startDate'])
+    verification_end_date = parse_date(award['verificationPeriod']['endDate'])
+    expected_start_date = set_specific_hour(verification_end_date, 17)
+    test_case.assertEqual(verification_start_date, expected_start_date)
+
+    # check generated signing
+    signing_end_date = parse_date(award['signingPeriod']['endDate'])
+    signing_start_date = parse_date(award['signingPeriod']['startDate'])
+    expected_start_date = set_specific_hour(signing_end_date, 17)
+    test_case.assertEqual(signing_start_date, expected_start_date)
+
+
 def switch_to_unsuccessful(test_case):
     expected_http_status = '200 OK'
     context = test_case.procedure.snapshot(fixture=AUCTION_WITH_URLS)
@@ -161,7 +239,18 @@ def switch_to_unsuccessful(test_case):
             }
         ]
     }
-    response = test_case.app.post_json(auction_url, {'data': request_data})
+
+    # get auctionPeriod.startDate
+    entrypoint = '/auctions/{}'.format(auction['data']['id'])
+    response = test_case.app.get(entrypoint)
+    data = response.json['data']
+    auction_start_date = parse_date(data['auctionPeriod']['startDate'])
+
+    # simulate valid auction time
+    # set 'now' to 14:00 day of auctionPeriod.startDate
+    valid_auction_time = set_specific_hour(auction_start_date, 14)
+    with patch('openprocurement.auctions.geb.managers.auctioneers.get_now', return_value=valid_auction_time):
+        response = test_case.app.post_json(auction_url, {'data': request_data})
     test_case.assertEqual(response.status, expected_http_status)
 
     entrypoint = '/auctions/{}'.format(auction['data']['id'])

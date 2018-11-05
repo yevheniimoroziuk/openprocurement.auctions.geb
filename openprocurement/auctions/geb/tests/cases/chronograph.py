@@ -22,6 +22,7 @@ from openprocurement.auctions.geb.tests.blanks.chronograph import (
     check_tender_period_end_no_active_bids,
     check_tender_period_end_no_minNumberOfQualifiedBids,
     check_tender_period_end_successful,
+    replaning_auction
 )
 
 
@@ -135,11 +136,38 @@ class ChronographEndEnquiryTest(BaseWebTest):
         self.app.authorization = ('Basic', ('chronograph', ''))
 
 
+class ChronographReplaningAuctionTest(BaseWebTest):
+
+    test_replaning_auction = snitch(replaning_auction)
+
+    def setUp(self):
+        super(ChronographReplaningAuctionTest, self).setUp()
+
+        procedure = ProcedureMachine()
+        procedure.set_db_connector(self.db)
+        procedure.toggle('active.auction')
+
+        context = procedure.snapshot()
+        auction = context['auction']
+
+        entrypoints = {}
+
+        pattern = '/auctions/{}?acc_token={}'
+        entrypoints['auction_patch'] = pattern.format(auction['data']['id'], auction['access']['token'])
+
+        pattern = '/auctions/{}'
+        entrypoints['auction_get'] = pattern.format(auction['data']['id'])
+        self.auction = auction
+        self.ENTRYPOINTS = entrypoints
+        self.app.authorization = ('Basic', ('chronograph', ''))
+
+
 def suite():
     suite = unittest.TestSuite()
     suite.addTest(unittest.makeSuite(ChronographRectificationTest))
     suite.addTest(unittest.makeSuite(ChronographTenderingTest))
     suite.addTest(unittest.makeSuite(ChronographEnquiryTest))
+    suite.addTest(unittest.makeSuite(ChronographReplaningAuctionTest))
     return suite
 
 
