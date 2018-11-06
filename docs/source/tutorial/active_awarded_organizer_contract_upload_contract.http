@@ -1,0 +1,32 @@
+POST /api/2.5/auctions/ef8ee87d4c8e4fe0950dfad142792817/contracts/d64d770b91b64f8baf97f306008338dc/documents?acc_token=2bf83e2d5c58424e83e48d3e6e3ed6b3
+Authorization: Basic YnJva2VyOg==
+Content-Type: application/json
+
+{
+  "data": {
+    "url": "http://localhost/get/d77e8aac635a45dda6d54c1bc2b92e90?KeyID=172d32c8&Signature=yGE%2Fg2oETn2%2FlpK%2BaWnHJZGYEZWyQuxoS4MtZCqw0EnRsTOS6iiz2%2BpKJDjVtJ1pOxS7LKeuxSupRwAVUkUjAA%3D%3D", 
+    "format": "application/msword", 
+    "title": "укр.doc", 
+    "hash": "md5:00000000000000000000000000000000", 
+    "documentType": "contractSigned"
+  }
+}
+
+
+201 Created
+Content-Type: application/json
+Location: /api/2.5/auctions/ef8ee87d4c8e4fe0950dfad142792817/contracts/d64d770b91b64f8baf97f306008338dc/documents/0a884a8b8f4c4b35956aac6313436927
+
+{
+  "data": {
+    "hash": "md5:00000000000000000000000000000000", 
+    "title": "укр.doc", 
+    "url": "http://localhost/get/d77e8aac635a45dda6d54c1bc2b92e90?KeyID=172d32c8&Signature=Fy6ShwXrGYP108sbpsbK%2FzhJttdX69YmHJmszXfN4ooidYCASGPAqFSQTsAGG7bg46KR2kwBl0xiAf0ie%2F2ECQ%253D%253D", 
+    "format": "application/msword", 
+    "documentOf": "auction", 
+    "datePublished": "2018-11-06T14:33:28.128950+02:00", 
+    "documentType": "contractSigned", 
+    "dateModified": "2018-11-06T14:33:28.128971+02:00", 
+    "id": "0a884a8b8f4c4b35956aac6313436927"
+  }
+}

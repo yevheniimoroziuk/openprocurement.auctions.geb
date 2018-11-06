@@ -1,0 +1,297 @@
+GET /api/2.5/auctions/ef8ee87d4c8e4fe0950dfad142792817
+Authorization: Basic YnJva2VyOg==
+
+
+200 OK
+Content-Type: application/json
+
+{
+  "data": {
+    "bankAccount": {
+      "description": "Test Bank Account", 
+      "accountIdentification": [
+        {
+          "scheme": "UA-EDR", 
+          "id": "66113000-5", 
+          "description": "Test"
+        }
+      ], 
+      "bankName": "Test bank name"
+    }, 
+    "auctionID": "UA-EA-2018-09-20-000001", 
+    "minNumberOfQualifiedBids": 2, 
+    "awardPeriod": {
+      "startDate": "2018-11-05T16:00:00+02:00", 
+      "endDate": "2018-11-06T14:33:22.433777+02:00"
+    }, 
+    "enquiryPeriod": {
+      "startDate": "2018-10-17T16:00:00+02:00", 
+      "endDate": "2018-11-03T20:00:00+02:00"
+    }, 
+    "registrationFee": {
+      "currency": "UAH", 
+      "amount": 700.87
+    }, 
+    "submissionMethod": "electronicAuction", 
+    "procuringEntity": {
+      "contactPoint": {
+        "name": "Державне управління справами", 
+        "telephone": "0440000000"
+      }, 
+      "identifier": {
+        "scheme": "UA-EDR", 
+        "id": "00037256", 
+        "uri": "http://www.dus.gov.ua/"
+      }, 
+      "name": "Державне управління справами", 
+      "address": {
+        "postalCode": "01220", 
+        "countryName": "Україна", 
+        "streetAddress": "вул. Банкова, 11, корпус 1", 
+        "region": "м. Київ", 
+        "locality": "м. Київ"
+      }
+    }, 
+    "owner": "broker", 
+    "id": "ef8ee87d4c8e4fe0950dfad142792817", 
+    "tenderPeriod": {
+      "startDate": "2018-10-21T16:00:00+02:00", 
+      "endDate": "2018-11-01T16:00:00+02:00"
+    }, 
+    "title": "футляри до державних нагород", 
+    "tenderAttempts": 1, 
+    "auctionParameters": {
+      "type": "texas"
+    }, 
+    "guarantee": {
+      "currency": "UAH", 
+      "amount": 35
+    }, 
+    "dateModified": "2018-11-06T14:33:20.039212+02:00", 
+    "status": "active.awarded", 
+    "lotHolder": {
+      "contactPoint": {
+        "name": "Державне управління справами", 
+        "telephone": "0440000000"
+      }, 
+      "identifier": {
+        "scheme": "UA-EDR", 
+        "id": "00037256", 
+        "uri": "http://www.dus.gov.ua/"
+      }, 
+      "name": "Державне управління справами", 
+      "address": {
+        "postalCode": "01220", 
+        "countryName": "Україна", 
+        "streetAddress": "вул. Банкова, 11, корпус 1", 
+        "region": "м. Київ", 
+        "locality": "м. Київ"
+      }
+    }, 
+    "description": "test procuredure", 
+    "contracts": [
+      {
+        "status": "pending", 
+        "signingPeriod": {
+          "startDate": "2018-11-05T16:00:00+02:00", 
+          "endDate": "2018-11-05T23:59:00+02:00"
+        }, 
+        "items": [
+          {
+            "description": "Земля для військовослужбовців", 
+            "classification": {
+              "scheme": "CAV-PS", 
+              "id": "06110000-6", 
+              "description": "Земельні ділянки"
+            }, 
+            "additionalClassifications": [
+              {
+                "scheme": "kvtspz", 
+                "id": "01.04", 
+                "description": "Test"
+              }, 
+              {
+                "scheme": "cadastralNumber", 
+                "id": "42", 
+                "description": "Test"
+              }
+            ], 
+            "address": {
+              "postalCode": "79000", 
+              "countryName": "Україна", 
+              "streetAddress": "вул. Банкова 1", 
+              "region": "м. Київ", 
+              "locality": "м. Київ"
+            }, 
+            "id": "3e1b5bec9f3846eea93e02c70c95d693", 
+            "unit": {
+              "code": "44617100-9", 
+              "name": "item"
+            }, 
+            "quantity": 5.0001
+          }
+        ], 
+        "suppliers": [
+          {
+            "contactPoint": {
+              "name": "Державне управління справами", 
+              "telephone": "0440000000"
+            }, 
+            "identifier": {
+              "scheme": "UA-EDR", 
+              "id": "00037256", 
+              "uri": "http://www.dus.gov.ua/"
+            }, 
+            "name": "Державне управління справами", 
+            "address": {
+              "postalCode": "01220", 
+              "countryName": "Україна", 
+              "streetAddress": "вул. Банкова, 11, корпус 1", 
+              "region": "м. Київ", 
+              "locality": "м. Київ"
+            }
+          }
+        ], 
+        "value": {
+          "currency": "UAH", 
+          "amount": 200.0, 
+          "valueAddedTaxIncluded": true
+        }, 
+        "date": "2018-11-06T14:33:22.438163+02:00", 
+        "awardID": "18271aa9e8d943538583f22b6eb4ef1c", 
+        "id": "67b67c6785234e29a12cefa9a7570d9c", 
+        "contractID": "UA-EA-2018-09-20-000001-1"
+      }
+    ], 
+    "auctionPeriod": {
+      "startDate": "2018-11-05T10:00:00+02:00", 
+      "endDate": "2018-11-05T16:00:00+02:00"
+    }, 
+    "procurementMethodType": "landlease", 
+    "awards": [
+      {
+        "status": "active", 
+        "documents": [
+          {
+            "hash": "md5:00000000000000000000000000000000", 
+            "author": "auction_owner", 
+            "title": "укр.doc", 
+            "url": "http://localhost/get/525adddf3d414dc49e4d75a574e6108c?KeyID=172d32c8&Signature=DIbVBCNX98G7n766bL5tVECaBMhXJc1ZSvU4KsZv2FhfU9jUdrvQTz089GKy6e9IOcisW6%252B4BzIq2r%252Bc5TLLBQ%253D%253D", 
+            "format": "application/msword", 
+            "documentOf": "auction", 
+            "datePublished": "2018-11-06T14:33:22.359533+02:00", 
+            "documentType": "auctionProtocol", 
+            "dateModified": "2018-11-06T14:33:22.359565+02:00", 
+            "id": "6d739ff7bccf45ae81968c20adc22189"
+          }
+        ], 
+        "verificationPeriod": {
+          "startDate": "2018-11-05T16:00:00+02:00", 
+          "endDate": "2018-11-06T14:33:22.433777+02:00"
+        }, 
+        "signingPeriod": {
+          "startDate": "2018-11-05T16:00:00+02:00", 
+          "endDate": "2018-11-05T23:59:00+02:00"
+        }, 
+        "suppliers": [
+          {
+            "contactPoint": {
+              "name": "Державне управління справами", 
+              "telephone": "0440000000"
+            }, 
+            "identifier": {
+              "scheme": "UA-EDR", 
+              "id": "00037256", 
+              "uri": "http://www.dus.gov.ua/"
+            }, 
+            "name": "Державне управління справами", 
+            "address": {
+              "postalCode": "01220", 
+              "countryName": "Україна", 
+              "streetAddress": "вул. Банкова, 11, корпус 1", 
+              "region": "м. Київ", 
+              "locality": "м. Київ"
+            }
+          }
+        ], 
+        "complaintPeriod": {
+          "startDate": "2018-11-05T16:00:00+02:00", 
+          "endDate": "2018-11-06T14:33:22.433777+02:00"
+        }, 
+        "bid_id": "8ef6c80be5f440329695167c7b81499b", 
+        "value": {
+          "currency": "UAH", 
+          "amount": 200.0, 
+          "valueAddedTaxIncluded": true
+        }, 
+        "date": "2018-11-06T14:33:22.443527+02:00", 
+        "id": "18271aa9e8d943538583f22b6eb4ef1c"
+      }
+    ], 
+    "date": "2018-11-06T14:33:22.443527+02:00", 
+    "budgetSpent": {
+      "currency": "UAH", 
+      "amount": 35, 
+      "valueAddedTaxIncluded": true
+    }, 
+    "lotIdentifier": "219560", 
+    "rectificationPeriod": {
+      "startDate": "2018-10-17T16:00:00+02:00", 
+      "endDate": "2018-10-21T16:00:00+02:00"
+    }, 
+    "contractTerms": {
+      "type": "lease", 
+      "leaseTerms": {
+        "leaseDuration": "P10Y"
+      }
+    }, 
+    "minimalStep": {
+      "currency": "UAH", 
+      "amount": 42, 
+      "valueAddedTaxIncluded": true
+    }, 
+    "items": [
+      {
+        "description": "Земля для військовослужбовців", 
+        "classification": {
+          "scheme": "CAV-PS", 
+          "id": "06110000-6", 
+          "description": "Земельні ділянки"
+        }, 
+        "additionalClassifications": [
+          {
+            "scheme": "kvtspz", 
+            "id": "01.04", 
+            "description": "Test"
+          }, 
+          {
+            "scheme": "cadastralNumber", 
+            "id": "42", 
+            "description": "Test"
+          }
+        ], 
+        "address": {
+          "postalCode": "79000", 
+          "countryName": "Україна", 
+          "streetAddress": "вул. Банкова 1", 
+          "region": "м. Київ", 
+          "locality": "м. Київ"
+        }, 
+        "id": "3e1b5bec9f3846eea93e02c70c95d693", 
+        "unit": {
+          "code": "44617100-9", 
+          "name": "item"
+        }, 
+        "quantity": 5.0001
+      }
+    ], 
+    "procurementMethod": "open", 
+    "value": {
+      "currency": "UAH", 
+      "amount": 100.0, 
+      "valueAddedTaxIncluded": true
+    }, 
+    "numberOfBids": 1, 
+    "awardCriteria": "highestCost"
+  }
+}

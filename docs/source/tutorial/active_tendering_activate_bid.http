@@ -1,4 +1,4 @@
-PATCH /api/2.5/auctions/ae7d7760cfc046b6b8b89e437cb4e761/bids/9ca5e52078464c3a965cff9a86c344e5?acc_token=626e4c9969b94db0a42ef62c8c471f8a
+PATCH /api/2.5/auctions/ef8ee87d4c8e4fe0950dfad142792817/bids/146bf425b2bb4fbe9e96fbbd4ab6aa11?acc_token=8fcf9c79ba8342b9b8a9a256489346f5
 Authorization: Basic YnJva2VyOg==
 Content-Type: application/json
 
@@ -20,7 +20,7 @@ Content-Type: application/json
       "amount": 100.0, 
       "valueAddedTaxIncluded": true
     }, 
-    "date": "2018-10-08T15:23:31.973065+03:00", 
+    "date": "2018-11-06T14:33:28.689238+02:00", 
     "qualified": false, 
     "tenderers": [
       {
@@ -44,6 +44,6 @@ Content-Type: application/json
       }
     ], 
     "owner": "broker", 
-    "id": "9ca5e52078464c3a965cff9a86c344e5"
+    "id": "146bf425b2bb4fbe9e96fbbd4ab6aa11"
   }
 }

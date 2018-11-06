@@ -1,4 +1,4 @@
-PATCH /api/2.5/auctions/ae7d7760cfc046b6b8b89e437cb4e761/questions/a10f5d8afefd4d8594a59775e8c59867?acc_token=6f90273c2b66498aac8f66e5d1e8671c
+PATCH /api/2.5/auctions/ef8ee87d4c8e4fe0950dfad142792817/questions/7c9385ceafc140c788115b218251bd5e?acc_token=2bf83e2d5c58424e83e48d3e6e3ed6b3
 Authorization: Basic YnJva2VyOg==
 Content-Type: application/json
 
@@ -16,9 +16,9 @@ Content-Type: application/json
   "data": {
     "description": "Просимо додати таблицю потрібної калорійності харчування", 
     "title": "Калорійність", 
-    "date": "2018-10-08T15:23:28.929421+03:00", 
+    "date": "2018-11-06T15:15:20.046860+02:00", 
     "answer": "Test answer", 
-    "id": "a10f5d8afefd4d8594a59775e8c59867", 
+    "id": "7c9385ceafc140c788115b218251bd5e", 
     "questionOf": "tender"
   }
 }

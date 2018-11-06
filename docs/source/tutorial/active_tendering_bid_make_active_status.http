@@ -1,4 +1,4 @@
-PATCH /api/2.5/auctions/ae7d7760cfc046b6b8b89e437cb4e761/bids/9ca5e52078464c3a965cff9a86c344e5?acc_token=626e4c9969b94db0a42ef62c8c471f8a
+PATCH /api/2.5/auctions/ef8ee87d4c8e4fe0950dfad142792817/bids/592ed4dc43ae49b787a24c6ee1eb3c01?acc_token=8fcf9c79ba8342b9b8a9a256489346f5
 Authorization: Basic YnJva2VyOg==
 Content-Type: application/json
 
@@ -17,13 +17,25 @@ Content-Type: application/json
 {
   "data": {
     "status": "active", 
+    "documents": [
+      {
+        "hash": "md5:00000000000000000000000000000000", 
+        "title": "укр.doc", 
+        "url": "http://localhost/api/2.5/auctions/ef8ee87d4c8e4fe0950dfad142792817/bids/592ed4dc43ae49b787a24c6ee1eb3c01/documents/405d176d7ae94b7fa7f4b7ae872f59fb?download=6bd4cfd5be94484dbb794dd4ea390a64", 
+        "format": "application/msword", 
+        "documentOf": "bid", 
+        "datePublished": "2018-11-06T14:33:29.461768+02:00", 
+        "documentType": "eligibilityDocuments", 
+        "dateModified": "2018-11-06T14:33:29.461822+02:00", 
+        "id": "405d176d7ae94b7fa7f4b7ae872f59fb"
+      }
+    ], 
     "bidNumber": 1, 
     "value": {
       "currency": "UAH", 
       "amount": 100.0, 
       "valueAddedTaxIncluded": true
     }, 
-    "date": "2018-10-08T15:23:32.150424+03:00", 
     "qualified": true, 
     "tenderers": [
       {
@@ -47,6 +59,6 @@ Content-Type: application/json
       }
     ], 
     "owner": "broker", 
-    "id": "9ca5e52078464c3a965cff9a86c344e5"
+    "id": "592ed4dc43ae49b787a24c6ee1eb3c01"
   }
 }
