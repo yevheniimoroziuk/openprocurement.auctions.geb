@@ -56,7 +56,8 @@ from openprocurement.auctions.geb.tests.blanks.active_rectification import (
     items_get_listing,
     items_patch_collections,
     patch_document,
-    put_document
+    put_document,
+    download_document
 )
 
 
@@ -198,6 +199,7 @@ class StatusActiveRectificationDocumentTest(BaseWebTest):
     test_add_offline_document = snitch(add_offline_document)
     test_patch_document = snitch(patch_document)
     test_put_document = snitch(put_document)
+    test_download_document = snitch(download_document)
 
     def setUp(self):
         super(StatusActiveRectificationDocumentTest, self).setUp()

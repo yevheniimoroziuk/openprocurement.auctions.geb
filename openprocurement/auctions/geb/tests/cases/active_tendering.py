@@ -28,9 +28,11 @@ from openprocurement.auctions.geb.tests.fixtures.active_tendering import (
 )
 
 from openprocurement.auctions.geb.tests.blanks.active_tendering import (
+    auction_auction_get,
     auction_document_patch,
     auction_document_put,
     auction_document_post,
+    auction_document_download,
     auction_document_post_offline,
     add_invalid_bid,
     add_question,
@@ -73,6 +75,7 @@ class StatusActiveTenderingTest(BaseWebTest):
     test_add_question = snitch(add_question)
     test_add_question_to_item = snitch(add_question_to_item)
     test_bid_add = snitch(bid_add)
+    test_auction_auction_get = snitch(auction_auction_get)
     test_auction_change_fields = snitch(auction_change_fields)
     test_add_invalid_bid = snitch(add_invalid_bid)
 
@@ -311,6 +314,7 @@ class StatusActiveTenderingDocumentsTest(BaseWebTest):
 
     test_auction_document_patch = snitch(auction_document_patch)
     test_auction_document_put = snitch(auction_document_put)
+    test_auction_document_download = snitch(auction_document_download)
 
     def setUp(self):
         super(StatusActiveTenderingDocumentsTest, self).setUp()

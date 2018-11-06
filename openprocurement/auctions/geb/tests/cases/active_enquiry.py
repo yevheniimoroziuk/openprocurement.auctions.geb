@@ -28,7 +28,9 @@ from openprocurement.auctions.geb.tests.fixtures.active_enquiry import (
 )
 
 from openprocurement.auctions.geb.tests.blanks.active_enquiry import (
+    auction_auction_get,
     auction_document_patch,
+    auction_document_download,
     auction_document_put,
     auction_document_post,
     auction_document_post_offline,
@@ -64,6 +66,7 @@ class StatusActiveEnquiryTest(BaseWebTest):
 
     test_bid_add = snitch(bid_add)
     test_add_question = snitch(add_question)
+    test_auction_auction_get = snitch(auction_auction_get)
     test_auction_document_post = snitch(auction_document_post)
     test_auction_document_post_offline = snitch(auction_document_post_offline)
     test_add_question_to_item = snitch(add_question_to_item)
@@ -184,6 +187,7 @@ class StatusActiveEnquiryDocumentsTest(BaseWebTest):
     docservice = True
 
     test_auction_document_patch = snitch(auction_document_patch)
+    test_auction_document_download = snitch(auction_document_download)
     test_auction_document_put = snitch(auction_document_put)
 
     def setUp(self):
