@@ -385,9 +385,19 @@ def validate_put_auction_document_period(request, **kwargs):
     Validate period in which can put auction document
     """
     auction = kwargs['auction']
+    auction_auction_statuses = ['active.qualification', 'active.awarded']
 
     if auction.status not in PUT_AUCTION_DOCUMENT_STATUSES:
-        return False
+        if request.authenticated_role != 'auction' and auction.status in auction_auction_statuses:
+            err_msg = 'Only module auction can update document in {}'.format(auction_auction_statuses)
+            request.errors.add('body', 'data', err_msg)
+            request.errors.status = 403
+            return False
+        else:
+            err_msg = 'Can update document only in {}'.format(PUT_AUCTION_DOCUMENT_STATUSES)
+            request.errors.add('body', 'data', err_msg)
+            request.errors.status = 403
+            return False
     return True
 
 

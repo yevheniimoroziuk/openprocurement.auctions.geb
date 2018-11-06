@@ -29,10 +29,11 @@ from openprocurement.auctions.geb.managers.checkers import (
 )
 
 from openprocurement.auctions.geb.managers.representers import (
-    ItemRepresenter,
-    CancellationRepresenter,
     AuctionSubResourceRepresenter,
+    BidRepresenter,
+    CancellationRepresenter,
     CancellationSubResourceRepresenter,
+    ItemRepresenter
 )
 
 from openprocurement.auctions.geb.managers.creators import (
@@ -48,6 +49,7 @@ from openprocurement.auctions.geb.managers.deleters import (
 
 from openprocurement.auctions.geb.managers.loggers import (
     AuctionLogger,
+    BidLogger,
     CancellationLogger,
     ItemLogger
 )
@@ -72,6 +74,8 @@ class BidManager(BidManager):
     Deleter = BidDeleter
     Initializator = BidInitializator
     Creator = Creator
+    Representer = BidRepresenter
+    Logger = BidLogger
 
 
 class BidDocumentManager(BidDocumentManager):

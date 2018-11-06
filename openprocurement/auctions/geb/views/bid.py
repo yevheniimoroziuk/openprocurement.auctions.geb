@@ -31,10 +31,9 @@ class AuctionBidResource(AuctionBidResource):
         save = manager.save()
 
         if save:
-            extra = context_unpack(self.request, {'MESSAGE_ID': 'auction_bid_patch'})
-            msg = 'Updated auction bid {}'.format(self.request.context.id)
-            self.LOGGER.info(msg, extra=extra)
-            return {'data': self.request.context.serialize(self.request.context.status)}
+            msg = 'Updated auction bid {}'.format(manager.context.id)
+            manager.log_action('auction_bid_patch', msg)
+            return manager.represent(self.request.method)
 
     @json_view(permission='edit_bid')
     def delete(self):

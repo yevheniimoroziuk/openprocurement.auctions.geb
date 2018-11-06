@@ -106,6 +106,9 @@ from openprocurement.auctions.geb.models.roles import (
 from openprocurement.auctions.geb.validation import (
     cav_ps_code_validator
 )
+from openprocurement.auctions.geb.utils import (
+    calc_expected_auction_end_time
+)
 
 
 @implementer(IDocument)
@@ -190,13 +193,27 @@ class AuctionAuctionPeriod(Period):
 
     @serializable(serialize_when_none=False)
     def shouldStartAfter(self):
-        if self.endDate:
+        auctionPeriod = self
+
+        # in status 'auctionPeriod.startDate' we don`t need shouldStartAfter
+        if auctionPeriod.endDate:
             return
-        auction = self.__parent__
+
+        auction = auctionPeriod.__parent__
+
+        # in status 'draft' we don`t need shouldStartAfter
         if auction.status in ['draft'] or not auction.enquiryPeriod:
             return
-        start_after = auction.enquiryPeriod.endDate
-        return rounding_shouldStartAfter(start_after, auction).isoformat()
+
+        should_start_after = auction.enquiryPeriod.endDate
+        if auctionPeriod.startDate:
+            # calculate expected auction end time
+            expected_end_time_of_auction = calc_expected_auction_end_time(auctionPeriod.startDate)
+            now = get_now()
+            # check if auction not happen
+            if now > expected_end_time_of_auction:  # TODO test replaning
+                should_start_after = expected_end_time_of_auction
+        return rounding_shouldStartAfter(should_start_after, auction).isoformat()
 
 
 class RectificationPeriod(Period):
@@ -348,35 +365,31 @@ class Auction(BaseAuction):
     _internal_type = "geb"
     modified = False
 
-    auctionPeriod = ModelType(AuctionAuctionPeriod, required=True, default={})
     auctionParameters = ModelType(AuctionParameters)
-    awardCriteria = StringType(choices=['highestCost'],
-                               default='highestCost')
+
+    auctionPeriod = ModelType(AuctionAuctionPeriod, required=True, default={})
+
+    awardCriteria = StringType(choices=['highestCost'], default='highestCost')
 
     awards = ListType(ModelType(Award), default=list())
 
-    bids = ListType(ModelType(Bid), default=list())
-
-    questions = ListType(ModelType(Question), default=list())
-
     bankAccount = ModelType(BankAccount)
+
+    bids = ListType(ModelType(Bid), default=list())
 
     budgetSpent = ModelType(Value, required=True)
 
-    contracts = ListType(ModelType(Contract), default=list())
-
-    contractTerms = ModelType(ContractTerms,
-                              required=True)
-
     cancellations = ListType(ModelType(Cancellation), default=list())
 
-    lotIdentifier = StringType(required=True)
+    complaints = ListType(ModelType(BaseComplaint), default=list())
 
-    lotHolder = ModelType(BaseOrganization, required=True)
+    contractTerms = ModelType(ContractTerms, required=True)
 
-    description = StringType(required=True)
+    contracts = ListType(ModelType(Contract), default=list())
 
     dateModified = IsoDateTimeType()
+
+    description = StringType(required=True)
 
     documents = ListType(ModelType(AuctionDocument), default=list())
 
@@ -384,19 +397,21 @@ class Auction(BaseAuction):
 
     guarantee = ModelType(Guarantee, required=True)
 
-    items = ListType(ModelType(Item),
-                     validators=[validate_items_uniq],
-                     default=list())
+    items = ListType(ModelType(Item), validators=[validate_items_uniq], default=list())
+
+    lotHolder = ModelType(BaseOrganization, required=True)
+
+    lotIdentifier = StringType(required=True)
 
     minNumberOfQualifiedBids = IntType(choices=[1, 2], default=2)
 
     mode = StringType()
 
-    complaints = ListType(ModelType(BaseComplaint), default=list())
-
     procurementMethod = StringType(choices=['open'], default='open')
 
     procurementMethodType = StringType(required=True)
+
+    questions = ListType(ModelType(Question), default=list())
 
     rectificationPeriod = ModelType(RectificationPeriod)
 
@@ -404,8 +419,7 @@ class Auction(BaseAuction):
 
     status = StringType(choices=AUCTION_STATUSES, default='draft')
 
-    submissionMethod = StringType(choices=['electronicAuction'],
-                                  default='electronicAuction')
+    submissionMethod = StringType(choices=['electronicAuction'], default='electronicAuction')
 
     tenderAttempts = IntType(choices=range(1, 11))
 

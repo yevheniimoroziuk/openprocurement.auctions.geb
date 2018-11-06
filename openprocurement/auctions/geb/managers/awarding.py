@@ -3,6 +3,9 @@ from datetime import timedelta
 from openprocurement.auctions.core.plugins.awarding.v3_1.adapters import (
     AwardingV3_1ConfiguratorMixin as BaseAwarding
 )
+from openprocurement.auctions.core.utils import (
+    set_specific_hour
+)
 from openprocurement.auctions.geb.models.schemas import (
     Auction
 )
@@ -18,9 +21,12 @@ class Awarding(BaseAwarding):
 
     @property
     def verificationPeriod(self):
+        # generate verificationPeriod.endDate
+        start_awarding = self.context.awardPeriod.startDate
         auction_end_date = self.context.auctionPeriod.endDate
+
         if auction_end_date:
-            end_date = cbd(auction_end_date,
+            end_date = cbd(start_awarding,
                            timedelta(days=0),
                            self.context,
                            specific_hour=18)
@@ -32,8 +38,16 @@ class Awarding(BaseAwarding):
                            specific_hour=18,
                            working_days=True)
 
+        # generate verificationPeriod.startDate
+        outstanding_auction_time = set_specific_hour(end_date, 18)
+
+        # check if module auction outstanding time to brings result
+        if start_awarding > outstanding_auction_time:
+            start_date = set_specific_hour(end_date, 17)
+        else:
+            start_date = start_awarding
         verification_period = {
-            'startDate': self._start_awarding,
+            'startDate': start_date,
             'endDate': end_date
         }
         self.verification_period = verification_period
@@ -43,8 +57,16 @@ class Awarding(BaseAwarding):
     def signingPeriod(self):
         verification_end_date = self.verification_period['endDate']
         end_date = cbd(verification_end_date, timedelta(days=0), self.context, specific_hour=23) + timedelta(minutes=59)
+        outstanding_auction_time = set_specific_hour(end_date, 18)
+        start_awarding = self.context.awardPeriod.startDate
+
+        # check if module auction outstanding time to brings result
+        if start_awarding > outstanding_auction_time:
+            start_date = set_specific_hour(end_date, 17)
+        else:
+            start_date = start_awarding
         singing_period = {
-            'startDate': self._start_awarding,
+            'startDate': start_date,
             'endDate': end_date
         }
 
