@@ -1,9 +1,11 @@
+import unittest
 from iso8601 import parse_date
 from mock import patch
 from datetime import timedelta
 
 from openprocurement.auctions.core.utils import (
-    set_specific_hour
+    set_specific_hour,
+    SANDBOX_MODE
 )
 
 from openprocurement.auctions.geb.tests.fixtures.active_tendering import (
@@ -89,6 +91,7 @@ def check_enquiry_period_end_unsuccessful(test_case):
     test_case.assertEqual(response.json['data']["status"], 'unsuccessful')
 
 
+@unittest.skipIf(SANDBOX_MODE, 'If sandbox mode is it enabled generating correct periods')
 def check_enquiry_period_end_active_qualification(test_case):
     context = test_case.procedure.snapshot(fixture=END_ACTIVE_ENQUIRY_AUCTION_QUALIFICATION)
 

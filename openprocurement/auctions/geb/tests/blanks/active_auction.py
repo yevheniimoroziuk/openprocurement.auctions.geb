@@ -1,3 +1,4 @@
+import unittest
 from contextlib import nested
 from mock import patch
 from copy import deepcopy
@@ -8,7 +9,8 @@ from openprocurement.auctions.core.tests.base import (
     test_document_data
 )
 from openprocurement.auctions.core.utils import (
-    set_specific_hour
+    set_specific_hour,
+    SANDBOX_MODE
 )
 
 from openprocurement.auctions.geb.tests.fixtures.active_auction import (
@@ -76,6 +78,7 @@ def get_auction_urls_dump(test_case):
     test_case.dump(response.request, response, filename)
 
 
+@unittest.skipIf(SANDBOX_MODE, 'If sandbox mode is it enabled generating correct periods')
 def switch_to_qualification(test_case):
     context = test_case.procedure.snapshot(fixture=AUCTION_WITH_URLS)
     auction = context['auction']
@@ -136,11 +139,11 @@ def switch_to_qualification(test_case):
     entrypoint = '/auctions/{}'.format(auction['data']['id'])
     response = test_case.app.get(entrypoint)
     auction = response.json['data']
-    enquiryPeriod_end_date = parse_date(auction['enquiryPeriod']['endDate'])
+    auction_period_end_date = parse_date(auction['auctionPeriod']['endDate'])
     verification_start_date = parse_date(award['verificationPeriod']['startDate'])
     verification_end_date = parse_date(award['verificationPeriod']['endDate'])
 
-    expected_end_date = ccbd(enquiryPeriod_end_date, timedelta(days=1), specific_hour=18, working_days=True)
+    expected_end_date = set_specific_hour(auction_period_end_date, 18)
     test_case.assertEqual(verification_end_date, expected_end_date)
 
     # check generated signing

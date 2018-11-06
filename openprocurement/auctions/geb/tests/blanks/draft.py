@@ -1,7 +1,9 @@
+import unittest
 from iso8601 import parse_date
 from datetime import timedelta, time
 from openprocurement.auctions.core.utils import (
     get_now,
+    SANDBOX_MODE
 )
 from openprocurement.auctions.geb.utils import (
     calculate_certainly_business_date as ccbd
@@ -11,6 +13,7 @@ from openprocurement.auctions.geb.tests.fixtures.items import (
 )
 
 
+@unittest.skipIf(SANDBOX_MODE, 'If sandbox mode is it enabled generating correct periods')
 def check_generated_rectification_period(test_case):
     # phase commit
     next_status = 'active.rectification'
@@ -40,6 +43,7 @@ def check_generated_rectification_period(test_case):
     test_case.assertEqual(verbose_start_date, verbose_now)
 
 
+@unittest.skipIf(SANDBOX_MODE, 'If sandbox mode is it enabled generating correct periods')
 def check_generated_tender_period(test_case):
     # phase commit
     next_status = 'active.rectification'
@@ -74,6 +78,7 @@ def check_generated_tender_period(test_case):
     test_case.assertEqual(expected_end_date, tender_period_end_date)
 
 
+@unittest.skipIf(SANDBOX_MODE, 'If sandbox mode is it enabled generating correct periods')
 def check_generated_enquiry_period(test_case):
     # phase commit
     next_status = 'active.rectification'
@@ -120,6 +125,7 @@ def phase_commit(test_case):
     test_case.assertEqual(next_status, response.json['data']['status'])
 
 
+@unittest.skipIf(SANDBOX_MODE, 'If sandbox mode is it enabled generating correct periods')
 def phase_commit_invalid_auctionPeriod(test_case):
 
     expected_http_status = '422 Unprocessable Entity'
