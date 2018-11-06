@@ -28,9 +28,6 @@ from openprocurement.auctions.geb.tests.fixtures.calculator import (
 
 now = get_now()
 calculator = Calculator(now, 'enquiryPeriod', 'start')
-
-# auction with tow active bids
-
 auction = deepcopy(END_ACTIVE_TENDERING_AUCTION_WITH_TWO_BIDS)
 auction['status'] = 'active.enquiry'
 auction["rectificationPeriod"] = {
@@ -51,58 +48,56 @@ auction["auctionPeriod"] = {
 auction["next_check"] = calculator.enquiryPeriod.endDate.isoformat()
 auction["date"] = calculator.auctionDate.date.isoformat()
 
+# auction in 'active.tendering' status.
+# description:
+# - has item
+# - two bids in status 'active'
+# - minNumberOfQualifiedBids = 2
+# - value.amount = 100
+# - minimalStep.amount = 42
+# - owner = 'broker'
 AUCTION = auction
 
 # auction with questions fixture
-
 auction = deepcopy(AUCTION)
 auction['questions'] = [QUESTION]
-
 AUCTION_WITH_QUESTIONS = auction
 
-
 # auction with documents
-
 auction = deepcopy(AUCTION)
-
 auction['documents'] = [DOCUMENT]
-
 AUCTION_WITH_DOCUMENTS = auction
 
 # auction with bids
 
+# auction with bid in 'pending'
 auction = deepcopy(AUCTION)
 auction['bids'] = [BID_PENDING_FIRST]
-
 AUCTION_WITH_BID_PENDING = auction
 
+# auction with bid in 'active'
 auction = deepcopy(AUCTION)
 auction['bids'] = [BID_ACTIVE_FIRST]
-
 AUCTION_WITH_BID_ACTIVE = auction
 
-# auction with bids with document
-
+# auction with bid in 'draft' with document
 auction = deepcopy(AUCTION)
 auction['bids'] = [BID_DRAFT_WITH_DOCUMENT]
-
 AUCTION_WITH_BID_DRAFT_WITH_DOCUMENT = auction
 
+# auction with bid in 'pending' with document
 auction = deepcopy(AUCTION)
 auction['bids'] = [BID_PENDING_FIRST_WITH_DOCUMENT]
-
 AUCTION_WITH_BID_PENDING_WITH_DOCUMENT = auction
 
+# auction with bid in 'active' with document
 auction = deepcopy(AUCTION)
 auction['bids'] = [BID_ACTIVE_FIRST_WITH_DOCUMENT]
-
 AUCTION_WITH_BID_ACTIVE_WITH_DOCUMENT = auction
 
-# end enquiry period fixtures
-
+# auction in end 'active.enquiry' with two bid in status 'active'
 now = get_now()
 calculator = Calculator(now, 'enquiryPeriod', 'end')
-
 auction = deepcopy(AUCTION)
 auction['status'] = 'active.enquiry'
 auction["rectificationPeriod"] = {
@@ -122,47 +117,38 @@ auction["auctionPeriod"] = {
 }
 auction["next_check"] = None
 auction["date"] = calculator.auctionDate.date.isoformat()
-
 END_ACTIVE_ENQUIRY_AUCTION = auction
 
+# auction in end 'active.enquiry' with two bid in status 'pending'
+# which will lead to the status 'unsuccessful' auction
 auction = deepcopy(END_ACTIVE_ENQUIRY_AUCTION)
 auction['bids'] = [BID_PENDING_FIRST, BID_PENDING_SECOND]
-
 END_ACTIVE_ENQUIRY_UNSUCCESSFUL_NO_BIDS_ACTIVE = auction
 
+# auction in end 'active.enquiry' with two bid in status 'active'
+# and minNumberOfQualifiedBids = 1
+# which will lead to the status 'active.qualification' auction
 auction = deepcopy(END_ACTIVE_ENQUIRY_AUCTION)
 auction['bids'] = [BID_ACTIVE_FIRST]
 auction['minNumberOfQualifiedBids'] = 1
-
-
 END_ACTIVE_ENQUIRY_AUCTION_QUALIFICATION = auction
 
-
 # auction with cancellations fixture
-
 auction = deepcopy(AUCTION)
 auction['_id'] = uuid4().hex
-auction['cancellations'] = [
-    CANCELLATION
-]
+auction['cancellations'] = [CANCELLATION]
 AUCTION_WITH_CANCELLATION = auction
 
-# auction with bids and cancellation
-
+# auction with bid in status 'active' and cancellation
 auction = deepcopy(AUCTION)
 auction['_id'] = uuid4().hex
-auction['cancellations'] = [
-    CANCELLATION
-]
+auction['cancellations'] = [CANCELLATION]
 auction['bids'] = [BID_ACTIVE_FIRST]
 
 AUCTION_WITH_BIDS_WITH_CANCELLATION = auction
 
-# auction with cancellations with document fixture
-
+# auction with cancellations with document
 auction = deepcopy(AUCTION)
 auction['_id'] = uuid4().hex
-auction['cancellations'] = [
-    CANCELLATION_WITH_DOCUMENTS
-]
+auction['cancellations'] = [CANCELLATION_WITH_DOCUMENTS]
 AUCTION_WITH_CANCELLATION_WITH_DOCUMENTS = auction
