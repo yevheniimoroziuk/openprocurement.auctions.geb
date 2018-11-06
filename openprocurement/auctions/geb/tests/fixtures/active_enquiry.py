@@ -48,7 +48,7 @@ auction["auctionPeriod"] = {
 auction["next_check"] = calculator.enquiryPeriod.endDate.isoformat()
 auction["date"] = calculator.auctionDate.date.isoformat()
 
-# auction in 'active.tendering' status.
+# auction in 'active.enquiry' status.
 # description:
 # - has item
 # - two bids in status 'active'

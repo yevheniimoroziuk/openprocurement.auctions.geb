@@ -16,20 +16,14 @@ from openprocurement.auctions.geb.tests.fixtures.awards import (
 from openprocurement.auctions.geb.tests.fixtures.documents import (
     AUCTION_DOCUMENT_AUDIT
 )
-from openprocurement.auctions.geb.tests.fixtures.bids import (
-    BID_ACTIVE_FIRST
-)
 from openprocurement.auctions.geb.utils import (
     calculate_certainly_business_date as ccbd
 )
 
 
 qualification_period_start = ccbd(get_now(), -timedelta(days=1), specific_hour=16)
-
 calculator = Calculator(qualification_period_start, 'qualificationPeriod', 'start')
-
 auction = deepcopy(ACTIVE_ENQUIRY_AUCTION)
-
 auction['status'] = 'active.qualification'
 auction['documents'] = [AUCTION_DOCUMENT_AUDIT]
 auction["rectificationPeriod"] = {
@@ -51,19 +45,26 @@ auction["auctionPeriod"] = {
 auction["awardPeriod"] = {
     "startDate": calculator.awardPeriod.startDate.isoformat(),
 }
-
 auction["next_check"] = None
-auction['bids'] = [BID_ACTIVE_FIRST]
+auction['bids'][1]['status'] = 'invalid'
 auction["awards"] = [AWARD_PENDING]
 auction["awards"][0]['bid_id'] = auction['bids'][0]['id']
 auction["date"] = calculator.auctionDate.date.isoformat()
 
+# auction in 'active.qualification' status.
+# description:
+# - has item
+# - first bid is winner and has status 'active'
+# - second bid is loser and has status 'invalid'
+# - has award for first bid
+# - minNumberOfQualifiedBids = 2
+# - value.amount = 100
+# - minimalStep.amount = 42
+# - owner = 'broker'
 AUCTION = auction
 
 # auction with award with protocol
-
 auction = deepcopy(AUCTION)
 auction["awards"] = [AWARD_PENDING_WITH_PROTOCOL]
 auction["awards"][0]['bid_id'] = auction['bids'][0]['id']
-
 AUCTION_WITH_AWARD_WITH_PROTOCOL = auction
