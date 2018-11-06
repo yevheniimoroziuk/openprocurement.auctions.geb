@@ -31,7 +31,7 @@ class AuctionItemResource(APIResource):
         return manager.represent_subresources_listing(implementedBy(item_type))
 
     @json_view(content_type="application/json", permission='create_item', validators=(validate_item_data))
-    def collection_post(self):  # TODO
+    def collection_post(self):
         """
         Auction Item Upload
         """
