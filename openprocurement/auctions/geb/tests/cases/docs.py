@@ -36,6 +36,18 @@ from openprocurement.auctions.geb.tests.states import (
     ProcedureMachine
 )
 
+from openprocurement.auctions.geb.tests.blanks.active_qualification import (
+    dump_bid_owner_upload_auction_protocol,
+    dump_organizer_activate_award,
+    dump_organizer_upload_auction_protocol
+)
+from openprocurement.auctions.geb.tests.blanks.active_awarded import (
+    organizer_activate_contract_dump,
+    organizer_uploads_the_contract_dump
+)
+from openprocurement.auctions.geb.tests.fixtures.active_awarded import (
+    AUCTION_WITH_CONTRACT_WITH_DOCUMENT
+)
 from openprocurement.auctions.geb.tests.fixtures.active_tendering import (
     AUCTION_WITH_QUESTIONS as ACTIVE_TENDERING_AUCTION_WITH_QUESTION,
     AUCTION_WITH_BID_DRAFT,
@@ -216,6 +228,115 @@ class ActiveAuctionDumpTest(BaseWebDocsTest):
         self.app.authorization = ('Basic', ('auction', ''))
 
 
+class ActiveQualificationDumpTest(BaseWebDocsTest):
+    docservice = True
+
+    test_dump_bid_owner_upload_auction_protocol = snitch(dump_bid_owner_upload_auction_protocol)
+    test_dump_organizer_activate_award = snitch(dump_organizer_activate_award)
+    test_dump_organizer_upload_auction_protocol = snitch(dump_organizer_upload_auction_protocol)
+
+    def setUp(self):
+        super(ActiveQualificationDumpTest, self).setUp()
+        procedure = ProcedureMachine()
+        procedure.set_db_connector(self.db)
+        procedure.toggle('active.qualification')
+        context = procedure.snapshot()
+
+        award = context['awards'][0]
+        bid = context['bids'][0]
+        auction = context['auction']
+        entrypoints = {}
+        pattern = '/auctions/{}/awards/{}/documents?acc_token={}'
+        entrypoints['award_document_post'] = pattern.format(auction['data']['id'],
+                                                            award['data']['id'],
+                                                            auction['access']['token'])
+
+        pattern = '/auctions/{}'
+        entrypoints['auction_get'] = pattern.format(auction['data']['id'])
+
+        pattern = '/auctions/{}/contracts'
+        entrypoints['contracts_get'] = pattern.format(auction['data']['id'])
+
+        pattern = '/auctions/{}/awards/{}'
+        entrypoints['award_get'] = pattern.format(auction['data']['id'],
+                                                  award['data']['id'])
+
+        pattern = '/auctions/{}/awards/{}?acc_token={}'
+        entrypoints['award_patch'] = pattern.format(auction['data']['id'],
+                                                    award['data']['id'],
+                                                    auction['access']['token'])
+        self.ENTRYPOINTS = entrypoints
+        self.auction = auction
+        self.award = award
+        self.bid = bid
+        self.ENTRYPOINTS = entrypoints
+        self.auction = auction
+        self.award = award
+        self.bid = bid
+
+
+class StatusActiveAwardedDumpTest(BaseWebDocsTest):
+    docservice = True
+    test_organizer_uploads_the_contract_dump = snitch(organizer_uploads_the_contract_dump)
+
+    def setUp(self):
+        super(StatusActiveAwardedDumpTest, self).setUp()
+        procedure = ProcedureMachine()
+        procedure.set_db_connector(self.db)
+        procedure.toggle('active.awarded')
+        context = procedure.snapshot()
+
+        contract = context['contracts'][0]
+        award = context['awards'][0]
+        auction = context['auction']
+        entrypoints = {}
+        pattern = '/auctions/{}/contracts/{}/documents?acc_token={}'
+        entrypoints['contract_document_post'] = pattern.format(auction['data']['id'],
+                                                               contract['data']['id'],
+                                                               auction['access']['token'])
+
+        pattern = '/auctions/{}/contracts/{}?acc_token={}'
+        entrypoints['contract_patch'] = pattern.format(auction['data']['id'],
+                                                       contract['data']['id'],
+                                                       auction['access']['token'])
+        self.ENTRYPOINTS = entrypoints
+        self.auction = auction
+        self.contract = contract
+        self.award = award
+
+
+class ContractWithContractDocumentTest(BaseWebDocsTest):
+    test_organizer_activate_contract = snitch(organizer_activate_contract_dump)
+
+    def setUp(self):
+        super(ContractWithContractDocumentTest, self).setUp()
+        procedure = ProcedureMachine()
+        procedure.set_db_connector(self.db)
+        procedure.toggle('active.awarded')
+        context = procedure.snapshot(fixture=AUCTION_WITH_CONTRACT_WITH_DOCUMENT)
+
+        contract = context['contracts'][0]
+        bid = context['bids'][0]
+        auction = context['auction']
+        entrypoints = {}
+
+        pattern = '/auctions/{}'
+        entrypoints['auction_get'] = pattern.format(auction['data']['id'])
+
+        pattern = '/auctions/{}/contracts/{}'
+        entrypoints['contract_get'] = pattern.format(auction['data']['id'],
+                                                     contract['data']['id'])
+
+        pattern = '/auctions/{}/contracts/{}?acc_token={}'
+        entrypoints['contract_patch'] = pattern.format(auction['data']['id'],
+                                                       contract['data']['id'],
+                                                       auction['access']['token'])
+        self.ENTRYPOINTS = entrypoints
+        self.auction = auction
+        self.contract = contract
+        self.bid = bid
+
+
 def suite():
     suite = unittest.TestSuite()
     suite.addTest(unittest.makeSuite(CreateAuctionDumpTest))
@@ -227,6 +348,7 @@ def suite():
     suite.addTest(unittest.makeSuite(TenderingAuctionBidsPendingDumpTest))
     suite.addTest(unittest.makeSuite(TenderingAuctionQuestionsDumpTest))
     suite.addTest(unittest.makeSuite(ActiveAuctionDumpTest))
+    suite.addTest(unittest.makeSuite(ActiveQualificationDumpTest))
     return suite
 
 
