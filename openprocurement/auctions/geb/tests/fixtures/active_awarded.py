@@ -19,12 +19,9 @@ from openprocurement.auctions.geb.utils import (
     calculate_certainly_business_date as ccbd
 )
 
-
 awarded_period_start = ccbd(get_now(), -timedelta(days=1), specific_hour=17)
 calculator = Calculator(awarded_period_start, 'awardPeriod', 'end')
-
 auction = deepcopy(ACTIVE_QUALIFICATION_AUCTION)
-
 auction['status'] = 'active.awarded'
 auction["rectificationPeriod"] = {
     "startDate": calculator.rectificationPeriod.startDate.isoformat(),
@@ -46,21 +43,28 @@ auction["awardPeriod"] = {
     "startDate": calculator.awardPeriod.startDate.isoformat(),
     "endDate": calculator.awardPeriod.endDate.isoformat(),
 }
-
 auction["next_check"] = None
 auction["awards"] = [AWARD_ACTIVE]
 auction["awards"][0]['bid_id'] = auction['bids'][0]['id']
 auction["contracts"] = [CONTRACT_PENDING]
 auction["contracts"][0]['awardID'] = auction['awards'][0]['id']
-
 auction["date"] = calculator.auctionDate.date.isoformat()
 
+# auction in 'active.awarded' status.
+# description:
+# - has item
+# - first bid is winner and has status 'active'
+# - second bid is loser and has status 'invalid'
+# - has award for first bid
+# - has contract in status 'pending' for second award
+# - minNumberOfQualifiedBids = 2
+# - value.amount = 100
+# - minimalStep.amount = 42
+# - owner = 'broker'
 AUCTION = auction
 
 # auction with contract with document
-
 auction = deepcopy(AUCTION)
 auction["contracts"] = [CONTRACT_PENDING_WITH_DOCUMENT]
 auction["contracts"][0]['awardID'] = auction['awards'][0]['id']
-
 AUCTION_WITH_CONTRACT_WITH_DOCUMENT = auction

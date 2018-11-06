@@ -107,3 +107,19 @@ def organizer_activate_contract_dump(test_case):
     filename = 'docs/source/tutorial/active_awarded_auction_after_contract_activation.http'
     test_case.dump(response.request, response, filename)
 
+
+def auction_put_auction_document_audit(test_case):
+    expected_http_status = '200 OK'
+    document = deepcopy(test_document_data)
+    url = test_case.generate_docservice_url(),
+    document['url'] = url[0]
+    request_data = {'data': document}
+
+    response = test_case.app.put_json(test_case.ENTRYPOINTS['auction_audit_put'], request_data)
+    test_case.assertEqual(expected_http_status, response.status)
+
+    document = response.json['data']
+    pattern = '/auctions/{}/documents/{}'
+    entrypoint = pattern.format(test_case.auction['data']['id'], document['id'])
+    response = test_case.app.get(entrypoint)
+    test_case.assertEqual(response.status, '200 OK')

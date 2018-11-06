@@ -5,9 +5,10 @@ from openprocurement.auctions.core.interfaces import (
     IAuctionSubResourceItemRepresenter,
     IAuctionSubResourcesRepresenter,
     IAuctionSubResourcesRepresentersFactory,
+    IBidRepresenter,
     ICancellationRepresenter,
-    ICancellationSubResourcesRepresenter,
     ICancellationSubResourceDocumentRepresenter,
+    ICancellationSubResourcesRepresenter,
     ICancellationSubResourcesRepresentersFactory,
     IItemRepresenter
 )
@@ -19,6 +20,8 @@ from openprocurement.auctions.geb.interfaces import (
 )
 
 # resources representers
+
+# Item resource representer
 
 
 @implementer(IItemRepresenter)
@@ -39,6 +42,33 @@ class ItemRepresenter(object):
             return self._represent_patch()
         elif method == 'GET':
                 return self._represent_get()
+
+# Bid resource representer
+
+
+@implementer(IBidRepresenter)
+class BidRepresenter(object):
+    name = 'Bid Representer'
+
+    def __init__(self, context):
+        self._context = context
+
+    def _represent_patch(self):
+        return {'data': self._context.serialize(self._context.status)}
+
+    def _represent_get(self):
+        return {'data': self._context.serialize("view")}
+
+    def _represent_delete(self):
+        return {'data': self._context.serialize("view")}
+
+    def represent(self, method, listing=False):
+        if method == 'PATCH':
+            return self._represent_patch()
+        elif method == 'GET':
+                return self._represent_get()
+        elif method == 'DELETE':
+                return self._represent_delete()
 
 
 @implementer(ICancellationRepresenter)

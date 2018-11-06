@@ -8,8 +8,9 @@ from openprocurement.auctions.geb.tests.states import (
     ProcedureMachine
 )
 from openprocurement.auctions.geb.tests.blanks.active_awarded import (
-    organizer_uploads_the_contract,
-    organizer_activate_contract
+    auction_put_auction_document_audit,
+    organizer_activate_contract,
+    organizer_uploads_the_contract
 )
 from openprocurement.auctions.geb.tests.fixtures.active_awarded import (
     AUCTION_WITH_CONTRACT_WITH_DOCUMENT
@@ -20,6 +21,7 @@ class StatusActiveAwardedTest(BaseWebTest):
     docservice = True
 
     test_organizer_downloads_the_contract = snitch(organizer_uploads_the_contract)
+    test_auction_put_auction_document_audit = snitch(auction_put_auction_document_audit)
 
     def setUp(self):
         super(StatusActiveAwardedTest, self).setUp()
@@ -31,6 +33,7 @@ class StatusActiveAwardedTest(BaseWebTest):
         contract = context['contracts'][0]
         award = context['awards'][0]
         auction = context['auction']
+        audit_document = context['documents'][0]
         entrypoints = {}
         pattern = '/auctions/{}/contracts/{}/documents?acc_token={}'
         entrypoints['contract_document_post'] = pattern.format(auction['data']['id'],
@@ -41,6 +44,10 @@ class StatusActiveAwardedTest(BaseWebTest):
         entrypoints['contract_patch'] = pattern.format(auction['data']['id'],
                                                        contract['data']['id'],
                                                        auction['access']['token'])
+        pattern = '/auctions/{}/documents/{}?acc_token={}'
+        entrypoints['auction_audit_put'] = pattern.format(auction['data']['id'],
+                                                          audit_document['data']['id'],
+                                                          auction['access']['token'])
         self.ENTRYPOINTS = entrypoints
         self.auction = auction
         self.contract = contract
