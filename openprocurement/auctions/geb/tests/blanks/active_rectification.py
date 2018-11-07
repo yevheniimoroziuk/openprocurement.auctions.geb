@@ -370,6 +370,28 @@ def patch_document(test_case):
     test_case.assertEqual(document[field], new)
 
 
+def download_document(test_case):
+    context = test_case.procedure.snapshot(fixture=AUCTION_WITH_DOCUMENTS)
+    auction = context['auction']
+    document = context['documents'][0]
+
+    # get document data
+    entrypoint_pattern = '/auctions/{}/documents/{}'
+    entrypoint = entrypoint_pattern.format(auction['data']['id'], document['data']['id'])
+    response = test_case.app.get(entrypoint)
+    document_data = response.json['data']
+
+    # get document key
+    key = document_data["url"].split('?')[-1]
+
+    # download document
+    entrypoint_pattern = '/auctions/{}/documents/{}?download={}'
+    entrypoint = entrypoint_pattern.format(auction['data']['id'], document['data']['id'], key)
+    response = test_case.app.get(entrypoint)
+
+    test_case.assertEqual(response.content_type, 'application/msword')
+
+
 def put_document(test_case):
     new_document = deepcopy(test_document_data)
     url = test_case.generate_docservice_url(),

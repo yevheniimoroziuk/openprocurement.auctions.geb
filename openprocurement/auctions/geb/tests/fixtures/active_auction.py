@@ -1,5 +1,10 @@
+from datetime import timedelta
 from uuid import uuid4
 from copy import deepcopy
+
+from openprocurement.auctions.core.utils import (
+    set_specific_hour
+)
 from openprocurement.auctions.geb.tests.fixtures.active_enquiry import (
     AUCTION as ACTIVE_ENQUIRY_AUCTION
 )
@@ -11,13 +16,21 @@ from openprocurement.auctions.geb.tests.fixtures.cancellations import (
 from openprocurement.auctions.geb.tests.fixtures.bids import (
     BID_ACTIVE_FIRST
 )
+from openprocurement.auctions.geb.tests.fixtures.documents import (
+    DOCUMENT
+)
+from openprocurement.auctions.geb.tests.fixtures.questions import (
+    QUESTION
+)
 from openprocurement.auctions.core.utils import get_now
 from openprocurement.auctions.geb.tests.fixtures.calculator import (
     Calculator
 )
 
-now = get_now()
-calculator = Calculator(now, 'auctionPeriod', 'start')
+# 'active.auction' start yesterday in 20:00
+auction_period_start_date = set_specific_hour(get_now() - timedelta(days=1), 20)
+
+calculator = Calculator(auction_period_start_date, 'auctionPeriod', 'start')
 auction = deepcopy(ACTIVE_ENQUIRY_AUCTION)
 auction['status'] = 'active.auction'
 auction["rectificationPeriod"] = {
@@ -48,7 +61,18 @@ auction["date"] = calculator.auctionDate.date.isoformat()
 # - owner = 'broker'
 AUCTION = auction
 
+# auction with documents
 auction = deepcopy(AUCTION)
+auction['documents'] = [DOCUMENT]
+AUCTION_WITH_DOCUMENT = auction
+auction = deepcopy(AUCTION)
+
+# auction with question
+auction = deepcopy(AUCTION)
+auction['questions'] = [QUESTION]
+AUCTION_WITH_QUESTION = auction
+auction = deepcopy(AUCTION)
+
 auction['auctionUrl'] = 'http://auction-sandbox.openprocurement.org/auctions/{}'.format(auction['_id'])
 for bid in auction['bids']:
     bid['participationUrl'] = "http://auction-sandbox.openprocurement.org/auctions/{}?key_for_bid={}".format(auction['_id'], bid['id'])

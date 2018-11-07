@@ -48,13 +48,13 @@ BID_DOCUMENT_TYPES = [
     'eligibilityDocuments',
 ]
 
-CANCELLATION_DOCUMENT_TYPES = ['cancellationDetails']
-NUMBER_OF_BIDS_TO_BE_QUALIFIED = 2
-
 DEFAULT_LEVEL_OF_ACCREDITATION = {
     'create': [1],
     'edit': [2]
 }
+
+CANCELLATION_DOCUMENT_TYPES = ['cancellationDetails']
+NUMBER_OF_BIDS_TO_BE_QUALIFIED = 2
 
 DEFAULT_PROCUREMENT_METHOD_TYPE = "landlease"
 AUCTION_PARAMETERS_TYPE = 'texas'

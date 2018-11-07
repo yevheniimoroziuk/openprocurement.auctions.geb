@@ -30,9 +30,6 @@ class AuctionCancellationDocumentResource(AuctionCancellationDocumentResource):
         document_type = type(manager.context).documents.model_class
         return manager.represent_subresources_listing(implementedBy(document_type))
 
-        collection_data = [i.serialize("view") for i in self.context.documents]
-        return {'data': collection_data}
-
     @json_view(validators=(validate_file_upload,), permission='edit_auction')
     def collection_post(self):
         """

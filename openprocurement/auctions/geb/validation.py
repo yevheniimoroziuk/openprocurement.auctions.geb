@@ -376,6 +376,9 @@ def validate_edit_auction_document_period(request, **kwargs):
     auction = kwargs['auction']
 
     if auction.status not in EDIT_AUCTION_DOCUMENT_STATUSES:
+        err_msg = 'Can`t update document in {}'.format(auction.status)
+        request.errors.add('body', 'data', err_msg)
+        request.errors.status = 403
         return False
     return True
 

@@ -156,6 +156,21 @@ def auction_document_post(test_case):
     test_case.assertEqual(expected_http_status, response.status)
 
 
+def auction_auction_get(test_case):
+    expected_http_status = '403 Forbidden'
+    auction_url = '/auctions/{}/auction'.format(test_case.auction['data']['id'])
+
+    auth = test_case.app.authorization
+
+    # auth as module auction
+    test_case.app.authorization = ('Basic', ('auction', ''))
+
+    response = test_case.app.get(auction_url, status=403)
+    test_case.assertEqual(response.status, expected_http_status)
+
+    test_case.app.authorization = auth
+
+
 def auction_document_patch(test_case):
     field = 'documentType'
     new = 'technicalSpecifications'
@@ -171,6 +186,24 @@ def auction_document_patch(test_case):
     response = test_case.app.get(test_case.ENTRYPOINTS['document_get'])
     document = response.json['data']
     test_case.assertEqual(document[field], new)
+
+
+def auction_document_download(test_case):
+    # get document data
+    response = test_case.app.get(test_case.ENTRYPOINTS['document_get'])
+    document_data = response.json['data']
+
+    # get document key
+    key = document_data["url"].split('?')[-1]
+
+    # download document
+    entrypoint_pattern = '/auctions/{}/documents/{}?download={}'
+    entrypoint = entrypoint_pattern.format(test_case.auction['data']['id'],
+                                           test_case.document['data']['id'],
+                                           key)
+    response = test_case.app.get(entrypoint)
+
+    test_case.assertEqual(response.content_type, 'application/msword')
 
 
 def auction_document_put(test_case):
@@ -341,16 +374,12 @@ def bid_draft_patch_document(test_case):
     new = 'eligibilityDocuments'
     expected_http_status = '200 OK'
 
-    auth = test_case.app.authorization
-
     request_data = {'data': {patch_field: new}}
     response = test_case.app.patch_json(test_case.ENTRYPOINTS['bid_document'], request_data)
     test_case.assertEqual(expected_http_status, response.status)
     response = test_case.app.get(test_case.ENTRYPOINTS['bid_document'], request_data)
     bid_document = response.json['data']
     test_case.assertEqual(bid_document[patch_field], new)
-
-    test_case.app.authorization = auth
 
 
 def bid_draft_get_document(test_case):
@@ -362,16 +391,12 @@ def bid_pending_patch_document(test_case):
     new = 'eligibilityDocuments'
     expected_http_status = '200 OK'
 
-    auth = test_case.app.authorization
-
     request_data = {'data': {patch_field: new}}
     response = test_case.app.patch_json(test_case.ENTRYPOINTS['bid_document'], request_data)
     test_case.assertEqual(expected_http_status, response.status)
     response = test_case.app.get(test_case.ENTRYPOINTS['bid_document'], request_data)
     bid_document = response.json['data']
     test_case.assertEqual(bid_document[patch_field], new)
-
-    test_case.app.authorization = auth
 
 
 def bid_pending_get_document(test_case):
@@ -383,16 +408,12 @@ def bid_active_patch_document(test_case):
     new = 'eligibilityDocuments'
     expected_http_status = '200 OK'
 
-    auth = test_case.app.authorization
-
     request_data = {'data': {patch_field: new}}
     response = test_case.app.patch_json(test_case.ENTRYPOINTS['bid_document'], request_data)
     test_case.assertEqual(expected_http_status, response.status)
     response = test_case.app.get(test_case.ENTRYPOINTS['bid_document'], request_data)
     bid_document = response.json['data']
     test_case.assertEqual(bid_document[patch_field], new)
-
-    test_case.app.authorization = auth
 
 
 def bid_active_get_document(test_case):
