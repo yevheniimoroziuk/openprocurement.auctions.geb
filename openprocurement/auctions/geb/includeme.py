@@ -47,8 +47,8 @@ def includeme(config, plugin_map):
     procurement_method_types = plugin_map.get('aliases', [])
     if plugin_map.get('use_default', False):
         procurement_method_types.append(DEFAULT_PROCUREMENT_METHOD_TYPE)
-        for procurementMethodType in procurement_method_types:
-            config.add_auction_procurementMethodType(Auction, procurementMethodType)
+    for procurementMethodType in procurement_method_types:
+        config.add_auction_procurementMethodType(Auction, procurementMethodType)
 
     # add views
     config.scan("openprocurement.auctions.geb.views")
