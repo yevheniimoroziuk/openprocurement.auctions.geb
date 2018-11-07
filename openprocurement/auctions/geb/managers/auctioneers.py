@@ -36,7 +36,7 @@ class Auctioneer(object):
     def validate(self):
         for validator in self.validators:
             if not validator(self._request):
-                return
+                return False
         return True
 
     def initialize(self):
@@ -49,7 +49,7 @@ class Auctioneer(object):
 
     def report(self):
         if self.validate():
-            self._context.auctionPeriod = {'endDate': self._now}
+            self._context.auctionPeriod['endDate'] = self._now
             self._context.modified = apply_patch(self._request, save=False, src=self._context.serialize())
         return self._context.modified
 

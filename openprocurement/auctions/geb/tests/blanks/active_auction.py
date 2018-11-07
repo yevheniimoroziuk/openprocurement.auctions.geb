@@ -14,16 +14,105 @@ from openprocurement.auctions.core.utils import (
 )
 
 from openprocurement.auctions.geb.tests.fixtures.active_auction import (
-    AUCTION as ACTIVE_AUCTION_AUCTION,
-    AUCTION_WITH_URLS
+    AUCTION,
+    AUCTION_WITH_URLS,
+    AUCTION_WITH_DOCUMENT,
+    AUCTION_WITH_QUESTION
 )
 from openprocurement.auctions.geb.utils import (
     calculate_certainly_business_date as ccbd
 )
 
 
+def auction_document_patch(test_case):
+    context = test_case.procedure.snapshot(fixture=AUCTION_WITH_DOCUMENT)
+    auction = context['auction']
+    document = context['documents'][0]
+
+    field = 'documentType'
+    new = 'technicalSpecifications'
+    request_data = {'data': {field: new}}
+
+    auth = test_case.app.authorization
+
+    # auth as auction owner
+    test_case.app.authorization = ('Basic', ('{}'.format(auction['access']['owner']), ''))
+
+    pattern = '/auctions/{}/documents/{}?acc_token={}'
+    entrypoint = pattern.format(auction['data']['id'], document['data']['id'], auction['access']['token'])
+    response = test_case.app.patch_json(entrypoint, request_data, status=403)
+    test_case.assertEqual(response.status, '403 Forbidden')
+
+    test_case.app.authorization = auth
+
+
+def auction_item_patch(test_case):
+    context = test_case.procedure.snapshot()
+    auction = context['auction']
+    item = context['items'][0]
+
+    field = 'description'
+    new = 'new description'
+    request_data = {'data': {field: new}}
+
+    auth = test_case.app.authorization
+
+    # auth as auction owner
+    test_case.app.authorization = ('Basic', ('{}'.format(auction['access']['owner']), ''))
+
+    pattern = '/auctions/{}/items/{}?acc_token={}'
+    entrypoint = pattern.format(auction['data']['id'], item['data']['id'], auction['access']['token'])
+    response = test_case.app.patch_json(entrypoint, request_data, status=403)
+    test_case.assertEqual(response.status, '403 Forbidden')
+
+    test_case.app.authorization = auth
+
+
+def auction_question_patch(test_case):
+    context = test_case.procedure.snapshot(fixture=AUCTION_WITH_QUESTION)
+    auction = context['auction']
+    question = context['questions'][0]
+
+    field = 'title'
+    new = 'New title'
+    request_data = {'data': {field: new}}
+
+    auth = test_case.app.authorization
+
+    # auth as auction owner
+    test_case.app.authorization = ('Basic', ('{}'.format(auction['access']['owner']), ''))
+
+    pattern = '/auctions/{}/questions/{}?acc_token={}'
+    entrypoint = pattern.format(auction['data']['id'], question['data']['id'], auction['access']['token'])
+    response = test_case.app.patch_json(entrypoint, request_data, status=403)
+    test_case.assertEqual(response.status, '403 Forbidden')
+
+    test_case.app.authorization = auth
+
+
+def bid_patch(test_case):
+    context = test_case.procedure.snapshot(fixture=AUCTION_WITH_URLS)
+    auction = context['auction']
+    bid = context['bids'][0]
+
+    auth = test_case.app.authorization
+
+    # auth as bid owner
+    test_case.app.authorization = ('Basic', ('{}'.format(bid['access']['owner']), ''))
+
+    request_data = {"data": {"value": {'amount': 102}}}
+    pattern = '/auctions/{}/bids/{}?acc_token={}'
+    entrypoint = pattern.format(auction['data']['id'], bid['data']['id'], bid['access']['token'])
+    # path bid
+    response = test_case.app.patch_json(entrypoint, request_data, status=403)
+    expected_http_status = '403 Forbidden'
+    test_case.assertEqual(expected_http_status, response.status)
+
+    test_case.app.authorization = auth
+
+
 def post_auction_document_audit(test_case):
-    context = test_case.procedure.snapshot(fixture=ACTIVE_AUCTION_AUCTION)
+    context = test_case.procedure.snapshot(fixture=AUCTION)
     auction = context['auction']
 
     entrypoint = '/auctions/{}/documents'.format(auction['data']['id'])
@@ -47,7 +136,7 @@ def post_auction_document_audit(test_case):
 
 def get_auction_auction(test_case):
     expected_http_status = '200 OK'
-    context = test_case.procedure.snapshot(fixture=ACTIVE_AUCTION_AUCTION)
+    context = test_case.procedure.snapshot(fixture=AUCTION)
     auction = context['auction']
     auction_url = '/auctions/{}/auction'.format(auction['data']['id'])
 
@@ -109,8 +198,8 @@ def switch_to_qualification(test_case):
     auction_start_date = parse_date(data['auctionPeriod']['startDate'])
 
     # simulate valid auction time
-    # set 'now' to 14:00 day of auctionPeriod.startDate
-    valid_auction_time = set_specific_hour(auction_start_date, 14)
+    # set 'now' to 14:00 next day of auctionPeriod.startDate
+    valid_auction_time = set_specific_hour(auction_start_date + timedelta(days=1), 14)
     with nested(
         patch('openprocurement.auctions.geb.managers.auctioneers.get_now', return_value=valid_auction_time),
         patch('openprocurement.auctions.core.plugins.awarding.base.adapters.get_now', return_value=valid_auction_time),
@@ -190,8 +279,8 @@ def switch_to_qualification_outstanding(test_case):
     auction_start_date = parse_date(data['auctionPeriod']['startDate'])
 
     # simulate valid auction time
-    # set 'now' to 14:00 day of auctionPeriod.startDate
-    outstanding_auction_time = set_specific_hour(auction_start_date, 19)
+    # set 'now' to 14:00 next day of auctionPeriod.startDate
+    outstanding_auction_time = set_specific_hour(auction_start_date + timedelta(days=1), 19)
     with nested(
         patch('openprocurement.auctions.geb.managers.auctioneers.get_now', return_value=outstanding_auction_time),
         patch('openprocurement.auctions.core.plugins.awarding.base.adapters.get_now', return_value=outstanding_auction_time),
@@ -250,8 +339,8 @@ def switch_to_unsuccessful(test_case):
     auction_start_date = parse_date(data['auctionPeriod']['startDate'])
 
     # simulate valid auction time
-    # set 'now' to 14:00 day of auctionPeriod.startDate
-    valid_auction_time = set_specific_hour(auction_start_date, 14)
+    # set 'now' to 14:00 next day of auctionPeriod.startDate
+    valid_auction_time = set_specific_hour(auction_start_date + timedelta(days=1), 14)
     with patch('openprocurement.auctions.geb.managers.auctioneers.get_now', return_value=valid_auction_time):
         response = test_case.app.post_json(auction_url, {'data': request_data})
     test_case.assertEqual(response.status, expected_http_status)
@@ -261,8 +350,42 @@ def switch_to_unsuccessful(test_case):
     test_case.assertEqual(response.json['data']['status'], 'unsuccessful')
 
 
+def post_result_invalid_number_of_bids(test_case):
+    expected_http_status = '422 Unprocessable Entity'
+    context = test_case.procedure.snapshot(fixture=AUCTION_WITH_URLS)
+    auction = context['auction']
+    bids = context['bids']
+    auction_url = '/auctions/{}/auction'.format(auction['data']['id'])
+
+    request_data = {
+        'bids': [
+            {
+                "id": bids[0]['data']['id'],
+                "value": {
+                    "amount": auction['data']['value']['amount'],
+                    "currency": "UAH",
+                    "valueAddedTaxIncluded": True
+                }
+            }
+        ]
+    }
+
+    # get auctionPeriod.startDate
+    entrypoint = '/auctions/{}'.format(auction['data']['id'])
+    response = test_case.app.get(entrypoint)
+    data = response.json['data']
+    auction_start_date = parse_date(data['auctionPeriod']['startDate'])
+
+    # simulate valid auction time
+    # set 'now' to 14:00 day of auctionPeriod.startDate
+    valid_auction_time = set_specific_hour(auction_start_date, 14)
+    with patch('openprocurement.auctions.geb.managers.auctioneers.get_now', return_value=valid_auction_time):
+        response = test_case.app.post_json(auction_url, {'data': request_data}, status=422)
+    test_case.assertEqual(response.status, expected_http_status)
+
+
 def update_auction_urls(test_case):
-    context = test_case.procedure.snapshot(fixture=ACTIVE_AUCTION_AUCTION)
+    context = test_case.procedure.snapshot(fixture=AUCTION)
     expected_http_status = '200 OK'
     request_data = {}
     auction = context['auction']

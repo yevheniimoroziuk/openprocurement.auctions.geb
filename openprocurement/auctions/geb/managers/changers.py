@@ -141,7 +141,6 @@ class DocumentChanger(object):
 @implementer(IBidDocumentChanger)
 class BidDocumentChanger(object):
     name = 'Bid Document Changer'
-    validators = []
 
     def __init__(self, request, context):
         self._request = request
@@ -149,9 +148,6 @@ class BidDocumentChanger(object):
         self._auction = context.__parent__
 
     def validate(self):
-        for validator in self.validators:
-            if not validator(self._request, auction=self._auction, document=self._context):
-                return
         return True
 
     def change(self):
@@ -173,7 +169,7 @@ class QuestionChanger(object):
     def validate(self):
         for validator in self.validators:
             if not validator(self._request, auction=self._auction, question=self._context):
-                return
+                return False
         return True
 
     def change(self):
@@ -195,7 +191,7 @@ class ItemChanger(object):
     def validate(self):
         for validator in self.validators:
             if not validator(self._request, auction=self._auction, item=self._context):
-                return
+                return False
         return True
 
     def change(self):

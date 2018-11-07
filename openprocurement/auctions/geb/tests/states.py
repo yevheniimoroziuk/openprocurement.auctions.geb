@@ -175,6 +175,30 @@ class ActiveAuction(State):
                 info['data'] = deepcopy(cancellation)
                 context['cancellations'].append(info)
 
+        # add documents context
+        context['documents'] = []
+        documents = fixture.get('documents', None)
+        if documents:
+            for document in documents:
+                info = {}
+                info['data'] = deepcopy(document)
+                context['documents'].append(info)
+        # add questions context
+        context['questions'] = []
+        questions = fixture.get('questions', None)
+        if questions:
+            for question in questions:
+                info = {}
+                info['data'] = deepcopy(question)
+                context['questions'].append(info)
+        # add items context
+        context['items'] = []
+        items = fixture.get('items', None)
+        if items:
+            for item in items:
+                info = {}
+                info['data'] = deepcopy(item)
+                context['items'].append(info)
         return context
 
     def _next(self, end=False):
