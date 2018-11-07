@@ -1,4 +1,4 @@
-POST /api/2.5/auctions/ae7d7760cfc046b6b8b89e437cb4e761/bids
+POST /api/2.5/auctions/ef8ee87d4c8e4fe0950dfad142792817/bids
 Authorization: Basic YnJva2VyOg==
 Content-Type: application/json
 
@@ -37,16 +37,16 @@ Content-Type: application/json
 
 201 Created
 Content-Type: application/json
-Location: /api/2.5/auctions/ae7d7760cfc046b6b8b89e437cb4e761/bids/e8558a7961e344df9997ceeb9c0c3610
+Location: /api/2.5/auctions/ef8ee87d4c8e4fe0950dfad142792817/bids/2d9045ffe37f4c2b8a09db0bfbb0d281
 
 {
   "access": {
-    "token": "9a246532dff84de8ada7a5c33169c1dd"
+    "token": "0b1527eaf3ca4c80a3124bcfee62a090"
   }, 
   "data": {
     "owner": "broker", 
     "status": "draft", 
-    "id": "e8558a7961e344df9997ceeb9c0c3610", 
+    "id": "2d9045ffe37f4c2b8a09db0bfbb0d281", 
     "value": {
       "currency": "UAH", 
       "amount": 100.0, 

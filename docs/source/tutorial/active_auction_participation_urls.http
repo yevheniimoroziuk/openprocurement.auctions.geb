@@ -1,4 +1,4 @@
-GET /api/2.5/auctions/ae7d7760cfc046b6b8b89e437cb4e761/bids/3021b2a3f475498b9bff3d58f605319f?acc_token=27213c33fd4146839f11f4227836a7bb
+GET /api/2.5/auctions/ef8ee87d4c8e4fe0950dfad142792817/bids/8ef6c80be5f440329695167c7b81499b?acc_token=8fcf9c79ba8342b9b8a9a256489346f5
 Authorization: Basic YnJva2VyOg==
 
 
@@ -8,11 +8,26 @@ Content-Type: application/json
 {
   "data": {
     "status": "active", 
+    "documents": [
+      {
+        "hash": "md5:00000000000000000000000000000000", 
+        "title": "укр.doc", 
+        "url": "http://localhost/get/dd2c4773c24148bcafb37c15e48b788d?KeyID=172d32c8&Signature=SXQigJFdovYi%2F9VhVcZvgq%252BuPPwe37qsEfHgszqwAhC8fN6gH4ZQvJNagEAwHujmd%252BXDhDYXFWsiHW8v6fwrAg%253D%253D", 
+        "format": "application/msword", 
+        "documentOf": "bid", 
+        "datePublished": "2018-11-06T14:33:20.036272+02:00", 
+        "documentType": "eligibilityDocuments", 
+        "dateModified": "2018-11-06T14:33:20.036272+02:00", 
+        "id": "beff27f2339342b78124ac5db1ba8519"
+      }
+    ], 
+    "bidNumber": 1, 
     "value": {
       "currency": "UAH", 
       "amount": 100.0, 
       "valueAddedTaxIncluded": true
     }, 
+    "qualified": true, 
     "tenderers": [
       {
         "contactPoint": {
@@ -35,7 +50,7 @@ Content-Type: application/json
       }
     ], 
     "owner": "broker", 
-    "id": "3021b2a3f475498b9bff3d58f605319f", 
-    "participationUrl": "http://auction-sandbox.openprocurement.org/auctions/ae7d7760cfc046b6b8b89e437cb4e761?key_for_bid=3021b2a3f475498b9bff3d58f605319f"
+    "id": "8ef6c80be5f440329695167c7b81499b", 
+    "participationUrl": "http://auction-sandbox.openprocurement.org/auctions/ef8ee87d4c8e4fe0950dfad142792817?key_for_bid=8ef6c80be5f440329695167c7b81499b"
   }
 }

@@ -1,4 +1,4 @@
-PATCH /api/2.5/auctions/ae7d7760cfc046b6b8b89e437cb4e761?acc_token=6f90273c2b66498aac8f66e5d1e8671c
+PATCH /api/2.5/auctions/1d5b55103d1f4188822add80bb4dbc99?acc_token=2bf83e2d5c58424e83e48d3e6e3ed6b3
 Authorization: Basic YnJva2VyOg==
 Content-Type: application/json
 
@@ -14,17 +14,26 @@ Content-Type: application/json
 
 {
   "data": {
-    "procurementMethod": "open", 
+    "bankAccount": {
+      "description": "Test Bank Account", 
+      "accountIdentification": [
+        {
+          "scheme": "UA-EDR", 
+          "id": "66113000-5", 
+          "description": "Test"
+        }
+      ], 
+      "bankName": "Test bank name"
+    }, 
     "auctionID": "UA-EA-2018-09-20-000001", 
     "minNumberOfQualifiedBids": 2, 
     "enquiryPeriod": {
-      "startDate": "2018-10-08T15:23:30.808829+03:00", 
-      "endDate": "2018-10-19T20:00:00+03:00"
+      "startDate": "2018-11-06T14:33:25.920043+02:00", 
+      "endDate": "2018-11-19T20:00:00+02:00"
     }, 
     "registrationFee": {
       "currency": "UAH", 
-      "amount": 700.87, 
-      "valueAddedTaxIncluded": true
+      "amount": 700.87
     }, 
     "submissionMethod": "electronicAuction", 
     "procuringEntity": {
@@ -47,10 +56,10 @@ Content-Type: application/json
       }
     }, 
     "owner": "broker", 
-    "id": "ae7d7760cfc046b6b8b89e437cb4e761", 
+    "id": "1d5b55103d1f4188822add80bb4dbc99", 
     "tenderPeriod": {
-      "startDate": "2018-10-10T15:23:30.808829+03:00", 
-      "endDate": "2018-10-17T20:00:00+03:00"
+      "startDate": "2018-11-08T14:33:25.920043+02:00", 
+      "endDate": "2018-11-14T20:00:00+02:00"
     }, 
     "title": "футляри до державних нагород", 
     "tenderAttempts": 1, 
@@ -61,7 +70,7 @@ Content-Type: application/json
       "currency": "UAH", 
       "amount": 35
     }, 
-    "dateModified": "2018-10-08T15:23:30.811070+03:00", 
+    "dateModified": "2018-11-06T14:33:25.923179+02:00", 
     "status": "active.rectification", 
     "lotHolder": {
       "contactPoint": {
@@ -84,10 +93,10 @@ Content-Type: application/json
     }, 
     "description": "test procuredure", 
     "auctionPeriod": {
-      "shouldStartAfter": "2018-10-20T00:00:00+03:00"
+      "shouldStartAfter": "2018-11-20T00:00:00+02:00"
     }, 
     "procurementMethodType": "landlease", 
-    "date": "2018-10-08T15:23:30.811070+03:00", 
+    "date": "2018-11-06T14:33:25.923179+02:00", 
     "budgetSpent": {
       "currency": "UAH", 
       "amount": 35, 
@@ -95,8 +104,8 @@ Content-Type: application/json
     }, 
     "lotIdentifier": "219560", 
     "rectificationPeriod": {
-      "startDate": "2018-10-08T15:23:30.808829+03:00", 
-      "endDate": "2018-10-10T15:23:30.808829+03:00"
+      "startDate": "2018-11-06T14:33:25.920043+02:00", 
+      "endDate": "2018-11-08T14:33:25.920043+02:00"
     }, 
     "contractTerms": {
       "type": "lease", 
@@ -106,7 +115,7 @@ Content-Type: application/json
     }, 
     "minimalStep": {
       "currency": "UAH", 
-      "amount": 35, 
+      "amount": 42, 
       "valueAddedTaxIncluded": true
     }, 
     "items": [
@@ -136,14 +145,15 @@ Content-Type: application/json
           "region": "м. Київ", 
           "locality": "м. Київ"
         }, 
-        "id": "9ecd43b21ba24192a9614af72691ad02", 
+        "id": "3e1b5bec9f3846eea93e02c70c95d693", 
         "unit": {
           "code": "44617100-9", 
           "name": "item"
         }, 
-        "quantity": 5.001
+        "quantity": 5.0001
       }
     ], 
+    "procurementMethod": "open", 
     "value": {
       "currency": "UAH", 
       "amount": 100.0, 

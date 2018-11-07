@@ -47,6 +47,19 @@ def organizer_uploads_the_auction_protocol(test_case):
     test_case.assertEqual('200 OK', response.status)
 
 
+def dump_organizer_upload_auction_protocol(test_case):
+    document = deepcopy(test_document_data)
+    document['documentType'] = 'auctionProtocol'
+    url = test_case.generate_docservice_url(),
+    document['url'] = url[0]
+
+    request_data = {'data': document}
+    response = test_case.app.post_json(test_case.ENTRYPOINTS['award_document_post'], request_data)
+
+    filename = 'docs/source/tutorial/active_qualification_organizer_upload_protocol.http'
+    test_case.dump(response.request, response, filename)
+
+
 def bid_owner_uploads_the_auction_protocol(test_case):
     expected_http_status = '201 Created'
     document = deepcopy(test_document_data)
@@ -73,6 +86,25 @@ def bid_owner_uploads_the_auction_protocol(test_case):
 
     test_case.app.authorization = auth
     test_case.assertEqual('200 OK', response.status)
+
+
+def dump_bid_owner_upload_auction_protocol(test_case):
+    document = deepcopy(test_document_data)
+    document['documentType'] = 'auctionProtocol'
+    url = test_case.generate_docservice_url(),
+    document['url'] = url[0]
+
+    request_data = {'data': document}
+
+    auth = test_case.app.authorization
+    test_case.app.authorization = ('Basic', ('{}'.format(test_case.bid['access']['owner']), ''))
+
+    response = test_case.app.post_json(test_case.ENTRYPOINTS['award_document_post'], request_data)
+
+    filename = 'docs/source/tutorial/active_qualification_bid_owner_upload_protocol.http'
+    test_case.dump(response.request, response, filename)
+
+    test_case.app.authorization = auth
 
 
 def organizer_activate_award(test_case):
@@ -118,3 +150,42 @@ def organizer_activate_award(test_case):
 
     end_date = parse_date(auction['awardPeriod']['endDate']).replace(second=0, microsecond=0)
     test_case.assertEqual(end_date, now)
+
+
+def dump_organizer_activate_award(test_case):
+    document = deepcopy(test_document_data)
+    document['documentType'] = 'auctionProtocol'
+    url = test_case.generate_docservice_url(),
+    document['url'] = url[0]
+
+    request_data = {'data': document}
+    test_case.app.post_json(test_case.ENTRYPOINTS['award_document_post'], request_data)
+
+    auth = test_case.app.authorization
+    request_data = {"data": {"status": "active"}}
+    test_case.app.authorization = ('Basic', ('{}'.format(test_case.bid['access']['owner']), ''))
+    response = test_case.app.patch_json(test_case.ENTRYPOINTS['award_patch'], request_data)
+    test_case.app.authorization = auth
+
+    filename = 'docs/source/tutorial/active_qualification_activate_award.http'
+    test_case.dump(response.request, response, filename)
+
+    # current award
+    response = test_case.app.get(test_case.ENTRYPOINTS['award_get'])
+
+    filename = 'docs/source/tutorial/active_qualification_award_after_activation.http'
+    test_case.dump(response.request, response, filename)
+
+    # current contract
+    response = test_case.app.get(test_case.ENTRYPOINTS['contracts_get'])
+
+    filename = 'docs/source/tutorial/active_qualification_contract_after_activation.http'
+    test_case.dump(response.request, response, filename)
+
+    # current auction
+    response = test_case.app.get(test_case.ENTRYPOINTS['auction_get'])
+
+    filename = 'docs/source/tutorial/active_qualification_auction_after_activation.http'
+    test_case.dump(response.request, response, filename)
+
+

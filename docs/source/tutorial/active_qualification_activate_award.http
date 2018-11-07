@@ -1,0 +1,74 @@
+PATCH /api/2.5/auctions/ef8ee87d4c8e4fe0950dfad142792817/awards/18271aa9e8d943538583f22b6eb4ef1c?acc_token=2bf83e2d5c58424e83e48d3e6e3ed6b3
+Authorization: Basic YnJva2VyOg==
+Content-Type: application/json
+
+{
+  "data": {
+    "status": "active"
+  }
+}
+
+
+200 OK
+Content-Type: application/json
+
+{
+  "data": {
+    "status": "active", 
+    "documents": [
+      {
+        "hash": "md5:00000000000000000000000000000000", 
+        "author": "auction_owner", 
+        "title": "укр.doc", 
+        "url": "http://localhost/get/525adddf3d414dc49e4d75a574e6108c?KeyID=172d32c8&Signature=DIbVBCNX98G7n766bL5tVECaBMhXJc1ZSvU4KsZv2FhfU9jUdrvQTz089GKy6e9IOcisW6%252B4BzIq2r%252Bc5TLLBQ%253D%253D", 
+        "format": "application/msword", 
+        "documentOf": "auction", 
+        "datePublished": "2018-11-06T14:33:22.359533+02:00", 
+        "documentType": "auctionProtocol", 
+        "dateModified": "2018-11-06T14:33:22.359565+02:00", 
+        "id": "6d739ff7bccf45ae81968c20adc22189"
+      }
+    ], 
+    "verificationPeriod": {
+      "startDate": "2018-11-05T16:00:00+02:00", 
+      "endDate": "2018-11-06T14:33:22.433777+02:00"
+    }, 
+    "signingPeriod": {
+      "startDate": "2018-11-05T16:00:00+02:00", 
+      "endDate": "2018-11-05T23:59:00+02:00"
+    }, 
+    "suppliers": [
+      {
+        "contactPoint": {
+          "name": "Державне управління справами", 
+          "telephone": "0440000000"
+        }, 
+        "identifier": {
+          "scheme": "UA-EDR", 
+          "id": "00037256", 
+          "uri": "http://www.dus.gov.ua/"
+        }, 
+        "name": "Державне управління справами", 
+        "address": {
+          "postalCode": "01220", 
+          "countryName": "Україна", 
+          "streetAddress": "вул. Банкова, 11, корпус 1", 
+          "region": "м. Київ", 
+          "locality": "м. Київ"
+        }
+      }
+    ], 
+    "complaintPeriod": {
+      "startDate": "2018-11-05T16:00:00+02:00", 
+      "endDate": "2018-11-06T14:33:22.433777+02:00"
+    }, 
+    "bid_id": "8ef6c80be5f440329695167c7b81499b", 
+    "value": {
+      "currency": "UAH", 
+      "amount": 200.0, 
+      "valueAddedTaxIncluded": true
+    }, 
+    "date": "2018-11-06T14:33:22.443527+02:00", 
+    "id": "18271aa9e8d943538583f22b6eb4ef1c"
+  }
+}

@@ -1,10 +1,10 @@
-POST /api/2.5/auctions/ae7d7760cfc046b6b8b89e437cb4e761/documents?acc_token=6f90273c2b66498aac8f66e5d1e8671c
+POST /api/2.5/auctions/ef8ee87d4c8e4fe0950dfad142792817/documents?acc_token=2bf83e2d5c58424e83e48d3e6e3ed6b3
 Authorization: Basic YnJva2VyOg==
 Content-Type: application/json
 
 {
   "data": {
-    "url": "http://localhost/get/7d9b21243c5141b0a6870edf6224c7db?KeyID=172d32c8&Signature=RsPD1frsSwIDQ3kIdub2UYNoSlpH0KATnsf8maur7BNx%2BPfoSVdxnpaipxWsweifu2azAeN3bnIKu5f2SfXZAQ%3D%3D", 
+    "url": "http://localhost/get/d57821532e9b46d295696014178892b0?KeyID=172d32c8&Signature=rBcgRg5%2Frnun80dPpfe2MAQn6B5oq9FN4YNz7qmuTqEeorsCb5nf4K8kfA34xYxzD9cF4LsIMSE4PLlIqCBBCQ%3D%3D", 
     "format": "application/msword", 
     "hash": "md5:00000000000000000000000000000000", 
     "title": "укр.doc"
@@ -14,17 +14,17 @@ Content-Type: application/json
 
 201 Created
 Content-Type: application/json
-Location: /api/2.5/auctions/ae7d7760cfc046b6b8b89e437cb4e761/documents/f497ae27a94b49f0a0a5ad2a80066acc
+Location: /api/2.5/auctions/ef8ee87d4c8e4fe0950dfad142792817/documents/ddfc8a3006804aec82fe711b0f0a1021
 
 {
   "data": {
     "hash": "md5:00000000000000000000000000000000", 
     "title": "укр.doc", 
-    "url": "http://localhost/get/7d9b21243c5141b0a6870edf6224c7db?KeyID=172d32c8&Signature=MIlodxFCu4MWKqWnC8zhh8WZRki8auYqhHQDQvyzYjihigsmrxg3aX%2FoR9JjY0TmicegmzCvSUZeIftpoBbGBg%253D%253D", 
+    "url": "http://localhost/get/d57821532e9b46d295696014178892b0?KeyID=172d32c8&Signature=0st1L6VAfrJIzTPvBpSr2tCR4Zqfc0Kpuyc79Ld3LBKg4A3MLeTBOh%2FoKSgwIdlup8HGR1eUFCyXXh9GYhOcBg%253D%253D", 
     "format": "application/msword", 
     "documentOf": "auction", 
-    "datePublished": "2018-10-08T15:23:31.182333+03:00", 
-    "dateModified": "2018-10-08T15:23:31.182353+03:00", 
-    "id": "f497ae27a94b49f0a0a5ad2a80066acc"
+    "datePublished": "2018-11-06T14:33:26.727372+02:00", 
+    "dateModified": "2018-11-06T14:33:26.727434+02:00", 
+    "id": "ddfc8a3006804aec82fe711b0f0a1021"
   }
 }

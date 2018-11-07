@@ -61,7 +61,7 @@ class ContractWithContractDocumentTest(BaseWebTest):
         super(ContractWithContractDocumentTest, self).setUp()
         procedure = ProcedureMachine()
         procedure.set_db_connector(self.db)
-        procedure.toggle('active.qualification')
+        procedure.toggle('active.awarded')
         context = procedure.snapshot(fixture=AUCTION_WITH_CONTRACT_WITH_DOCUMENT)
 
         contract = context['contracts'][0]

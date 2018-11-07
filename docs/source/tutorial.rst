@@ -231,3 +231,59 @@ And bidders can find out their participation URLs via their bids:
 .. include:: tutorial/active_auction_participation_urls.http
     :code:
 We can see what `participationUrl` were generated in bid
+
+status: active.qualification
+----------------------------
+Auction owner can upload auction protocol:
+
+.. include:: tutorial/active_qualification_organize_upload_protocol.http
+    :code:
+
+Bidder owner can upload auction protocol:
+
+.. include:: tutorial/active_qualification_bid_owner_upload_protocol.http
+    :code:
+
+Auction owner can activate award:
+
+.. include:: tutorial/active_qualification_activate-award.http
+    :code:
+
+Award after its activation:
+
+.. include:: tutorial/active_qualification_award_after_activation.http
+    :code:
+
+Contract after award activation:
+
+.. include:: tutorial/active_qualification_contract_after_activation.http
+    :code:
+
+Auction after award activation:
+
+.. include:: tutorial/active_qualification_auction_after_activation.http
+    :code:
+
+status: active.awarded
+----------------------
+Auction owner have to patch contract with dateSigned to activate contract:
+
+.. include:: tutorial/active_awarded_organizer_patch_contract_with_dateSigned.http
+    :code:
+
+Auction owner can activate contract, after patching contract with dateSigned :
+
+.. include:: tutorial/active_awarded_organizer_activate_contract.http
+    :code:
+
+
+Contract after its activation:
+
+.. include:: tutorial/active_awarded_contract_after_activation.http
+    :code:
+
+Auction after award activation:
+
+.. include:: tutorial/active_awarded_auction_after_contract_activation.http
+    :code:
+

@@ -5,7 +5,17 @@ Content-Type: application/json
 {
   "data": {
     "status": "draft", 
-    "lotIdentifier": "219560", 
+    "bankAccount": {
+      "description": "Test Bank Account", 
+      "accountIdentification": [
+        {
+          "scheme": "UA-EDR", 
+          "id": "66113000-5", 
+          "description": "Test"
+        }
+      ], 
+      "bankName": "Test bank name"
+    }, 
     "lotHolder": {
       "contactPoint": {
         "name": "Державне управління справами", 
@@ -32,15 +42,16 @@ Content-Type: application/json
         "leaseDuration": "P10Y"
       }
     }, 
-    "title": "футляри до державних нагород", 
+    "lotIdentifier": "219560", 
     "minimalStep": {
       "currency": "UAH", 
-      "amount": 35
+      "amount": 42
     }, 
     "auctionPeriod": {
-      "startDate": "2018-10-22"
+      "startDate": "2018-11-20"
     }, 
     "tenderAttempts": 1, 
+    "title": "футляри до державних нагород", 
     "procurementMethodType": "landlease", 
     "value": {
       "currency": "UAH", 
@@ -96,7 +107,7 @@ Content-Type: application/json
           "code": "44617100-9", 
           "name": "item"
         }, 
-        "quantity": 5.001
+        "quantity": 5.0001
       }
     ], 
     "registrationFee": {
@@ -117,21 +128,20 @@ Content-Type: application/json
 
 201 Created
 Content-Type: application/json
-Location: /api/2.5/auctions/10529e490d424e58ba4cbf7eab4144f7
+Location: /api/2.5/auctions/91e3e7946529494389c69b74ff4bdf56
 
 {
   "access": {
-    "transfer": "a974bec898654fc28cacab06c3ae9ec4", 
-    "token": "064b7cae18fd4d43b43b9fde54ddaf8c"
+    "transfer": "a1786e07f1604e2daebed660d40955af", 
+    "token": "7f9a013b46af452ea3528fbd89043be3"
   }, 
   "data": {
     "procurementMethod": "open", 
-    "auctionID": "UA-EA-2018-10-08-000001", 
+    "auctionID": "UA-EA-2018-11-06-000001", 
     "minNumberOfQualifiedBids": 2, 
     "registrationFee": {
       "currency": "UAH", 
-      "amount": 700.87, 
-      "valueAddedTaxIncluded": true
+      "amount": 700.87
     }, 
     "submissionMethod": "electronicAuction", 
     "procuringEntity": {
@@ -154,7 +164,7 @@ Location: /api/2.5/auctions/10529e490d424e58ba4cbf7eab4144f7
       }
     }, 
     "owner": "broker", 
-    "id": "10529e490d424e58ba4cbf7eab4144f7", 
+    "id": "91e3e7946529494389c69b74ff4bdf56", 
     "guarantee": {
       "currency": "UAH", 
       "amount": 35
@@ -164,7 +174,7 @@ Location: /api/2.5/auctions/10529e490d424e58ba4cbf7eab4144f7
     "auctionParameters": {
       "type": "texas"
     }, 
-    "dateModified": "2018-10-08T15:23:30.350514+03:00", 
+    "dateModified": "2018-11-06T14:33:24.274844+02:00", 
     "status": "draft", 
     "lotHolder": {
       "contactPoint": {
@@ -186,13 +196,11 @@ Location: /api/2.5/auctions/10529e490d424e58ba4cbf7eab4144f7
       }
     }, 
     "description": "test procuredure", 
-    "procurementMethodType": "landlease", 
-    "date": "2018-10-08T15:23:30.347973+03:00", 
-    "budgetSpent": {
-      "currency": "UAH", 
-      "amount": 35, 
-      "valueAddedTaxIncluded": true
+    "auctionPeriod": {
+      "startDate": "2018-11-20T00:00:00+02:00"
     }, 
+    "procurementMethodType": "landlease", 
+    "date": "2018-11-06T14:33:24.271809+02:00", 
     "lotIdentifier": "219560", 
     "contractTerms": {
       "type": "lease", 
@@ -202,7 +210,7 @@ Location: /api/2.5/auctions/10529e490d424e58ba4cbf7eab4144f7
     }, 
     "minimalStep": {
       "currency": "UAH", 
-      "amount": 35, 
+      "amount": 42, 
       "valueAddedTaxIncluded": true
     }, 
     "items": [
@@ -232,19 +240,18 @@ Location: /api/2.5/auctions/10529e490d424e58ba4cbf7eab4144f7
           "region": "м. Київ", 
           "locality": "м. Київ"
         }, 
-        "id": "19ad415119d149da9d1b01071f128a8b", 
+        "id": "8c602eba07104554b02a8fe77566e8b9", 
         "unit": {
           "code": "44617100-9", 
           "name": "item"
         }, 
-        "quantity": 5.001
+        "quantity": 5.0001
       }
     ], 
     "value": {
       "currency": "UAH", 
       "amount": 100.0, 
       "valueAddedTaxIncluded": true
-    }, 
-    "awardCriteria": "highestCost"
+    }
   }
 }

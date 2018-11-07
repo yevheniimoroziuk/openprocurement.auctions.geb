@@ -1,4 +1,4 @@
-GET /api/2.5/auctions/ae7d7760cfc046b6b8b89e437cb4e761
+GET /api/2.5/auctions/1d5b55103d1f4188822add80bb4dbc99
 Authorization: Basic YnJva2VyOg==
 
 
@@ -12,8 +12,7 @@ Content-Type: application/json
     "minNumberOfQualifiedBids": 2, 
     "registrationFee": {
       "currency": "UAH", 
-      "amount": 700.87, 
-      "valueAddedTaxIncluded": true
+      "amount": 700.87
     }, 
     "submissionMethod": "electronicAuction", 
     "procuringEntity": {
@@ -36,7 +35,7 @@ Content-Type: application/json
       }
     }, 
     "owner": "broker", 
-    "id": "ae7d7760cfc046b6b8b89e437cb4e761", 
+    "id": "1d5b55103d1f4188822add80bb4dbc99", 
     "guarantee": {
       "currency": "UAH", 
       "amount": 35
@@ -46,7 +45,7 @@ Content-Type: application/json
     "auctionParameters": {
       "type": "texas"
     }, 
-    "dateModified": "2018-10-08T15:23:28.927341+03:00", 
+    "dateModified": "2018-11-06T14:33:20.036604+02:00", 
     "status": "draft", 
     "lotHolder": {
       "contactPoint": {
@@ -68,13 +67,11 @@ Content-Type: application/json
       }
     }, 
     "description": "test procuredure", 
-    "procurementMethodType": "landlease", 
-    "date": "2018-10-08T15:23:28.927341+03:00", 
-    "budgetSpent": {
-      "currency": "UAH", 
-      "amount": 35, 
-      "valueAddedTaxIncluded": true
+    "auctionPeriod": {
+      "startDate": "2018-11-20T14:33:20.036604+02:00"
     }, 
+    "procurementMethodType": "landlease", 
+    "date": "2018-11-06T14:33:20.036604+02:00", 
     "lotIdentifier": "219560", 
     "contractTerms": {
       "type": "lease", 
@@ -84,7 +81,7 @@ Content-Type: application/json
     }, 
     "minimalStep": {
       "currency": "UAH", 
-      "amount": 35, 
+      "amount": 42, 
       "valueAddedTaxIncluded": true
     }, 
     "items": [
@@ -114,19 +111,18 @@ Content-Type: application/json
           "region": "м. Київ", 
           "locality": "м. Київ"
         }, 
-        "id": "75e1d882f3a6419d8eea06b09727fa8f", 
+        "id": "3e1b5bec9f3846eea93e02c70c95d693", 
         "unit": {
           "code": "44617100-9", 
           "name": "item"
         }, 
-        "quantity": 5.001
+        "quantity": 5.0001
       }
     ], 
     "value": {
       "currency": "UAH", 
       "amount": 100.0, 
       "valueAddedTaxIncluded": true
-    }, 
-    "awardCriteria": "highestCost"
+    }
   }
 }
