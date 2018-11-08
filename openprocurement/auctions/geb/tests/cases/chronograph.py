@@ -10,19 +10,22 @@ from openprocurement.auctions.geb.tests.states import (
     ProcedureMachine
 )
 from openprocurement.auctions.geb.tests.blanks.chronograph import (
+    check_rectification_period_end,
+    enquiry_switch_to_active_auction,
+    enquiry_switch_to_active_qualification,
+    enquiry_set_unsuccessful_bids,
+    enquiry_switch_to_unsuccessful_bids_min_number_1_no_bids,
+    enquiry_switch_to_unsuccessful_bids_min_number_2_no_bids,
+    enquiry_switch_to_unsuccessful_bids_min_number_2_bid_1_active,
+    enquiry_switch_to_active_auction_bids_min_number_1_bids_2_active,
+    replaning_auction,
+    set_auctionPeriod_startDate_enquiring,
     set_auctionPeriod_startDate_rectification,
     set_auctionPeriod_startDate_tendering,
-    set_auctionPeriod_startDate_enquiring,
-    check_enquiry_period_end_active_auction,
-    check_enquiry_period_end_active_qualification,
-    check_enquiry_period_end_set_unsuccessful_bids,
-    check_enquiry_period_end_unsuccessful,
-    check_rectification_period_end,
-    check_tender_period_end_delete_draft_bids,
-    check_tender_period_end_no_active_bids,
-    check_tender_period_end_no_minNumberOfQualifiedBids,
-    check_tender_period_end_successful,
-    replaning_auction
+    tendering_delete_draft_bids,
+    tendering_switch_to_enquiry,
+    tendering_switch_to_unsuccessful_bid_min_number_2_bid_1_active,
+    tendering_switch_to_unsuccessful_only_draft_bids,
 )
 
 
@@ -83,10 +86,10 @@ class ChronographTenderingTest(BaseWebTest):
 
 class ChronographEndTenderingTest(BaseWebTest):
 
-    test_check_tender_period_end_no_active_bids = snitch(check_tender_period_end_no_active_bids)
-    test_check_tender_period_end_no_minNumberOfQualifiedBids = snitch(check_tender_period_end_no_minNumberOfQualifiedBids)
-    test_check_tender_period_end_delete_draft_bids = snitch(check_tender_period_end_delete_draft_bids)
-    test_check_tender_period_end_successful = snitch(check_tender_period_end_successful)
+    test_tendering_switch_to_unsuccessful_only_draft_bids = snitch(tendering_switch_to_unsuccessful_only_draft_bids)
+    test_tendering_switch_unsuccessful_bid_min_number_2_bid_1_active = snitch(tendering_switch_to_unsuccessful_bid_min_number_2_bid_1_active)
+    test_tendering_delete_draft_bids = snitch(tendering_delete_draft_bids)
+    test_tendering_switch_to_enquiry = snitch(tendering_switch_to_enquiry)
 
     def setUp(self):
         super(ChronographEndTenderingTest, self).setUp()
@@ -101,10 +104,6 @@ class ChronographEndTenderingTest(BaseWebTest):
 
 class ChronographEnquiryTest(BaseWebTest):
 
-    test_check_enquiry_period_end_unsuccessful = snitch(check_enquiry_period_end_unsuccessful)
-    test_check_enquiry_period_end_active_auction = snitch(check_enquiry_period_end_active_auction)
-    test_check_enquiry_period_end_active_qualification = snitch(check_enquiry_period_end_active_qualification)
-    test_check_enquiry_period_end_set_unsuccessful_bids = snitch(check_enquiry_period_end_set_unsuccessful_bids)
     test_set_auctionPeriod_startDate_enquiring = snitch(set_auctionPeriod_startDate_enquiring)
 
     def setUp(self):
@@ -120,10 +119,13 @@ class ChronographEnquiryTest(BaseWebTest):
 
 class ChronographEndEnquiryTest(BaseWebTest):
 
-    test_check_enquiry_period_end_unsuccessful = snitch(check_enquiry_period_end_unsuccessful)
-    test_check_enquiry_period_end_active_auction = snitch(check_enquiry_period_end_active_auction)
-    test_check_enquiry_period_end_active_qualification = snitch(check_enquiry_period_end_active_qualification)
-    test_check_enquiry_period_end_set_unsuccessful_bids = snitch(check_enquiry_period_end_set_unsuccessful_bids)
+    test_enquiry_switch_to_unsuccessful_bids_min_number_2_no_bids = snitch(enquiry_switch_to_unsuccessful_bids_min_number_2_no_bids)
+    test_enquiry_switch_to_unsuccessful_bids_min_number_2_bid_1_active = snitch(enquiry_switch_to_unsuccessful_bids_min_number_2_bid_1_active)
+    test_enquiry_switch_to_unsuccessful_bids_min_number_1_no_bids = snitch(enquiry_switch_to_unsuccessful_bids_min_number_1_no_bids)
+    test_enquiry_switch_to_active_auction_bids_min_number_1_bids_2_active = snitch(enquiry_switch_to_active_auction_bids_min_number_1_bids_2_active)
+    test_enquiry_switch_to_active_auction = snitch(enquiry_switch_to_active_auction)
+    test_enquiry_switch_to_active_qualification = snitch(enquiry_switch_to_active_qualification)
+    test_enquiry_set_unsuccessful_bids = snitch(enquiry_set_unsuccessful_bids)
 
     def setUp(self):
         super(ChronographEndEnquiryTest, self).setUp()

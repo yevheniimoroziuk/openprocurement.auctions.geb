@@ -17,10 +17,14 @@ from openprocurement.auctions.geb.tests.fixtures.active_enquiry import (
     AUCTION_WITH_BIDS_WITH_CANCELLATION
 )
 from openprocurement.auctions.geb.tests.blanks.active_auction import (
+    auction_question_post,
     auction_document_patch,
+    auction_document_post,
     auction_item_patch,
-    bid_patch,
     auction_question_patch,
+    bid_delete,
+    bid_document_post,
+    bid_patch,
     get_auction_auction,
     get_participation_urls,
     post_auction_document_audit,
@@ -38,18 +42,22 @@ from openprocurement.auctions.geb.tests.blanks.cancellations import (
 class StatusActiveAuctionTest(BaseWebTest):
     docservice = True
 
-    test_get_auction_auction = snitch(get_auction_auction)
-    test_bid_patch = snitch(bid_patch)
-    test_auction_question_patch = snitch(auction_question_patch)
-    test_auction_item_patch = snitch(auction_item_patch)
     test_auction_document_patch = snitch(auction_document_patch)
-    test_update_auction_urls = snitch(update_auction_urls)
-    test_switch_to_qualification = snitch(switch_to_qualification)
-    test_post_result_invalid_number_of_bids = snitch(post_result_invalid_number_of_bids)
-    test_switch_to_qualification_outstanding = snitch(switch_to_qualification_outstanding)
-    test_post_auction_document_audit = snitch(post_auction_document_audit)
-    test_switch_to_unsuccessful = snitch(switch_to_unsuccessful)
+    test_auction_question_post = snitch(auction_question_post)
+    test_auction_document_post = snitch(auction_document_post)
+    test_auction_item_patch = snitch(auction_item_patch)
+    test_auction_question_patch = snitch(auction_question_patch)
+    test_bid_delete = snitch(bid_delete)
+    test_bid_document_post = snitch(bid_document_post)
+    test_bid_patch = snitch(bid_patch)
+    test_get_auction_auction = snitch(get_auction_auction)
     test_get_participation_urls = snitch(get_participation_urls)
+    test_post_auction_document_audit = snitch(post_auction_document_audit)
+    test_post_result_invalid_number_of_bids = snitch(post_result_invalid_number_of_bids)
+    test_switch_to_qualification = snitch(switch_to_qualification)
+    test_switch_to_qualification_outstanding = snitch(switch_to_qualification_outstanding)
+    test_switch_to_unsuccessful = snitch(switch_to_unsuccessful)
+    test_update_auction_urls = snitch(update_auction_urls)
 
     def setUp(self):
         super(StatusActiveAuctionTest, self).setUp()

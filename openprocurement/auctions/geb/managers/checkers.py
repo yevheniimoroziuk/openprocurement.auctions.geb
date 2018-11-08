@@ -24,14 +24,18 @@ class AuctionChecker(object):
         self._context = context
         self._next_status = None
 
-    def _check_bids(self):
+    def _end_tendering_check_bids(self):
+        # if no any bids in status 'active' or 'pending'
+        # switch procedure to status 'unsuccessful'
         for bid in self._context.bids:
             if bid.status in ['pending', 'active']:
-                return
+                return True
         self._next_status = 'unsuccessful'
         raise StopChecks()
 
-    def _check_tendering_minNumberOfQualifiedBids(self):
+    def _end_tendering_check_minNumberOfQualifiedBids(self):
+        # if minNumberOfQualifiedBids is 2 and is only 1 bid
+        # switch procedure to status 'unsuccessful'
         min_number = self._context.minNumberOfQualifiedBids
         bids = len([bid for bid in self._context.bids if bid.status in ('active', 'pending')])
 
@@ -74,7 +78,10 @@ class AuctionChecker(object):
         if self._next_status:
             self._context.status = self._next_status
 
-    def _set_unseccessful_bids(self):
+    def _end_enquiry_set_unseccessful_bids(self):
+        # in the end of enquiry period
+        # all bids that are in status 'draft/pending'
+        # switch to 'unsuccessful' status
         for bid in self._context['bids']:
             if bid.status in ['draft', 'pending']:
                 bid.status = 'unsuccessful'
@@ -90,13 +97,13 @@ class AuctionChecker(object):
             if date == self._context.rectificationPeriod.endDate:
                 self._next_status = 'active.tendering'
             elif date == self._context.tenderPeriod.endDate:
-                self._check_bids()
-                self._check_tendering_minNumberOfQualifiedBids()
+                self._end_tendering_check_bids()
+                self._end_tendering_check_minNumberOfQualifiedBids()
                 self._end_tendering_delete_bids()
                 self._next_status = 'active.enquiry'
             elif date == self._context.enquiryPeriod.endDate:
                 self._check_enquiry_minNumberOfQualifiedBids()
-                self._set_unseccessful_bids()
+                self._end_enquiry_set_unseccessful_bids()
         except StopChecks:
             pass
         self._set_next_status()
