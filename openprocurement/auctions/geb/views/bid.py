@@ -1,8 +1,7 @@
 # -*- coding: utf-8 -*-
 from openprocurement.auctions.core.utils import (
     opresource,
-    json_view,
-    context_unpack
+    json_view
 )
 from openprocurement.auctions.core.views.mixins import AuctionBidResource
 from openprocurement.auctions.core.validation import (
@@ -35,17 +34,24 @@ class AuctionBidResource(AuctionBidResource):
             manager.log_action('auction_bid_patch', msg)
             return manager.represent(self.request.method)
 
+    @json_view(permission='view_auction')
+    def get(self):
+        """
+        Auction Bid Get
+        """
+        manager = self.request.registry.queryMultiAdapter((self.request, self.context), IBidManager)
+        return manager.represent(self.request.method)
+
     @json_view(permission='edit_bid')
     def delete(self):
         save = None
 
         manager = self.request.registry.queryMultiAdapter((self.request, self.context), IBidManager)
 
-        bid = manager.delete()
+        manager.delete()
         save = manager.save()
 
         if save:
-            extra = context_unpack(self.request, {'MESSAGE_ID': 'auction_bid_delete'})
-            msg = 'Deleted auction bid {}'.format(self.request.context.id)
-            self.LOGGER.info(msg, extra=extra)
-            return {'data': bid.serialize('view')}
+            msg = 'Delete auction bid {}'.format(manager.context.id)
+            manager.log_action('auction_bid_delete', msg)
+            return manager.represent(self.request.method)

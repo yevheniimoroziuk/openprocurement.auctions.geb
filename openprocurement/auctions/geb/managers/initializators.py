@@ -16,7 +16,7 @@ from openprocurement.auctions.core.utils import (
 
 from openprocurement.auctions.geb.constants import (
     AUCTION_PARAMETERS_TYPE,
-    RECTIFICATION_PERIOD_DURATION
+    AUCTION_RECTIFICATION_PERIOD_DURATION
 )
 from openprocurement.auctions.geb.validation import (
     validate_bid_initialization,
@@ -82,7 +82,7 @@ class AuctionInitializator(object):
 
         start_date = self._now
         end_date = calculate_business_date(self._now,
-                                           RECTIFICATION_PERIOD_DURATION,
+                                           AUCTION_RECTIFICATION_PERIOD_DURATION,
                                            self._context)
 
         period.startDate = start_date
