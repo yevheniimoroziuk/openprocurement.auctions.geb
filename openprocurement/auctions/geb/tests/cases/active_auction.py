@@ -23,6 +23,7 @@ from openprocurement.auctions.geb.tests.blanks.active_auction import (
     auction_item_patch,
     auction_question_patch,
     bid_delete,
+    bid_get,
     bid_document_post,
     bid_patch,
     get_auction_auction,
@@ -48,6 +49,7 @@ class StatusActiveAuctionTest(BaseWebTest):
     test_auction_item_patch = snitch(auction_item_patch)
     test_auction_question_patch = snitch(auction_question_patch)
     test_bid_delete = snitch(bid_delete)
+    test_bid_get = snitch(bid_get)
     test_bid_document_post = snitch(bid_document_post)
     test_bid_patch = snitch(bid_patch)
     test_get_auction_auction = snitch(get_auction_auction)

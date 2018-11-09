@@ -2,6 +2,10 @@
 from uuid import uuid4
 from copy import deepcopy
 
+from openprocurement.auctions.core.utils import (
+    get_now
+)
+
 from openprocurement.auctions.geb.tests.fixtures.common import (
     test_procuringEntity
 )
@@ -9,6 +13,7 @@ from openprocurement.auctions.geb.tests.fixtures.documents import (
     ELIGIBILITY_DOCUMENT,
     BID_DOCUMENT
 )
+now = get_now()
 
 # bid in 'draft' status
 # description:
@@ -25,7 +30,8 @@ BID_DRAFT = {
     "tenderers": [deepcopy(test_procuringEntity)],
     "owner": "broker",
     "qualified": False,
-    "id": uuid4().hex
+    "id": uuid4().hex,
+    "date": now.isoformat()
 }
 
 # bid in 'draft' status with document

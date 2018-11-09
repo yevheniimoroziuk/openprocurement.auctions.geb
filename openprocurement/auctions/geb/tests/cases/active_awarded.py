@@ -9,6 +9,7 @@ from openprocurement.auctions.geb.tests.states import (
 )
 from openprocurement.auctions.geb.tests.blanks.active_awarded import (
     auction_put_auction_document_audit,
+    bid_get,
     organizer_activate_contract,
     organizer_uploads_the_contract
 )
@@ -86,9 +87,33 @@ class ContractWithContractDocumentTest(BaseWebTest):
         self.bid = bid
 
 
+class StatusActiveAwardedBidsTest(BaseWebTest):
+    docservice = True
+
+    test_bid_get = snitch(bid_get)
+
+    def setUp(self):
+        super(StatusActiveAwardedBidsTest, self).setUp()
+        procedure = ProcedureMachine()
+        procedure.set_db_connector(self.db)
+        procedure.toggle('active.awarded')
+        context = procedure.snapshot()
+
+        auction = context['auction']
+        bid = context['bids'][0]
+        entrypoints = {}
+        pattern = '/auctions/{}/bids/{}'
+        entrypoints['bid_get'] = pattern.format(auction['data']['id'],
+                                                bid['data']['id'])
+        self.ENTRYPOINTS = entrypoints
+        self.auction = auction
+        self.bid = bid
+
+
 def suite():
     suite = unittest.TestSuite()
     suite.addTest(unittest.makeSuite(StatusActiveAwardedTest))
+    suite.addTest(unittest.makeSuite(StatusActiveAwardedBidsTest))
     suite.addTest(unittest.makeSuite(ContractWithContractDocumentTest))
     return suite
 

@@ -27,6 +27,36 @@ from openprocurement.auctions.geb.utils import (
 )
 
 
+def bid_get(test_case):
+    auth = test_case.app.authorization
+
+    # build context of test
+    context = test_case.procedure.snapshot(fixture=AUCTION_WITH_URLS)
+    auction = context['auction']
+    bid = context['bids'][0]
+
+    # auth as bid_owner
+    test_case.app.authorization = ('Basic', ('{}'.format(bid['access']['owner']), ''))
+
+    expected_http_status = '200 OK'
+    pattern = '/auctions/{}/bids/{}?acc_token={}'
+    entrypoint = pattern.format(auction['data']['id'], bid['data']['id'], bid['access']['token'])
+    response = test_case.app.get(entrypoint)
+    test_case.assertEqual(expected_http_status, response.status)
+
+    # auth as auction owner
+    test_case.app.authorization = ('Basic', ('{}'.format(auction['access']['owner']), ''))
+
+    # not bid owner can`t get bid in auction status 'active.auction'
+    expected_http_status = '403 Forbidden'
+    pattern = '/auctions/{}/bids/{}'
+    entrypoint = pattern.format(auction['data']['id'], bid['data']['id'])
+    response = test_case.app.get(entrypoint, status=403)
+    test_case.assertEqual(expected_http_status, response.status)
+
+    test_case.app.authorization = auth
+
+
 def bid_delete(test_case):
     # can`t delete bid in auction status 'active.auction'
 
