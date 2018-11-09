@@ -189,3 +189,26 @@ def dump_organizer_activate_award(test_case):
     test_case.dump(response.request, response, filename)
 
 
+def bid_get(test_case):
+    # in auction status 'active.qualification'
+    # anybody can get bid without access token
+
+    expected_http_status = '200 OK'
+    expected_data = (
+        'id',
+        'status',
+        'tenderers',
+        'value',
+        'date',
+        'id',
+        'owner',
+        'qualified',
+        'bidNumber',
+        'documents',
+        'participationUrl'
+
+    )
+    response = test_case.app.get(test_case.ENTRYPOINTS['bid_get'])
+    test_case.assertEqual(expected_http_status, response.status)
+    bid = response.json['data']
+    test_case.assertEqual(set(bid.keys()), set(expected_data))

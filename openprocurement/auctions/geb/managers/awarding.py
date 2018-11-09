@@ -31,6 +31,10 @@ class Awarding(BaseAwarding):
                            self.context,
                            specific_hour=18)
         else:
+            # if auction minNumberOfQualifiedBids was 1
+            # only 1 bid was in status 'active'
+            # after 'active.enquiry' auction switch to 'active.qualification'
+            # verificationPeriod start after end of enquiryPeriod
             enquiry_end_date = self.context.enquiryPeriod.endDate
             end_date = cbd(enquiry_end_date,
                            timedelta(days=1),

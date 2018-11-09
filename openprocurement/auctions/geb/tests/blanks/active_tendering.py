@@ -520,8 +520,18 @@ def bid_get_in_draft_status(test_case):
 
     test_case.app.authorization = auth
 
+    # not bid owner get bid
+    expected_http_status = '403 Forbidden'
+    pattern = '/auctions/{}/bids/{}'
+    entrypoint = pattern.format(test_case.auction['data']['id'], test_case.bid['data']['id'])
+    response = test_case.app.get(entrypoint, status=403)
+    test_case.assertEqual(expected_http_status, response.status)
+
 
 def bid_get_in_pending_status(test_case):
+    # bid owner get bid
+
+    # auth as bid owner
     auth = test_case.app.authorization
 
     test_case.app.authorization = ('Basic', ('{}'.format(test_case.bid['access']['owner']), ''))
@@ -531,6 +541,13 @@ def bid_get_in_pending_status(test_case):
     test_case.assertEqual(expected_http_status, response.status)
 
     test_case.app.authorization = auth
+
+    # not bid owner get bid
+    expected_http_status = '403 Forbidden'
+    pattern = '/auctions/{}/bids/{}'
+    entrypoint = pattern.format(test_case.auction['data']['id'], test_case.bid['data']['id'])
+    response = test_case.app.get(entrypoint, status=403)
+    test_case.assertEqual(expected_http_status, response.status)
 
 
 def bid_get_in_pending_status_dump(test_case):
@@ -551,6 +568,13 @@ def bid_get_in_active_status(test_case):
     test_case.assertEqual(expected_http_status, response.status)
 
     test_case.app.authorization = auth
+
+    # not bid owner get bid
+    expected_http_status = '403 Forbidden'
+    pattern = '/auctions/{}/bids/{}'
+    entrypoint = pattern.format(test_case.auction['data']['id'], test_case.bid['data']['id'])
+    response = test_case.app.get(entrypoint, status=403)
+    test_case.assertEqual(expected_http_status, response.status)
 
 
 def bid_make_pending(test_case):

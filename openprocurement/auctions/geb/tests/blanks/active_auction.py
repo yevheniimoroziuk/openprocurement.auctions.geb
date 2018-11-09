@@ -13,6 +13,9 @@ from openprocurement.auctions.core.utils import (
     SANDBOX_MODE
 )
 
+from openprocurement.auctions.geb.tests.fixtures.common import (
+    test_question_data
+)
 from openprocurement.auctions.geb.tests.fixtures.active_auction import (
     AUCTION,
     AUCTION_WITH_URLS,
@@ -22,6 +25,138 @@ from openprocurement.auctions.geb.tests.fixtures.active_auction import (
 from openprocurement.auctions.geb.utils import (
     calculate_certainly_business_date as ccbd
 )
+
+
+def bid_get(test_case):
+    auth = test_case.app.authorization
+
+    # build context of test
+    context = test_case.procedure.snapshot(fixture=AUCTION_WITH_URLS)
+    auction = context['auction']
+    bid = context['bids'][0]
+
+    # auth as bid_owner
+    test_case.app.authorization = ('Basic', ('{}'.format(bid['access']['owner']), ''))
+
+    expected_http_status = '200 OK'
+    pattern = '/auctions/{}/bids/{}?acc_token={}'
+    entrypoint = pattern.format(auction['data']['id'], bid['data']['id'], bid['access']['token'])
+    response = test_case.app.get(entrypoint)
+    test_case.assertEqual(expected_http_status, response.status)
+
+    # auth as auction owner
+    test_case.app.authorization = ('Basic', ('{}'.format(auction['access']['owner']), ''))
+
+    # not bid owner can`t get bid in auction status 'active.auction'
+    expected_http_status = '403 Forbidden'
+    pattern = '/auctions/{}/bids/{}'
+    entrypoint = pattern.format(auction['data']['id'], bid['data']['id'])
+    response = test_case.app.get(entrypoint, status=403)
+    test_case.assertEqual(expected_http_status, response.status)
+
+    test_case.app.authorization = auth
+
+
+def bid_delete(test_case):
+    # can`t delete bid in auction status 'active.auction'
+
+    # build context of test
+    context = test_case.procedure.snapshot(fixture=AUCTION_WITH_URLS)
+    auction = context['auction']
+    bid = context['bids'][0]
+
+    auth = test_case.app.authorization
+
+    # auth as bid owner
+    test_case.app.authorization = ('Basic', ('{}'.format(bid['access']['owner']), ''))
+    # build request
+    expected_http_status = '403 Forbidden'
+    pattern = '/auctions/{}/bids/{}?acc_token={}'
+    entrypoint = pattern.format(auction['data']['id'], bid['data']['id'], bid['access']['token'])
+    # try to delete bid
+    response = test_case.app.delete_json(entrypoint, status=403)
+    test_case.assertEqual(expected_http_status, response.status)
+
+    test_case.app.authorization = auth
+
+
+def auction_document_post(test_case):
+    # procedure owner can`t create auction document procedure status 'active.auction'
+
+    # build context of test
+    context = test_case.procedure.snapshot(fixture=AUCTION_WITH_DOCUMENT)
+    auction = context['auction']
+
+    auth = test_case.app.authorization
+
+    # auth as auction owner
+    test_case.app.authorization = ('Basic', ('{}'.format(auction['access']['owner']), ''))
+
+    # build request
+    document = deepcopy(test_document_data)
+    url = test_case.generate_docservice_url(),
+    document['url'] = url[0]
+    request_data = {'data': document}
+    pattern = '/auctions/{}/documents?acc_token={}'
+    entrypoint = pattern.format(auction['data']['id'], auction['access']['token'])
+    # try to post auction document
+    response = test_case.app.post_json(entrypoint, request_data, status=403)
+    test_case.assertEqual(response.status, '403 Forbidden')
+
+    test_case.app.authorization = auth
+
+
+def bid_document_post(test_case):
+    # bid owner can`t create bid document procedure status 'active.auction'
+
+    # build context of test
+    context = test_case.procedure.snapshot(fixture=AUCTION_WITH_DOCUMENT)
+    auction = context['auction']
+    bid = context['bids'][0]
+
+    auth = test_case.app.authorization
+
+    # auth as bid owner
+    test_case.app.authorization = ('Basic', ('{}'.format(bid['access']['owner']), ''))
+
+    # build request
+    document = deepcopy(test_document_data)
+    url = test_case.generate_docservice_url(),
+    document['url'] = url[0]
+    request_data = {'data': document}
+    pattern = '/auctions/{}/bids/{}/documents?acc_token={}'
+    entrypoint = pattern.format(auction['data']['id'],
+                                bid['data']['id'],
+                                bid['access']['token'])
+    # try to post bid document
+    response = test_case.app.post_json(entrypoint, request_data, status=403)
+    test_case.assertEqual(response.status, '403 Forbidden')
+
+    test_case.app.authorization = auth
+
+
+def auction_question_post(test_case):
+    # can`t add question in procedure status 'active.auction'
+
+    # build context of test
+    context = test_case.procedure.snapshot(fixture=AUCTION_WITH_DOCUMENT)
+    auction = context['auction']
+
+    auth = test_case.app.authorization
+
+    # auth as auction owner
+    test_case.app.authorization = ('Basic', ('{}'.format(auction['access']['owner']), ''))
+
+    # build request
+    request_data = test_question_data
+    pattern = '/auctions/{}/questions?acc_token={}'
+    entrypoint = pattern.format(auction['data']['id'],
+                                auction['access']['token'])
+    # try to post question
+    response = test_case.app.post_json(entrypoint, request_data, status=403)
+    test_case.assertEqual(response.status, '403 Forbidden')
+
+    test_case.app.authorization = auth
 
 
 def auction_document_patch(test_case):

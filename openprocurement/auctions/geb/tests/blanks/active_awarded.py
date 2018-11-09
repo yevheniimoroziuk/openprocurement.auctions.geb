@@ -123,3 +123,28 @@ def auction_put_auction_document_audit(test_case):
     entrypoint = pattern.format(test_case.auction['data']['id'], document['id'])
     response = test_case.app.get(entrypoint)
     test_case.assertEqual(response.status, '200 OK')
+
+
+def bid_get(test_case):
+    # in auction status 'active.awarderd'
+    # anybody can get bid without access token
+
+    expected_http_status = '200 OK'
+    expected_data = (
+        'id',
+        'status',
+        'tenderers',
+        'value',
+        'date',
+        'id',
+        'owner',
+        'qualified',
+        'bidNumber',
+        'documents',
+        'participationUrl'
+
+    )
+    response = test_case.app.get(test_case.ENTRYPOINTS['bid_get'])
+    test_case.assertEqual(expected_http_status, response.status)
+    bid = response.json['data']
+    test_case.assertEqual(set(bid.keys()), set(expected_data))

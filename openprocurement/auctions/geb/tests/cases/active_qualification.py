@@ -8,10 +8,11 @@ from openprocurement.auctions.geb.tests.states import (
     ProcedureMachine
 )
 from openprocurement.auctions.geb.tests.blanks.active_qualification import (
-    organizer_uploads_the_auction_protocol,
-    bid_owner_uploads_the_auction_protocol,
     auction_put_auction_document_audit,
-    organizer_activate_award
+    bid_get,
+    bid_owner_uploads_the_auction_protocol,
+    organizer_activate_award,
+    organizer_uploads_the_auction_protocol
 )
 from openprocurement.auctions.geb.tests.fixtures.active_qualification import (
     AUCTION_WITH_AWARD_WITH_PROTOCOL
@@ -92,9 +93,33 @@ class AwardWithProtocolTest(BaseWebTest):
         self.bid = bid
 
 
+class StatusActiveQualificationBidsTest(BaseWebTest):
+    docservice = True
+
+    test_bid_get = snitch(bid_get)
+
+    def setUp(self):
+        super(StatusActiveQualificationBidsTest, self).setUp()
+        procedure = ProcedureMachine()
+        procedure.set_db_connector(self.db)
+        procedure.toggle('active.qualification')
+        context = procedure.snapshot()
+
+        auction = context['auction']
+        bid = context['bids'][0]
+        entrypoints = {}
+        pattern = '/auctions/{}/bids/{}'
+        entrypoints['bid_get'] = pattern.format(auction['data']['id'],
+                                                bid['data']['id'])
+        self.ENTRYPOINTS = entrypoints
+        self.auction = auction
+        self.bid = bid
+
+
 def suite():
     suite = unittest.TestSuite()
     suite.addTest(unittest.makeSuite(StatusActiveQualificationTest))
+    suite.addTest(unittest.makeSuite(StatusActiveQualificationBidsTest))
     suite.addTest(unittest.makeSuite(AwardWithProtocolTest))
     return suite
 

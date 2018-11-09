@@ -19,6 +19,9 @@ from openprocurement.auctions.geb.interfaces import (
     ICancellationDocument
 )
 
+from openprocurement.auctions.geb.constants import (
+    AUCTION_STATUSES_FOR_FORBIDDEN_GET_BIDS
+)
 # resources representers
 
 # Item resource representer
@@ -50,14 +53,27 @@ class ItemRepresenter(object):
 class BidRepresenter(object):
     name = 'Bid Representer'
 
-    def __init__(self, context):
+    def __init__(self, request, context):
+        self._request = request
         self._context = context
 
     def _represent_patch(self):
         return {'data': self._context.serialize(self._context.status)}
 
     def _represent_get(self):
-        return {'data': self._context.serialize("view")}
+        # bid owner always get bid
+        if self._request.authenticated_role == 'bid_owner':
+            return {'data': self._context.serialize('view')}
+
+        auction_status = self._request.validated['auction_status']
+
+        # only after auction is over, anybody can get bid
+        if auction_status in AUCTION_STATUSES_FOR_FORBIDDEN_GET_BIDS:
+            err_msg = 'Can\'t view bid in current ({}) auction status'.format(auction_status)
+            self._request.errors.add('body', 'data', err_msg)
+            self._request.errors.status = 403
+
+        return {'data': self._context.serialize(auction_status)}
 
     def _represent_delete(self):
         return {'data': self._context.serialize("view")}

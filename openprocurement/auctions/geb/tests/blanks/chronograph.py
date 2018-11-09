@@ -16,7 +16,10 @@ from openprocurement.auctions.geb.tests.fixtures.active_tendering import (
 from openprocurement.auctions.geb.tests.fixtures.active_enquiry import (
     END_ACTIVE_ENQUIRY_AUCTION,
     END_ACTIVE_ENQUIRY_AUCTION_QUALIFICATION,
-    END_ACTIVE_ENQUIRY_UNSUCCESSFUL_NO_BIDS_ACTIVE
+    END_ACTIVE_ENQUIRY_UNSUCCESSFUL_NO_BIDS_ACTIVE,
+    END_ACTIVE_ENQUIRY_WITH_MIN_NUMBER_BID_1_WITH_2_ACTIVE_BIDS,
+    END_ACTIVE_ENQUIRY_WITH_MIN_NUMBER_BID_1_WITH_NO_ACTIVE_BIDS,
+    END_ACTIVE_ENQUIRY_WITH_MIN_NUMBER_BID_2_WITH_1_ACTIVE_BID
 )
 from openprocurement.auctions.geb.utils import (
     calculate_certainly_business_date as ccbd
@@ -33,7 +36,13 @@ def check_rectification_period_end(test_case):
     test_case.assertEqual(response.json['data']["status"], 'active.tendering')
 
 
-def check_tender_period_end_no_active_bids(test_case):
+# end tendering test
+
+def tendering_switch_to_unsuccessful_only_draft_bids(test_case):
+    # end active.tendering Period
+    # chronograph check
+    # if no any bids in status 'pending/active'
+    # set procedure status 'unsuccessful'
     context = test_case.procedure.snapshot()
     auction = context['auction']
 
@@ -47,7 +56,12 @@ def check_tender_period_end_no_active_bids(test_case):
     test_case.assertEqual(response.json['data']["status"], 'unsuccessful')
 
 
-def check_tender_period_end_no_minNumberOfQualifiedBids(test_case):
+def tendering_switch_to_unsuccessful_bid_min_number_2_bid_1_active(test_case):
+    # end active.tendering Period
+    # chronograph check
+    # if minNumberOfQualifiedBids 2 - only 1 bid in status 'pending/active'
+    # (no other bids)
+    # set procedure status 'unsuccessful'
     context = test_case.procedure.snapshot(fixture=END_ACTIVE_TENDERING_AUCTION_WITH_ONE_BID)
     auction = context['auction']
 
@@ -61,7 +75,11 @@ def check_tender_period_end_no_minNumberOfQualifiedBids(test_case):
     test_case.assertEqual(response.json['data']["status"], 'unsuccessful')
 
 
-def check_tender_period_end_successful(test_case):
+def tendering_switch_to_enquiry(test_case):
+    # end active.tendering Period
+    # chronograph check
+    # minNumberOfQualifiedBids 2 and 2 bid in status 'pending/active'
+    # set procedure status 'active.enquiry'
     context = test_case.procedure.snapshot(fixture=END_ACTIVE_TENDERING_AUCTION_WITH_TWO_BIDS)
     auction = context['auction']
 
@@ -75,7 +93,47 @@ def check_tender_period_end_successful(test_case):
     test_case.assertEqual(response.json['data']["status"], 'active.enquiry')
 
 
-def check_enquiry_period_end_unsuccessful(test_case):
+def tendering_delete_draft_bids(test_case):
+    # end active.tendering Period
+    # chronograph check
+    # if some bids in status 'draft'
+    # delete this bids
+    context = test_case.procedure.snapshot(fixture=END_ACTIVE_TENDERING_AUCTION_WITH_TWO_BIDS_AND_ONE_DRAFT)
+    auction = context['auction']
+    bids = context['bids']
+    draft_bid = [bid for bid in bids if bid['data']['status'] == 'draft'][0]
+
+    bid_url_pattern = '/auctions/{auction}/bids/{bid}?acc_token={token}'
+    bid_url = bid_url_pattern.format(auction=auction['data']['id'],
+                                     bid=draft_bid['data']['id'],
+                                     token=draft_bid['access']['token'])
+
+    auth = test_case.app.authorization
+    test_case.app.authorization = ('Basic', ('{}'.format(draft_bid['access']['owner']), ''))
+    test_case.app.get(bid_url)
+    test_case.app.authorization = auth
+
+    request_data = {'data': {'id': auction['data']['id']}}
+    entrypoint = '/auctions/{}'.format(auction['data']['id'])
+    response = test_case.app.patch_json(entrypoint, request_data)
+
+    response = test_case.app.get(entrypoint)
+    test_case.assertEqual(response.status, '200 OK')
+    test_case.assertEqual(response.json['data']["status"], 'active.enquiry')
+
+    test_case.app.authorization = ('Basic', ('{}'.format(draft_bid['access']['owner']), ''))
+    test_case.app.get(bid_url, status=404)
+    test_case.app.authorization = auth
+
+# end enquiry tests
+
+
+def enquiry_switch_to_unsuccessful_bids_min_number_2_no_bids(test_case):
+    # end active.enquiry Period
+    # chronograph check
+    # minNumberOfQualifiedBids = 2
+    # if no 2 bids in status 'active'
+    # switch procedure to unsuccessful
 
     context = test_case.procedure.snapshot(fixture=END_ACTIVE_ENQUIRY_UNSUCCESSFUL_NO_BIDS_ACTIVE)
 
@@ -91,10 +149,78 @@ def check_enquiry_period_end_unsuccessful(test_case):
     test_case.assertEqual(response.json['data']["status"], 'unsuccessful')
 
 
-@unittest.skipIf(SANDBOX_MODE, 'If sandbox mode is it enabled generating correct periods')
-def check_enquiry_period_end_active_qualification(test_case):
-    context = test_case.procedure.snapshot(fixture=END_ACTIVE_ENQUIRY_AUCTION_QUALIFICATION)
+def enquiry_switch_to_unsuccessful_bids_min_number_2_bid_1_active(test_case):
+    # end active.enquiry Period
+    # chronograph check
+    # minNumberOfQualifiedBids = 2
+    # if only 1 bid in status 'active'
+    # switch procedure to unsuccessful
 
+    context = test_case.procedure.snapshot(fixture=END_ACTIVE_ENQUIRY_WITH_MIN_NUMBER_BID_2_WITH_1_ACTIVE_BID)
+
+    auction = context['auction']
+
+    request_data = {'data': {'id': auction['data']['id']}}
+
+    entrypoint = '/auctions/{}'.format(auction['data']['id'])
+    response = test_case.app.patch_json(entrypoint, request_data)
+
+    response = test_case.app.get(entrypoint)
+    test_case.assertEqual(response.status, '200 OK')
+    test_case.assertEqual(response.json['data']["status"], 'unsuccessful')
+
+
+def enquiry_switch_to_unsuccessful_bids_min_number_1_no_bids(test_case):
+    # end active.enquiry Period
+    # chronograph check
+    # minNumberOfQualifiedBids = 1
+    # if no any bids in status 'active'
+    # switch procedure to unsuccessful
+
+    context = test_case.procedure.snapshot(fixture=END_ACTIVE_ENQUIRY_WITH_MIN_NUMBER_BID_1_WITH_NO_ACTIVE_BIDS)
+
+    auction = context['auction']
+
+    request_data = {'data': {'id': auction['data']['id']}}
+
+    entrypoint = '/auctions/{}'.format(auction['data']['id'])
+    response = test_case.app.patch_json(entrypoint, request_data)
+
+    response = test_case.app.get(entrypoint)
+    test_case.assertEqual(response.status, '200 OK')
+    test_case.assertEqual(response.json['data']["status"], 'unsuccessful')
+
+
+def enquiry_switch_to_active_auction_bids_min_number_1_bids_2_active(test_case):
+    # end active.enquiry Period
+    # chronograph check
+    # minNumberOfQualifiedBids = 1
+    # if 2 or more bids in status 'active'
+    # switch procedure to status 'active.auction'
+
+    context = test_case.procedure.snapshot(fixture=END_ACTIVE_ENQUIRY_WITH_MIN_NUMBER_BID_1_WITH_2_ACTIVE_BIDS)
+
+    auction = context['auction']
+
+    request_data = {'data': {'id': auction['data']['id']}}
+
+    entrypoint = '/auctions/{}'.format(auction['data']['id'])
+    response = test_case.app.patch_json(entrypoint, request_data)
+
+    response = test_case.app.get(entrypoint)
+    test_case.assertEqual(response.status, '200 OK')
+    test_case.assertEqual(response.json['data']["status"], 'active.auction')
+
+
+@unittest.skipIf(SANDBOX_MODE, 'If sandbox mode is it enabled generating correct periods')
+def enquiry_switch_to_active_qualification(test_case):
+    # end active.enquiry Period
+    # chronograph check
+    # minNumberOfQualifiedBids = 1
+    # if is 1 bid in status 'active'
+    # switch procedure to 'active.qualification'
+
+    context = test_case.procedure.snapshot(fixture=END_ACTIVE_ENQUIRY_AUCTION_QUALIFICATION)
     bid = context['bids'][0]
     auction = context['auction']
 
@@ -131,7 +257,12 @@ def check_enquiry_period_end_active_qualification(test_case):
     test_case.assertEqual(signing_end_date, expected_end_date)
 
 
-def check_enquiry_period_end_active_auction(test_case):
+def enquiry_switch_to_active_auction(test_case):
+    # end active.enquiry Period
+    # chronograph check
+    # minNumberOfQualifiedBids = 2
+    # if is more then 2 bid in status 'active'
+    # switch procedure to 'active.auction'
 
     context = test_case.procedure.snapshot(fixture=END_ACTIVE_ENQUIRY_AUCTION)
 
@@ -147,7 +278,10 @@ def check_enquiry_period_end_active_auction(test_case):
     test_case.assertEqual(response.json['data']["status"], 'active.auction')
 
 
-def check_enquiry_period_end_set_unsuccessful_bids(test_case):
+def enquiry_set_unsuccessful_bids(test_case):
+    # in the end of enquiry period
+    # all bids that are in status 'draft/pending'
+    # switch to 'unsuccessful' status
     context = test_case.procedure.snapshot(fixture=END_ACTIVE_ENQUIRY_UNSUCCESSFUL_NO_BIDS_ACTIVE)
 
     auction = context['auction']
@@ -175,35 +309,6 @@ def chronograph(test_case, auction):
     request_data = {'data': {'id': auction['id']}}
     entrypoint = '/auctions/{}'.format(auction['id'])
     test_case.app.patch_json(entrypoint, request_data)
-    test_case.app.authorization = auth
-
-
-def check_tender_period_end_delete_draft_bids(test_case):
-    context = test_case.procedure.snapshot(fixture=END_ACTIVE_TENDERING_AUCTION_WITH_TWO_BIDS_AND_ONE_DRAFT)
-    auction = context['auction']
-    bids = context['bids']
-    draft_bid = [bid for bid in bids if bid['data']['status'] == 'draft'][0]
-
-    bid_url_pattern = '/auctions/{auction}/bids/{bid}?acc_token={token}'
-    bid_url = bid_url_pattern.format(auction=auction['data']['id'],
-                                     bid=draft_bid['data']['id'],
-                                     token=draft_bid['access']['token'])
-
-    auth = test_case.app.authorization
-    test_case.app.authorization = ('Basic', ('{}'.format(draft_bid['access']['owner']), ''))
-    test_case.app.get(bid_url)
-    test_case.app.authorization = auth
-
-    request_data = {'data': {'id': auction['data']['id']}}
-    entrypoint = '/auctions/{}'.format(auction['data']['id'])
-    response = test_case.app.patch_json(entrypoint, request_data)
-
-    response = test_case.app.get(entrypoint)
-    test_case.assertEqual(response.status, '200 OK')
-    test_case.assertEqual(response.json['data']["status"], 'active.enquiry')
-
-    test_case.app.authorization = ('Basic', ('{}'.format(draft_bid['access']['owner']), ''))
-    test_case.app.get(bid_url, status=404)
     test_case.app.authorization = auth
 
 

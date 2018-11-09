@@ -71,7 +71,7 @@ from openprocurement.auctions.geb.constants import (
     AUCTION_STATUSES,
     BID_DOCUMENT_TYPES,
     BID_STATUSES,
-    GEB_ITEM_ADDITIONAL_CLASSIFICATIONS
+    ITEM_ADDITIONAL_CLASSIFICATIONS_TYPES
 )
 
 from openprocurement.auctions.geb.models.roles import (
@@ -300,7 +300,7 @@ class GebClassification(Classification):
 
 
 class GebAdditionalClassification(Classification):
-    scheme = StringType(required=True, choices=GEB_ITEM_ADDITIONAL_CLASSIFICATIONS)
+    scheme = StringType(required=True, choices=ITEM_ADDITIONAL_CLASSIFICATIONS_TYPES)
     _id_field_validators = Classification._id_field_validators + (cpvs_validator,
                                                                   kvtspz_validator)
 

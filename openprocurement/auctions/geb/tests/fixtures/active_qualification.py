@@ -1,7 +1,7 @@
 from datetime import timedelta
 from copy import deepcopy
-from openprocurement.auctions.geb.tests.fixtures.active_enquiry import (
-    AUCTION as ACTIVE_ENQUIRY_AUCTION
+from openprocurement.auctions.geb.tests.fixtures.active_auction import (
+    AUCTION as ACTIVE_AUCTION_AUCTION
 )
 
 from openprocurement.auctions.core.utils import get_now
@@ -23,7 +23,7 @@ from openprocurement.auctions.geb.utils import (
 
 qualification_period_start = ccbd(get_now(), -timedelta(days=1), specific_hour=16)
 calculator = Calculator(qualification_period_start, 'qualificationPeriod', 'start')
-auction = deepcopy(ACTIVE_ENQUIRY_AUCTION)
+auction = deepcopy(ACTIVE_AUCTION_AUCTION)
 auction['status'] = 'active.qualification'
 auction['documents'] = [AUCTION_DOCUMENT_AUDIT]
 auction["rectificationPeriod"] = {
@@ -50,6 +50,13 @@ auction['bids'][1]['status'] = 'invalid'
 auction["awards"] = [AWARD_PENDING]
 auction["awards"][0]['bid_id'] = auction['bids'][0]['id']
 auction["date"] = calculator.auctionDate.date.isoformat()
+participation_url_pattern = 'http://auction-sandbox.openprocurement.org/auctions/{}?key_for_bid={}'
+
+url = participation_url_pattern.format(auction['_id'], auction['bids'][0]['id'])
+auction['bids'][0]['participationUrl'] = url
+
+url = participation_url_pattern.format(auction['_id'], auction['bids'][1]['id'])
+auction['bids'][1]['participationUrl'] = url
 
 # auction in 'active.qualification' status.
 # description:

@@ -15,6 +15,7 @@ from openprocurement.auctions.geb.tests.fixtures.documents import (
 )
 from openprocurement.auctions.geb.tests.fixtures.bids import (
     BID_ACTIVE_FIRST,
+    BID_ACTIVE_SECOND,
     BID_ACTIVE_FIRST_WITH_DOCUMENT,
     BID_DRAFT_WITH_DOCUMENT,
     BID_PENDING_FIRST,
@@ -124,6 +125,30 @@ END_ACTIVE_ENQUIRY_AUCTION = auction
 auction = deepcopy(END_ACTIVE_ENQUIRY_AUCTION)
 auction['bids'] = [BID_PENDING_FIRST, BID_PENDING_SECOND]
 END_ACTIVE_ENQUIRY_UNSUCCESSFUL_NO_BIDS_ACTIVE = auction
+
+# auction in end 'active.enquiry' with two bid in status 'pending'
+# and minNumberOfQualifiedBids = 1
+# which will lead to the status 'unsuccessful' auction
+auction = deepcopy(END_ACTIVE_ENQUIRY_AUCTION)
+auction['bids'] = [BID_PENDING_FIRST, BID_PENDING_SECOND]
+auction['minNumberOfQualifiedBids'] = 1
+END_ACTIVE_ENQUIRY_WITH_MIN_NUMBER_BID_1_WITH_NO_ACTIVE_BIDS = auction
+
+# auction in end 'active.enquiry' with two bid in status 'active'
+# and minNumberOfQualifiedBids = 1
+# which will lead to the status 'active.auction' auction
+auction = deepcopy(END_ACTIVE_ENQUIRY_AUCTION)
+auction['bids'] = [BID_ACTIVE_FIRST, BID_ACTIVE_SECOND]
+auction['minNumberOfQualifiedBids'] = 1
+END_ACTIVE_ENQUIRY_WITH_MIN_NUMBER_BID_1_WITH_2_ACTIVE_BIDS = auction
+
+# auction in end 'active.enquiry' with 1 bid in status 'active'
+# and minNumberOfQualifiedBids = 2
+# which will lead to the status 'unsuccessful' auction
+auction = deepcopy(END_ACTIVE_ENQUIRY_AUCTION)
+auction['bids'] = [BID_ACTIVE_FIRST]
+auction['minNumberOfQualifiedBids'] = 2
+END_ACTIVE_ENQUIRY_WITH_MIN_NUMBER_BID_2_WITH_1_ACTIVE_BID = auction
 
 # auction in end 'active.enquiry' with two bid in status 'active'
 # and minNumberOfQualifiedBids = 1

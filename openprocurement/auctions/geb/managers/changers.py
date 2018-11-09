@@ -203,7 +203,6 @@ class ItemChanger(object):
 @implementer(ICancellationChanger)
 class CancellationChanger(object):
     name = 'Cancellation Changer'
-    validators = []
     initializator = CancellationChangerInitializator
 
     def __init__(self, request, context):
@@ -213,9 +212,6 @@ class CancellationChanger(object):
         self._initializator = self.initializator(self._request, self._auction, self._context)
 
     def validate(self):
-        for validator in self.validators:
-            if not validator(self._request, auction=self._auction, item=self._context):
-                return
         return True
 
     def _change(self):

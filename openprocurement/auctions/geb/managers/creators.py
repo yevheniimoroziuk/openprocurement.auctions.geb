@@ -52,7 +52,7 @@ class AuctionDocumentCreator(object):
     def validate(self):
         for validator in self.validators:
             if not validator(self._request):
-                return
+                return False
         return True
 
     def create(self, document):
@@ -78,7 +78,7 @@ class BidDocumentCreator(object):
     def validate(self):
         for validator in self.validators:
             if not validator(self._request, auction=self._auction, bid=self._context):
-                return
+                return False
         return True
 
     def create(self, document):
@@ -93,7 +93,6 @@ class BidDocumentCreator(object):
 class CancellationDocumentCreator(object):
     name = 'Cancellation Document Creator'
     resource_interface = ICancellationDocument
-    validators = []
 
     def __init__(self, request, context):
         self._request = request
@@ -101,9 +100,6 @@ class CancellationDocumentCreator(object):
         self._auction = context.__parent__
 
     def validate(self):
-        for validator in self.validators:
-            if not validator(self._request, auction=self._auction, bid=self._context):
-                return
         return True
 
     def create(self, document):
@@ -148,16 +144,12 @@ class AuctionCreator(object):
 class AuctionItemCreator(object):
     name = 'Auction Item creator'
     resource_interface = IItem
-    validators = []
 
     def __init__(self, request, context):
         self._request = request
         self._context = context
 
     def _validate(self):
-        for validator in self.validators:
-            if not validator(self._request):
-                return
         return True
 
     def create(self, item):
@@ -180,7 +172,7 @@ class AuctionQuestionCreator(object):
     def validate(self):
         for validator in self.validators:
             if not validator(self._request):
-                return
+                return False
         return True
 
     def create(self, question):
@@ -194,7 +186,6 @@ class AuctionQuestionCreator(object):
 class AuctionCancellationCreator(object):
     name = 'Auction Canceller'
     resource_interface = ICancellation
-    validators = []
     allow_pre_terminal_statuses = False
 
     def __init__(self, request, context):
@@ -202,9 +193,6 @@ class AuctionCancellationCreator(object):
         self._context = context
 
     def validate(self):
-        for validator in self.validators:
-            if not validator(self._request):
-                return
         return True
 
     def _add_cancellation(self):
