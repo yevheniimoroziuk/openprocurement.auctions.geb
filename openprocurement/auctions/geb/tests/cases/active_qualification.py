@@ -12,6 +12,7 @@ from openprocurement.auctions.geb.tests.blanks.active_qualification import (
     bid_get,
     bid_owner_uploads_the_auction_protocol,
     organizer_activate_award,
+    organizer_rejection_award,
     organizer_uploads_the_auction_protocol
 )
 from openprocurement.auctions.geb.tests.fixtures.active_qualification import (
@@ -23,6 +24,7 @@ class StatusActiveQualificationTest(BaseWebTest):
     docservice = True
 
     test_organizer_downloads_the_auction_protocol = snitch(organizer_uploads_the_auction_protocol)
+    test_organizer_rejection_award = snitch(organizer_rejection_award)
     test_auction_put_auction_document_audit = snitch(auction_put_auction_document_audit)
     test_bid_owner_downloads_the_auction_protocol = snitch(bid_owner_uploads_the_auction_protocol)
 
@@ -47,6 +49,13 @@ class StatusActiveQualificationTest(BaseWebTest):
         entrypoints['award_patch'] = pattern.format(auction['data']['id'],
                                                     award['data']['id'],
                                                     auction['access']['token'])
+
+        pattern = '/auctions/{}/awards/{}'
+        entrypoints['award_get'] = pattern.format(auction['data']['id'],
+                                                  award['data']['id'])
+
+        pattern = '/auctions/{}'
+        entrypoints['auction_get'] = pattern.format(auction['data']['id'])
 
         pattern = '/auctions/{}/documents/{}?acc_token={}'
         entrypoints['auction_audit_put'] = pattern.format(auction['data']['id'],
