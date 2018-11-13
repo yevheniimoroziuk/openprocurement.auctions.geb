@@ -1,6 +1,7 @@
 [run]
 omit =
     *tests*
+    *includeme*
 
 [report]
 exclude_lines =

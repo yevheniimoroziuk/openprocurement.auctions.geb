@@ -54,6 +54,7 @@ from openprocurement.auctions.geb.tests.blanks.active_tendering import (
     bid_patch_in_active_status,
     bid_patch_in_draft_status,
     bid_patch_in_pending_status,
+    bid_patch_bid_number_invalid,
     bid_draft_get_document,
     bid_draft_patch_document,
     bid_pending_patch_document,
@@ -159,6 +160,7 @@ class StatusActiveTenderingPendingBidsTest(BaseWebTest):
     docservice = True
 
     test_bid_patch_in_pending_status = snitch(bid_patch_in_pending_status)
+    test_bid_patch_bidNumber_invalid = snitch(bid_patch_bid_number_invalid)
     test_bid_make_activate = snitch(bid_make_activate)
     test_bid_add_document_in_pending_status = snitch(bid_add_document_in_pending_status)
     test_bid_delete_in_pending_status = snitch(bid_delete_in_pending_status)
@@ -182,6 +184,9 @@ class StatusActiveTenderingPendingBidsTest(BaseWebTest):
         entrypoints['bid'] = pattern.format(auction=auction['data']['id'],
                                             bid=bid['data']['id'],
                                             token=bid['access']['token'])
+
+        pattern = '/auctions/{auction}/bids'
+        entrypoints['bid_post'] = pattern.format(auction=auction['data']['id'])
 
         pattern = '/auctions/{auction}/bids/{bid}/documents?acc_token={token}'
         entrypoints['add_bid_document'] = pattern.format(auction=auction['data']['id'],

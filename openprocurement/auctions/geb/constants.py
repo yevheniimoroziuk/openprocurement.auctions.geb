@@ -5,9 +5,6 @@ from datetime import timedelta
 # document type for ofline documents
 DOCUMENT_TYPE_OFFLINE = ['x_dgfAssetFamiliarization']
 
-# document type for url only
-DOCUMENT_TYPE_URL_ONLY = ['virtualDataRoom']
-
 # auction resource document types
 AUCTION_DOCUMENT_TYPES = [
     'technicalSpecifications',

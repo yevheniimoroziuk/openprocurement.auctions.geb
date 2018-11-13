@@ -63,7 +63,6 @@ from openprocurement.auctions.geb.interfaces import (
     IQuestion
 )
 
-from openprocurement.auctions.geb.utils import get_auction
 
 from openprocurement.auctions.geb.constants import (
     AUCTION_DOCUMENT_TYPES,
@@ -147,17 +146,7 @@ class Question(BaseQuestion):
             'active.enquiry': question_enquiry_role,
             'active.rectification': question_rectification_role
         }
-
     questionOf = StringType(required=True, choices=['tender'], default='tender')
-
-    def validate_relatedItem(self, data, relatedItem):
-        if not relatedItem and data.get('questionOf') in ['item']:
-            raise ValidationError(u'This field is required.')
-
-        if relatedItem:
-            auction = get_auction(data['__parent__'], IAuction)
-            if data.get('questionOf') == 'item' and relatedItem not in [item.id for item in auction.items]:
-                raise ValidationError(u"relatedItem should be one of items")
 
 
 class LeaseTerms(Model):
@@ -277,6 +266,8 @@ class Bid(Model):
             raise ValidationError("Bid value valueAddedTaxIncluded should be equal as Auction value valueAddedTaxIncluded")
 
     def validate_bidNumber(self, data, bidNumber):
+        # validate bidNumber
+        # bid owner must set the unique value of bidNumber
         auction = data['__parent__']
         if not bidNumber:
             return
@@ -320,11 +311,11 @@ class Item(BaseItem):
 
     def validate_additionalClassifications(self, data, classificator):
         classificators = data['additionalClassifications']
-        err_msg = 'At least must be two additional classifications (kvtspz, cadastralNumber)'
         need_schemas = {'kvtspz', 'cadastralNumber'}
         schemas = set([classificator.scheme for classificator in classificators])
 
         if not need_schemas.issubset(schemas):
+            err_msg = 'At least must be two additional classifications (kvtspz, cadastralNumber)'
             raise ValidationError(err_msg)
 
 
@@ -363,66 +354,36 @@ class Auction(BaseAuction):
         return roles
 
     _internal_type = "geb"
-    modified = False
-
     auctionParameters = ModelType(AuctionParameters)
-
     auctionPeriod = ModelType(AuctionAuctionPeriod, required=True, default={})
-
     awardCriteria = StringType(choices=['highestCost'], default='highestCost')
-
     awards = ListType(ModelType(Award), default=list())
-
     bankAccount = ModelType(BankAccount)
-
     bids = ListType(ModelType(Bid), default=list())
-
     budgetSpent = ModelType(Value, required=True)
-
     cancellations = ListType(ModelType(Cancellation), default=list())
-
     complaints = ListType(ModelType(BaseComplaint), default=list())
-
     contractTerms = ModelType(ContractTerms, required=True)
-
     contracts = ListType(ModelType(Contract), default=list())
-
     dateModified = IsoDateTimeType()
-
     description = StringType(required=True)
-
     documents = ListType(ModelType(AuctionDocument), default=list())
-
     enquiryPeriod = ModelType(Period)
-
     guarantee = ModelType(Guarantee, required=True)
-
     items = ListType(ModelType(Item), validators=[validate_items_uniq], default=list())
-
     lotHolder = ModelType(BaseOrganization, required=True)
-
     lotIdentifier = StringType(required=True)
-
     minNumberOfQualifiedBids = IntType(choices=[1, 2], default=2)
-
     mode = StringType()
-
+    modified = False
     procurementMethod = StringType(choices=['open'], default='open')
-
     procurementMethodType = StringType(required=True)
-
     questions = ListType(ModelType(Question), default=list())
-
     rectificationPeriod = ModelType(RectificationPeriod)
-
     registrationFee = ModelType(Guarantee, required=True)
-
     status = StringType(choices=AUCTION_STATUSES, default='draft')
-
     submissionMethod = StringType(choices=['electronicAuction'], default='electronicAuction')
-
     tenderAttempts = IntType(choices=range(1, 11))
-
     tenderPeriod = ModelType(Period)
 
     def __acl__(self):

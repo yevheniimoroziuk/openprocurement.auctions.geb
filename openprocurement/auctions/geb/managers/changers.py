@@ -24,8 +24,10 @@ from openprocurement.auctions.geb.validation import (
     validate_question_changing_period,
     validate_item_changing_period,
     validate_phase_commit,
-    validate_edit_auction_document_period,
-    validate_put_auction_document_period,
+    # patch auction document validators
+    validate_period_auction_document_patch,
+    # put auction document validators
+    validate_period_auction_document_put,
     # patch bids validators
     validate_bid_patch_draft,
     validate_bid_patch_pending,
@@ -111,8 +113,8 @@ class BidChanger(object):
 @implementer(IDocumentChanger)
 class DocumentChanger(object):
     name = 'Document Changer'
-    patch_validators = [validate_edit_auction_document_period]
-    put_validators = [validate_put_auction_document_period]
+    patch_validators = [validate_period_auction_document_patch]
+    put_validators = [validate_period_auction_document_put]
 
     def __init__(self, request, context):
         self._request = request
@@ -122,7 +124,7 @@ class DocumentChanger(object):
     def validate(self, validators):
         for validator in validators:
             if not validator(self._request, auction=self._auction, document=self._context):
-                return
+                return False
         return True
 
     def change(self):
