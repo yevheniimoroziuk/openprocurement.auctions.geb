@@ -152,6 +152,50 @@ def organizer_activate_award(test_case):
     test_case.assertEqual(end_date, now)
 
 
+def organizer_rejection_award(test_case):
+    # organizer can reject award only if award status 'pending'
+
+    auth = test_case.app.authorization
+
+    # auth as auction owner
+    test_case.app.authorization = ('Basic', ('{}'.format(test_case.auction['access']['owner']), ''))
+
+    # try to reject award
+    request_data = {"data": {"status": "unsuccessful"}}
+    response = test_case.app.patch_json(test_case.ENTRYPOINTS['award_patch'],
+                                        request_data,
+                                        status=403)
+    # get 403 because, need to upload rejection protocol(document) before patch status
+    test_case.assertEqual(response.status, '403 Forbidden')
+
+    # upload rejection protocol
+    document = deepcopy(test_document_data)
+    document['documentType'] = 'rejectionProtocol'
+    url = test_case.generate_docservice_url(),
+    document['url'] = url[0]
+
+    request_data = {'data': document}
+    response = test_case.app.post_json(test_case.ENTRYPOINTS['award_document_post'], request_data)
+
+    # try to reject award
+    request_data = {"data": {"status": "unsuccessful"}}
+    response = test_case.app.patch_json(test_case.ENTRYPOINTS['award_patch'], request_data)
+
+    # check auction
+    response = test_case.app.get(test_case.ENTRYPOINTS['auction_get'], request_data)
+    auction = response.json['data']
+
+    test_case.assertEqual(auction['status'], 'unsuccessful')
+
+    # check award
+    response = test_case.app.get(test_case.ENTRYPOINTS['award_get'], request_data)
+    award = response.json['data']
+
+    test_case.assertEqual(award['status'], 'unsuccessful')
+
+    test_case.app.authorization = auth
+
+
 def dump_organizer_activate_award(test_case):
     document = deepcopy(test_document_data)
     document['documentType'] = 'auctionProtocol'

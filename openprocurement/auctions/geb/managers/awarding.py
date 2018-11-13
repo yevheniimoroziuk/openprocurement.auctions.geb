@@ -3,6 +3,9 @@ from datetime import timedelta
 from openprocurement.auctions.core.plugins.awarding.v3_1.adapters import (
     AwardingV3_1ConfiguratorMixin as BaseAwarding
 )
+from openprocurement.auctions.core.adapters import (
+    AuctionConfigurator
+)
 from openprocurement.auctions.core.utils import (
     set_specific_hour
 )
@@ -14,7 +17,7 @@ from openprocurement.auctions.core.utils import (
 )
 
 
-class Awarding(BaseAwarding):
+class Awarding(AuctionConfigurator, BaseAwarding):
     model = Auction
     pending_admission_for_one_bid = False
     NUMBER_OF_BIDS_TO_BE_QUALIFIED = 1
@@ -75,3 +78,11 @@ class Awarding(BaseAwarding):
         }
 
         return singing_period
+
+    def _reject_award(self):
+        # organizer reject award, auction switch to status 'unsuccessful'
+
+        self.context.status = 'unsuccessful'
+
+    def back_to_awarding(self):
+        self._reject_award()

@@ -11,6 +11,9 @@ from openprocurement.auctions.geb.managers.main import (
     CancellationManager,
     QuestionManager
 )
+from openprocurement.auctions.geb.managers.main import (
+    Awarding
+)
 from openprocurement.auctions.geb.constants import (
     DEFAULT_PROCUREMENT_METHOD_TYPE,
     DEFAULT_LEVEL_OF_ACCREDITATION
@@ -24,6 +27,7 @@ from openprocurement.auctions.core.interfaces import (
     IBidManager,
     IBidDocumentManager,
     ICancellationManager,
+    IContentConfigurator,
     IDocumentManager,
     IItemManager,
     IQuestionManager
@@ -54,6 +58,7 @@ def includeme(config, plugin_map):
     config.scan("openprocurement.auctions.geb.views")
 
     # register adapters
+    config.registry.registerAdapter(Awarding, (IAuction, IRequest), IContentConfigurator)
     config.registry.registerAdapter(AuctionManager, (IRequest, IAuction), IAuctionManager)
     config.registry.registerAdapter(AuctionPartialManager, (IAuction,), IAuctionManager)
     config.registry.registerAdapter(BidManager, (IRequest, IBid), IBidManager)

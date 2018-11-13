@@ -148,3 +148,50 @@ def bid_get(test_case):
     test_case.assertEqual(expected_http_status, response.status)
     bid = response.json['data']
     test_case.assertEqual(set(bid.keys()), set(expected_data))
+
+
+def organizer_rejection_contract(test_case):
+    # organizer can reject contract only if contract status 'pending'
+
+    auth = test_case.app.authorization
+
+    # auth as auction owner
+    test_case.app.authorization = ('Basic', ('{}'.format(test_case.auction['access']['owner']), ''))
+
+    # try to reject contract
+    request_data = {"data": {"status": "cancelled"}}
+    response = test_case.app.patch_json(test_case.ENTRYPOINTS['contract_patch'],
+                                        request_data,
+                                        status=403)
+    # get 403 because, need to upload rejection protocol(document) before patch status
+    test_case.assertEqual(response.status, '403 Forbidden')
+
+    # upload rejection protocol
+    document = deepcopy(test_document_data)
+    document['documentType'] = 'rejectionProtocol'
+    url = test_case.generate_docservice_url(),
+    document['url'] = url[0]
+
+    request_data = {'data': document}
+    response = test_case.app.post_json(test_case.ENTRYPOINTS['contract_document_post'], request_data)
+
+    # try to reject contract
+    request_data = {"data": {"status": "cancelled"}}
+    response = test_case.app.patch_json(test_case.ENTRYPOINTS['contract_patch'], request_data)
+
+    # check auction
+    response = test_case.app.get(test_case.ENTRYPOINTS['auction_get'], request_data)
+    auction = response.json['data']
+    test_case.assertEqual(auction['status'], 'unsuccessful')
+
+    # check award
+    response = test_case.app.get(test_case.ENTRYPOINTS['award_get'], request_data)
+    contract = response.json['data']
+    test_case.assertEqual(auction['status'], 'unsuccessful')
+
+    # check contract
+    response = test_case.app.get(test_case.ENTRYPOINTS['contract_get'], request_data)
+    contract = response.json['data']
+    test_case.assertEqual(contract['status'], 'cancelled')
+
+    test_case.app.authorization = auth
