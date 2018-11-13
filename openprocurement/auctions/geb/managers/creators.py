@@ -12,12 +12,12 @@ from openprocurement.auctions.core.interfaces import (
     ICreator
 )
 from openprocurement.auctions.geb.validation import (
-    validate_auctionPeriod,
     validate_auction_status_for_adding_bid_document,
     validate_bid_status_for_adding_bid_document,
     validate_document_adding_period,
-    validate_first_auction_status,
-    validate_question_adding_period
+    validate_question_adding_period,
+    # auction post validators
+    validate_auction_post_correct_auctionPeriod
 )
 from openprocurement.auctions.core.utils import (
     generate_auction_id,
@@ -114,7 +114,9 @@ class CancellationDocumentCreator(object):
 class AuctionCreator(object):
     name = 'Auction Creator'
     resource_interface = IAuction
-    validators = [validate_first_auction_status, validate_auctionPeriod]
+    validators = [
+        validate_auction_post_correct_auctionPeriod
+    ]
 
     def __init__(self, request, context):
         self._request = request
@@ -123,21 +125,34 @@ class AuctionCreator(object):
     def validate(self):
         for validator in self.validators:
             if not validator(self._request):
-                return
+                return False
         return True
 
     def _generate_id(self):
         return uuid4().hex
 
-    def create(self, auction):
+    def _systematize(self, applicant):
+        """
+            Expand applicant
+            add required field:
+                - id
+                - auctionID
+                - modified = True
+        """
+        auction_id = self._generate_id()
+        db = self._request.registry.db
+        server_id = self._request.registry.server_id
+
+        applicant.id = auction_id
+        applicant.auctionID = generate_auction_id(get_now(), db, server_id)
+        applicant.modified = True
+
+        return applicant
+
+    def create(self, applicant):
         if self.validate():
-            auction_id = self._generate_id()
-            auction.id = auction_id
-            db = self._request.registry.db
-            server_id = self._request.registry.server_id
-            auction.auctionID = generate_auction_id(get_now(), db, server_id)
-            self._context.modified = True
-            return self._context
+            auction = self._systematize(applicant)
+            return auction
 
 
 @implementer(IAuctionItemCreator)

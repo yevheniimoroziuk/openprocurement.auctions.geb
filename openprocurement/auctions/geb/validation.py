@@ -82,13 +82,18 @@ def _validate_patch_data(request, model, data):
 
 
 def validate_patch_data(request, model, data):
+    """
+        patch resource validator
+    """
     try:
         _validate_patch_data(request, model, data)
+    # handle model errors
     except (ModelValidationError, ModelConversionError) as e:
         for i in e.message:
             request.errors.add('body', i, e.message[i])
         request.errors.status = 422
         raise error_handler(request)
+    # handle json errors
     except JsonPointerException as err:
         request.errors.add('body', 'data', err.message)
         request.errors.status = 422
@@ -128,7 +133,7 @@ def validate_bid_patch_draft(request, **kwargs):
 def validate_bid_patch_pending(request, **kwargs):
 
     # check if it administrator bacause he can do everything
-    if request.authenticated_role == 'administrator':
+    if request.authenticated_role == 'Administrator':
         return True
 
     # check if it is patch status, only to active can switch
@@ -179,7 +184,7 @@ def validate_bid_patch_pending(request, **kwargs):
 def validate_bid_patch_active(request, **kwargs):
 
     # check if it administrator bacause he can do everything
-    if request.authenticated_role == 'administrator':
+    if request.authenticated_role == 'Administrator':
         return True
 
     # check if it is patch status, in active ca`nt patch status
@@ -272,13 +277,20 @@ def cav_ps_code_validator(data, code):
     if code not in CAV_PS_CODES:
         raise ValidationError(BaseType.MESSAGES['choices'].format(CAV_PS_CODES))
 
+# auction post validators
 
-def validate_first_auction_status(request):
-    status = request.json_body['data'].get('status')
-    if status and status != 'draft':
-        err_msg = "Auction status must be draft"
+
+def validate_auction_post_correct_auctionPeriod(request):
+    """
+        check if auction initial data has auctionPeriod.startDate
+        auctionPeriod.startDate is required for creating auction
+        if don`t have add errors and return False
+    """
+    auction = request.validated['json_data']
+    if not auction.get('auctionPeriod') or not auction['auctionPeriod'].get('startDate'):
+        err_msg = 'You must set auctionPeriod start date'
         request.errors.add('body', 'data', err_msg)
-        request.errors.status = 403
+        request.errors.status = 422
         return False
     return True
 
@@ -325,16 +337,6 @@ def validate_bid_initialization(request):
     return True
 
 
-def validate_auctionPeriod(request):
-    auction = request.validated['json_data']
-    if not auction.get('auctionPeriod') or not auction['auctionPeriod'].get('startDate'):
-        err_msg = 'You must set auctionPeriod start date'
-        request.errors.add('body', 'data', err_msg)
-        request.errors.status = 422
-        return False
-    return True
-
-
 def validate_auction_auction_status(request):
     auction = request.context
 
@@ -369,7 +371,10 @@ def validate_auction_identity_of_bids(request):
     return True
 
 
-def validate_edit_auction_document_period(request, **kwargs):
+# auction document validators
+
+
+def validate_period_auction_document_patch(request, **kwargs):
     """
     Validate period in which can edit auction document
     """
@@ -383,24 +388,17 @@ def validate_edit_auction_document_period(request, **kwargs):
     return True
 
 
-def validate_put_auction_document_period(request, **kwargs):
+def validate_period_auction_document_put(request, **kwargs):
     """
     Validate period in which can put auction document
     """
     auction = kwargs['auction']
-    auction_auction_statuses = ['active.qualification', 'active.awarded']
 
     if auction.status not in AUCTION_STATUSES_FOR_PUT_DOCUMENTS_STATUSES:
-        if request.authenticated_role != 'auction' and auction.status in auction_auction_statuses:
-            err_msg = 'Only module auction can update document in {}'.format(auction_auction_statuses)
-            request.errors.add('body', 'data', err_msg)
-            request.errors.status = 403
-            return False
-        else:
-            err_msg = 'Can update document only in {}'.format(AUCTION_STATUSES_FOR_PUT_DOCUMENTS_STATUSES)
-            request.errors.add('body', 'data', err_msg)
-            request.errors.status = 403
-            return False
+        err_msg = 'Can update document only in {}'.format(AUCTION_STATUSES_FOR_PUT_DOCUMENTS_STATUSES)
+        request.errors.add('body', 'data', err_msg)
+        request.errors.status = 403
+        return False
     return True
 
 

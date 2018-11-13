@@ -30,7 +30,6 @@ from openprocurement.auctions.geb.constants import (
 @implementer(IAuctionInitializator)
 class AuctionInitializator(object):
     name = 'Auction Initializator'
-    validators = []
 
     def __init__(self, request, context):
         self._now = get_now()
@@ -38,14 +37,6 @@ class AuctionInitializator(object):
         self._context = context
 
     def _validate(self, status):
-        for validator in self.validators:
-            if validator.name == status:
-                break
-        else:
-            return True
-        for validator in validator.validators:
-            if not validator(self._request):
-                return False
         return True
 
     def _initialize_enquiryPeriod(self):
@@ -110,14 +101,6 @@ class AuctionInitializator(object):
                 return True
         return False
 
-    def _invalidate_bids_after_auction(self):
-        context = self._context
-
-        auction_value = context.value.amount
-        invalid_bids = [bid for bid in context.bids if bid.value.amount == auction_value]
-        for bid in invalid_bids:
-            bid.status = 'invalid'
-
     def initialize(self, status):
         if self._check_demand():
             if self._validate(status):
@@ -129,8 +112,6 @@ class AuctionInitializator(object):
                     self._initialize_tenderPeriod()
                     self._initialize_enquiryPeriod()
                     self._clean_auctionPeriod()
-            else:
-                self._context.modified = False
 
 
 @implementer(IBidInitializator)
@@ -170,39 +151,18 @@ class CancellationChangerInitializator(object):
         self._auction = auction
         self._context = context
 
-    def _validate(self, status):
-        for validator in self.validators:
-            if validator.name == status:
-                break
-        else:
-            return True
-        for validator in validator.validators:
-            if not validator(self._request):
-                return False
-        return True
-
     def _check_demand(self):
+        # check if patch is for activating cancellation
         resource_src = self._request.validated['resource_src']
-        # activate cancellation
         if self._context.status == 'active' and resource_src['status'] == 'pending':
             return True
-        return False
 
     def _pendify_auction_status(self, context, target_status):
-        pending_prefix = 'pending'
-
-        if (
-            getattr(self._context, 'merchandisingObject', False)  # indicates registry integration
-            and not self._context.merchandisingObject
-            and self.allow_pre_terminal_statuses  # allows to manage using of preterm statuses
-        ):
-            status = '{0}.{1}'.format(pending_prefix, target_status)
-        else:
-            status = target_status
-
+        status = target_status
         context.status = status
 
     def _clean_procedure(self):
+        # clean bids after cancellation procedure
         auction_status = self._request.validated['auction_src']['status']
 
         if auction_status in AUCTION_STATUSES_FOR_CLEAN_BIDS_IN_CANCELLATION:

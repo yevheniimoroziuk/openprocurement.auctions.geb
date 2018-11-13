@@ -16,7 +16,7 @@ from openprocurement.auctions.core.interfaces import (
     IDocumentManager
 )
 
-from openprocurement.auctions.geb.utils import (
+from openprocurement.auctions.core.utils import (
     get_file
 )
 

@@ -33,7 +33,7 @@ class AuctionItemResource(APIResource):
     @json_view(content_type="application/json", permission='create_item', validators=(validate_item_data))
     def collection_post(self):
         """
-        Auction Item Upload
+        Auction Item Post
         """
         save = None
 

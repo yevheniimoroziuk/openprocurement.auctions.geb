@@ -606,6 +606,28 @@ def bid_make_pending_dump(test_case):
     test_case.dump(response.request, response, filename)
 
 
+def bid_patch_bid_number_invalid(test_case):
+    # create bid
+    request_data = test_bid_data
+    request_data['bidNumber'] = 1
+    response = test_case.app.post_json(test_case.ENTRYPOINTS['bid_post'], request_data)
+    bid = response.json['data']
+    access = response.json['access']
+
+    request_data = {"data": {"status": 'pending'}}
+    pattern = '/auctions/{}/bids/{}?acc_token={}'
+    entrypoint = pattern.format(test_case.auction['data']['id'], bid['id'], access['token'])
+    test_case.app.patch_json(entrypoint, request_data)
+
+    request_data = {"data": {"bidNumber": 1}}
+    response = test_case.app.patch_json(entrypoint, request_data)
+
+    # biNumber must be unique
+    request_data = {"data": {"bidNumber": 1}}
+    response = test_case.app.patch_json(test_case.ENTRYPOINTS['bid'], request_data, status=422)
+    test_case.assertEqual(response.status, '422 Unprocessable Entity')
+
+
 def bid_make_activate(test_case):
     document = deepcopy(test_document_data)
     document['documentType'] = 'eligibilityDocuments'
