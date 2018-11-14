@@ -24,15 +24,27 @@ class Awarding(AuctionConfigurator, BaseAwarding):
 
     @property
     def verificationPeriod(self):
-        # generate verificationPeriod.endDate
         start_awarding = self.context.awardPeriod.startDate
         auction_end_date = self.context.auctionPeriod.endDate
+
+        # set start_date
+        start_date = start_awarding
 
         if auction_end_date:
             end_date = cbd(start_awarding,
                            timedelta(days=0),
                            self.context,
                            specific_hour=18)
+
+            # find the outstanding time for bringing result of module auction
+            outstanding_auction_time = set_specific_hour(auction_end_date, 18)
+
+            # check if module auction outstanding time to brings result
+            if start_awarding > outstanding_auction_time:
+                start_date = cbd(start_awarding,
+                                 timedelta(days=0),
+                                 self.context,
+                                 specific_hour=17)
         else:
             # if auction minNumberOfQualifiedBids was 1
             # only 1 bid was in status 'active'
@@ -45,14 +57,6 @@ class Awarding(AuctionConfigurator, BaseAwarding):
                            specific_hour=18,
                            working_days=True)
 
-        # generate verificationPeriod.startDate
-        outstanding_auction_time = set_specific_hour(end_date, 18)
-
-        # check if module auction outstanding time to brings result
-        if start_awarding > outstanding_auction_time:
-            start_date = set_specific_hour(end_date, 17)
-        else:
-            start_date = start_awarding
         verification_period = {
             'startDate': start_date,
             'endDate': end_date
@@ -62,16 +66,28 @@ class Awarding(AuctionConfigurator, BaseAwarding):
 
     @property
     def signingPeriod(self):
-        verification_end_date = self.verification_period['endDate']
-        end_date = cbd(verification_end_date, timedelta(days=0), self.context, specific_hour=23) + timedelta(minutes=59)
-        outstanding_auction_time = set_specific_hour(end_date, 18)
         start_awarding = self.context.awardPeriod.startDate
+        auction_end_date = self.context.auctionPeriod.endDate
+        verification_end_date = self.verification_period['endDate']
 
-        # check if module auction outstanding time to brings result
-        if start_awarding > outstanding_auction_time:
-            start_date = set_specific_hour(end_date, 17)
-        else:
-            start_date = start_awarding
+        # set endDate
+        end_date = cbd(verification_end_date, timedelta(days=0), self.context, specific_hour=23) + timedelta(minutes=59)
+
+        # set startDate
+        start_date = start_awarding
+
+        if auction_end_date:
+
+            # find the outstanding time for bringing result of module auction
+            outstanding_auction_time = set_specific_hour(auction_end_date, 18)
+
+            # check if module auction outstanding time to brings result
+            if start_awarding > outstanding_auction_time:
+                start_date = cbd(start_awarding,
+                                 timedelta(days=0),
+                                 self.context,
+                                 specific_hour=17)
+
         singing_period = {
             'startDate': start_date,
             'endDate': end_date

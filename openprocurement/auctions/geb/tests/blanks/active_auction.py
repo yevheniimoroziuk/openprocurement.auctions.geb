@@ -384,6 +384,7 @@ def switch_to_qualification(test_case):
     test_case.assertEqual(award_period_start, verification_start_date)
 
 
+@unittest.skipIf(SANDBOX_MODE, 'If sandbox mode is it enabled generating correct periods')
 def switch_to_qualification_outstanding(test_case):
     context = test_case.procedure.snapshot(fixture=AUCTION_WITH_URLS)
     auction = context['auction']
@@ -413,8 +414,8 @@ def switch_to_qualification_outstanding(test_case):
     data = response.json['data']
     auction_start_date = parse_date(data['auctionPeriod']['startDate'])
 
-    # simulate valid auction time
-    # set 'now' to 14:00 next day of auctionPeriod.startDate
+    # simulate invalid auction time
+    # set 'now' to 19:00 next day of auctionPeriod.startDate
     outstanding_auction_time = set_specific_hour(auction_start_date + timedelta(days=1), 19)
     with nested(
         patch('openprocurement.auctions.geb.managers.auctioneers.get_now', return_value=outstanding_auction_time),
