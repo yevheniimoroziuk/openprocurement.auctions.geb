@@ -1,5 +1,5 @@
 import unittest
-from contextlib import nested
+from freezegun import freeze_time
 from mock import patch
 from copy import deepcopy
 from iso8601 import parse_date
@@ -335,10 +335,7 @@ def switch_to_qualification(test_case):
     # simulate valid auction time
     # set 'now' to 14:00 next day of auctionPeriod.startDate
     valid_auction_time = set_specific_hour(auction_start_date + timedelta(days=1), 14)
-    with nested(
-        patch('openprocurement.auctions.geb.managers.auctioneers.get_now', return_value=valid_auction_time),
-        patch('openprocurement.auctions.core.plugins.awarding.base.adapters.get_now', return_value=valid_auction_time),
-    ) as (auction_periond_end, award_period_start):
+    with freeze_time(valid_auction_time):
         response = test_case.app.post_json(auction_url, {'data': request_data})
     expected_http_status = '200 OK'
     test_case.assertEqual(response.status, expected_http_status)
@@ -417,10 +414,7 @@ def switch_to_qualification_outstanding(test_case):
     # simulate invalid auction time
     # set 'now' to 19:00 next day of auctionPeriod.startDate
     outstanding_auction_time = set_specific_hour(auction_start_date + timedelta(days=1), 19)
-    with nested(
-        patch('openprocurement.auctions.geb.managers.auctioneers.get_now', return_value=outstanding_auction_time),
-        patch('openprocurement.auctions.core.plugins.awarding.base.adapters.get_now', return_value=outstanding_auction_time),
-    ) as (auction_periond_end, award_period_start):
+    with freeze_time(outstanding_auction_time):
         response = test_case.app.post_json(auction_url, {'data': request_data})
 
     response = test_case.app.get('/auctions/{}/awards'.format(auction['data']['id']))
