@@ -97,10 +97,17 @@ class AuctionChecker(object):
             if date == self._context.rectificationPeriod.endDate:
                 self._next_status = 'active.tendering'
             elif date == self._context.tenderPeriod.endDate:
-                self._end_tendering_check_bids()
-                self._end_tendering_check_minNumberOfQualifiedBids()
-                self._end_tendering_delete_bids()
-                self._next_status = 'active.enquiry'
+                #self._end_tendering_check_bids()
+                #self._end_tendering_check_minNumberOfQualifiedBids()
+                #self._end_tendering_delete_bids()
+                #self._next_status = 'active.enquiry'
+
+                #### !
+                for bid in self._context['bids']:
+                    remove_bid(self._request, self._context, bid)
+                self._next_status = 'unsuccessful'
+                #### !
+
             elif date == self._context.enquiryPeriod.endDate:
                 self._check_enquiry_minNumberOfQualifiedBids()
                 self._end_enquiry_set_unseccessful_bids()
