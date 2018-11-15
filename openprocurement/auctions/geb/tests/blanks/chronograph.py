@@ -266,6 +266,32 @@ def enquiry_switch_to_active_auction_bids_min_number_1_bids_2_active(test_case):
     test_case.assertEqual(response.json['data']["status"], 'active.auction')
 
 
+@unittest.skipIf(not SANDBOX_MODE, 'If sandbox mode is it enabled generating correct periods')
+def enquiry_switch_to_active_qualification_sandbox(test_case):
+    # end active.enquiry Period
+    # chronograph check
+    # minNumberOfQualifiedBids = 1
+    # if is 1 bid in status 'active'
+    # switch procedure to 'active.qualification'
+
+    context = test_case.procedure.snapshot(fixture=END_ACTIVE_ENQUIRY_AUCTION_QUALIFICATION)
+    auction = context['auction']
+    entrypoint = '/auctions/{}'.format(auction['data']['id'])
+
+    # get auctionPeriod.enquiryPeriod.EndDate
+    response = test_case.app.get(entrypoint)
+    data = response.json['data']
+    enquiry_end = parse_date(data['enquiryPeriod']['endDate'])
+
+    # simulate enquiryPeriod.endDate
+    with freeze_time(enquiry_end):
+        request_data = {'data': {'id': auction['data']['id']}}
+        response = test_case.app.patch_json(entrypoint, request_data)
+
+    test_case.assertEqual(response.status, '200 OK')
+    test_case.assertEqual(response.json['data']["status"], 'active.qualification')
+
+
 @unittest.skipIf(SANDBOX_MODE, 'If sandbox mode is it enabled generating correct periods')
 def enquiry_switch_to_active_qualification(test_case):
     # end active.enquiry Period

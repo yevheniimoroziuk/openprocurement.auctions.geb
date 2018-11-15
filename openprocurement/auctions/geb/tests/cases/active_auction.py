@@ -142,7 +142,7 @@ class StatusActiveAuctionCancellationsDocumentsTest(BaseWebTest, CancellationDoc
 
         procedure = ProcedureMachine()
         procedure.set_db_connector(self.db)
-        procedure.toggle('draft')
+        procedure.toggle('active.auction')
         context = procedure.snapshot(fixture=AUCTION_WITH_CANCELLATION_WITH_DOCUMENTS)
 
         auction = context['auction']

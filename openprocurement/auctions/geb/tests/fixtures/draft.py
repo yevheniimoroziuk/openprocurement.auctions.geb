@@ -65,7 +65,7 @@ AUCTION = {
 }
 
 if SANDBOX_MODE:
-    AUCTION['procurementMethodDetails'] = 'quick, accelerator=1440'
+    AUCTION['procurementMethodDetails'] = 'quick, accelerator=14400'
     AUCTION['submissionMethodDetails'] = 'test submissionMethodDetails'
 
 # auction with invalid auction period
