@@ -1,6 +1,6 @@
 import unittest
+from freezegun import freeze_time
 from iso8601 import parse_date
-from mock import patch
 from datetime import timedelta
 
 from openprocurement.auctions.core.utils import (
@@ -27,9 +27,18 @@ from openprocurement.auctions.geb.utils import (
 
 
 def check_rectification_period_end(test_case):
-    request_data = {'data': {'id': test_case.auction['data']['id']}}
+    # end active.tendering Period
+    # chronograph check
 
-    response = test_case.app.patch_json(test_case.ENTRYPOINTS['auction'], request_data)
+    # get auctionPeriod.rectificationPeriod.EndDate
+    response = test_case.app.get(test_case.ENTRYPOINTS['auction'])
+    data = response.json['data']
+    rectification_end = parse_date(data['rectificationPeriod']['endDate'])
+
+    # simulate rectificationPeriod.endDate
+    with freeze_time(rectification_end):
+        request_data = {'data': {'id': test_case.auction['data']['id']}}
+        response = test_case.app.patch_json(test_case.ENTRYPOINTS['auction'], request_data)
 
     response = test_case.app.get(test_case.ENTRYPOINTS['auction'])
     test_case.assertEqual(response.status, '200 OK')
@@ -45,11 +54,17 @@ def tendering_switch_to_unsuccessful_only_draft_bids(test_case):
     # set procedure status 'unsuccessful'
     context = test_case.procedure.snapshot()
     auction = context['auction']
-
-    request_data = {'data': {'id': auction['data']['id']}}
-
     entrypoint = '/auctions/{}'.format(auction['data']['id'])
-    response = test_case.app.patch_json(entrypoint, request_data)
+
+    # get auctionPeriod.tenderPeriod.EndDate
+    response = test_case.app.get(entrypoint)
+    data = response.json['data']
+    tendering_end = parse_date(data['tenderPeriod']['endDate'])
+
+    # simulate tenderingPeriod.endDate
+    with freeze_time(tendering_end):
+        request_data = {'data': {'id': auction['data']['id']}}
+        response = test_case.app.patch_json(entrypoint, request_data)
 
     response = test_case.app.get(entrypoint)
     test_case.assertEqual(response.status, '200 OK')
@@ -64,11 +79,17 @@ def tendering_switch_to_unsuccessful_bid_min_number_2_bid_1_active(test_case):
     # set procedure status 'unsuccessful'
     context = test_case.procedure.snapshot(fixture=END_ACTIVE_TENDERING_AUCTION_WITH_ONE_BID)
     auction = context['auction']
-
-    request_data = {'data': {'id': auction['data']['id']}}
-
     entrypoint = '/auctions/{}'.format(auction['data']['id'])
-    response = test_case.app.patch_json(entrypoint, request_data)
+
+    # get auctionPeriod.tenderPeriod.EndDate
+    response = test_case.app.get(entrypoint)
+    data = response.json['data']
+    tendering_end = parse_date(data['tenderPeriod']['endDate'])
+
+    # simulate tenderingPeriod.endDate
+    with freeze_time(tendering_end):
+        request_data = {'data': {'id': auction['data']['id']}}
+        response = test_case.app.patch_json(entrypoint, request_data)
 
     response = test_case.app.get(entrypoint)
     test_case.assertEqual(response.status, '200 OK')
@@ -82,11 +103,17 @@ def tendering_switch_to_enquiry(test_case):
     # set procedure status 'active.enquiry'
     context = test_case.procedure.snapshot(fixture=END_ACTIVE_TENDERING_AUCTION_WITH_TWO_BIDS)
     auction = context['auction']
-
-    request_data = {'data': {'id': auction['data']['id']}}
-
     entrypoint = '/auctions/{}'.format(auction['data']['id'])
-    response = test_case.app.patch_json(entrypoint, request_data)
+
+    # get auctionPeriod.tenderPeriod.EndDate
+    response = test_case.app.get(entrypoint)
+    data = response.json['data']
+    tendering_end = parse_date(data['tenderPeriod']['endDate'])
+
+    # simulate tenderingPeriod.endDate
+    with freeze_time(tendering_end):
+        request_data = {'data': {'id': auction['data']['id']}}
+        response = test_case.app.patch_json(entrypoint, request_data)
 
     response = test_case.app.get(entrypoint)
     test_case.assertEqual(response.status, '200 OK')
@@ -100,6 +127,7 @@ def tendering_delete_draft_bids(test_case):
     # delete this bids
     context = test_case.procedure.snapshot(fixture=END_ACTIVE_TENDERING_AUCTION_WITH_TWO_BIDS_AND_ONE_DRAFT)
     auction = context['auction']
+    entrypoint = '/auctions/{}'.format(auction['data']['id'])
     bids = context['bids']
     draft_bid = [bid for bid in bids if bid['data']['status'] == 'draft'][0]
 
@@ -113,9 +141,15 @@ def tendering_delete_draft_bids(test_case):
     test_case.app.get(bid_url)
     test_case.app.authorization = auth
 
-    request_data = {'data': {'id': auction['data']['id']}}
-    entrypoint = '/auctions/{}'.format(auction['data']['id'])
-    response = test_case.app.patch_json(entrypoint, request_data)
+    # get auctionPeriod.tenderPeriod.EndDate
+    response = test_case.app.get(entrypoint)
+    data = response.json['data']
+    tendering_end = parse_date(data['tenderPeriod']['endDate'])
+
+    # simulate tenderingPeriod.endDate
+    with freeze_time(tendering_end):
+        request_data = {'data': {'id': auction['data']['id']}}
+        response = test_case.app.patch_json(entrypoint, request_data)
 
     response = test_case.app.get(entrypoint)
     test_case.assertEqual(response.status, '200 OK')
@@ -136,13 +170,18 @@ def enquiry_switch_to_unsuccessful_bids_min_number_2_no_bids(test_case):
     # switch procedure to unsuccessful
 
     context = test_case.procedure.snapshot(fixture=END_ACTIVE_ENQUIRY_UNSUCCESSFUL_NO_BIDS_ACTIVE)
-
     auction = context['auction']
-
-    request_data = {'data': {'id': auction['data']['id']}}
-
     entrypoint = '/auctions/{}'.format(auction['data']['id'])
-    response = test_case.app.patch_json(entrypoint, request_data)
+
+    # get auctionPeriod.enquiryPeriod.EndDate
+    response = test_case.app.get(entrypoint)
+    data = response.json['data']
+    enquiry_end = parse_date(data['enquiryPeriod']['endDate'])
+
+    # simulate enquiryPeriod.endDate
+    with freeze_time(enquiry_end):
+        request_data = {'data': {'id': auction['data']['id']}}
+        response = test_case.app.patch_json(entrypoint, request_data)
 
     response = test_case.app.get(entrypoint)
     test_case.assertEqual(response.status, '200 OK')
@@ -157,13 +196,18 @@ def enquiry_switch_to_unsuccessful_bids_min_number_2_bid_1_active(test_case):
     # switch procedure to unsuccessful
 
     context = test_case.procedure.snapshot(fixture=END_ACTIVE_ENQUIRY_WITH_MIN_NUMBER_BID_2_WITH_1_ACTIVE_BID)
-
     auction = context['auction']
-
-    request_data = {'data': {'id': auction['data']['id']}}
-
     entrypoint = '/auctions/{}'.format(auction['data']['id'])
-    response = test_case.app.patch_json(entrypoint, request_data)
+
+    # get auctionPeriod.enquiryPeriod.EndDate
+    response = test_case.app.get(entrypoint)
+    data = response.json['data']
+    enquiry_end = parse_date(data['enquiryPeriod']['endDate'])
+
+    # simulate enquiryPeriod.endDate
+    with freeze_time(enquiry_end):
+        request_data = {'data': {'id': auction['data']['id']}}
+        response = test_case.app.patch_json(entrypoint, request_data)
 
     response = test_case.app.get(entrypoint)
     test_case.assertEqual(response.status, '200 OK')
@@ -178,13 +222,18 @@ def enquiry_switch_to_unsuccessful_bids_min_number_1_no_bids(test_case):
     # switch procedure to unsuccessful
 
     context = test_case.procedure.snapshot(fixture=END_ACTIVE_ENQUIRY_WITH_MIN_NUMBER_BID_1_WITH_NO_ACTIVE_BIDS)
-
     auction = context['auction']
-
-    request_data = {'data': {'id': auction['data']['id']}}
-
     entrypoint = '/auctions/{}'.format(auction['data']['id'])
-    response = test_case.app.patch_json(entrypoint, request_data)
+
+    # get auctionPeriod.enquiryPeriod.EndDate
+    response = test_case.app.get(entrypoint)
+    data = response.json['data']
+    enquiry_end = parse_date(data['enquiryPeriod']['endDate'])
+
+    # simulate enquiryPeriod.endDate
+    with freeze_time(enquiry_end):
+        request_data = {'data': {'id': auction['data']['id']}}
+        response = test_case.app.patch_json(entrypoint, request_data)
 
     response = test_case.app.get(entrypoint)
     test_case.assertEqual(response.status, '200 OK')
@@ -199,17 +248,48 @@ def enquiry_switch_to_active_auction_bids_min_number_1_bids_2_active(test_case):
     # switch procedure to status 'active.auction'
 
     context = test_case.procedure.snapshot(fixture=END_ACTIVE_ENQUIRY_WITH_MIN_NUMBER_BID_1_WITH_2_ACTIVE_BIDS)
-
     auction = context['auction']
-
-    request_data = {'data': {'id': auction['data']['id']}}
-
     entrypoint = '/auctions/{}'.format(auction['data']['id'])
-    response = test_case.app.patch_json(entrypoint, request_data)
+
+    # get auctionPeriod.enquiryPeriod.EndDate
+    response = test_case.app.get(entrypoint)
+    data = response.json['data']
+    enquiry_end = parse_date(data['enquiryPeriod']['endDate'])
+
+    # simulate enquiryPeriod.endDate
+    with freeze_time(enquiry_end):
+        request_data = {'data': {'id': auction['data']['id']}}
+        response = test_case.app.patch_json(entrypoint, request_data)
 
     response = test_case.app.get(entrypoint)
     test_case.assertEqual(response.status, '200 OK')
     test_case.assertEqual(response.json['data']["status"], 'active.auction')
+
+
+@unittest.skipIf(not SANDBOX_MODE, 'If sandbox mode is it enabled generating correct periods')
+def enquiry_switch_to_active_qualification_sandbox(test_case):
+    # end active.enquiry Period
+    # chronograph check
+    # minNumberOfQualifiedBids = 1
+    # if is 1 bid in status 'active'
+    # switch procedure to 'active.qualification'
+
+    context = test_case.procedure.snapshot(fixture=END_ACTIVE_ENQUIRY_AUCTION_QUALIFICATION)
+    auction = context['auction']
+    entrypoint = '/auctions/{}'.format(auction['data']['id'])
+
+    # get auctionPeriod.enquiryPeriod.EndDate
+    response = test_case.app.get(entrypoint)
+    data = response.json['data']
+    enquiry_end = parse_date(data['enquiryPeriod']['endDate'])
+
+    # simulate enquiryPeriod.endDate
+    with freeze_time(enquiry_end):
+        request_data = {'data': {'id': auction['data']['id']}}
+        response = test_case.app.patch_json(entrypoint, request_data)
+
+    test_case.assertEqual(response.status, '200 OK')
+    test_case.assertEqual(response.json['data']["status"], 'active.qualification')
 
 
 @unittest.skipIf(SANDBOX_MODE, 'If sandbox mode is it enabled generating correct periods')
@@ -223,10 +303,17 @@ def enquiry_switch_to_active_qualification(test_case):
     context = test_case.procedure.snapshot(fixture=END_ACTIVE_ENQUIRY_AUCTION_QUALIFICATION)
     bid = context['bids'][0]
     auction = context['auction']
-
-    request_data = {'data': {'id': auction['data']['id']}}
     entrypoint = '/auctions/{}'.format(auction['data']['id'])
-    response = test_case.app.patch_json(entrypoint, request_data)
+
+    # get auctionPeriod.enquiryPeriod.EndDate
+    response = test_case.app.get(entrypoint)
+    data = response.json['data']
+    enquiry_end = parse_date(data['enquiryPeriod']['endDate'])
+
+    # simulate enquiryPeriod.endDate
+    with freeze_time(enquiry_end):
+        request_data = {'data': {'id': auction['data']['id']}}
+        response = test_case.app.patch_json(entrypoint, request_data)
 
     test_case.assertEqual(response.status, '200 OK')
     test_case.assertEqual(response.json['data']["status"], 'active.qualification')
@@ -265,13 +352,18 @@ def enquiry_switch_to_active_auction(test_case):
     # switch procedure to 'active.auction'
 
     context = test_case.procedure.snapshot(fixture=END_ACTIVE_ENQUIRY_AUCTION)
-
     auction = context['auction']
-
-    request_data = {'data': {'id': auction['data']['id']}}
-
     entrypoint = '/auctions/{}'.format(auction['data']['id'])
-    response = test_case.app.patch_json(entrypoint, request_data)
+
+    # get auctionPeriod.enquiryPeriod.EndDate
+    response = test_case.app.get(entrypoint)
+    data = response.json['data']
+    enquiry_end = parse_date(data['enquiryPeriod']['endDate'])
+
+    # simulate enquiryPeriod.endDate
+    with freeze_time(enquiry_end):
+        request_data = {'data': {'id': auction['data']['id']}}
+        response = test_case.app.patch_json(entrypoint, request_data)
 
     response = test_case.app.get(entrypoint)
     test_case.assertEqual(response.status, '200 OK')
@@ -283,14 +375,19 @@ def enquiry_set_unsuccessful_bids(test_case):
     # all bids that are in status 'draft/pending'
     # switch to 'unsuccessful' status
     context = test_case.procedure.snapshot(fixture=END_ACTIVE_ENQUIRY_UNSUCCESSFUL_NO_BIDS_ACTIVE)
-
     auction = context['auction']
     bids = context['bids']
-
-    request_data = {'data': {'id': auction['data']['id']}}
-
     entrypoint = '/auctions/{}'.format(auction['data']['id'])
-    response = test_case.app.patch_json(entrypoint, request_data)
+
+    # get auctionPeriod.enquiryPeriod.EndDate
+    response = test_case.app.get(entrypoint)
+    data = response.json['data']
+    enquiry_end = parse_date(data['enquiryPeriod']['endDate'])
+
+    # simulate enquiryPeriod.endDate
+    with freeze_time(enquiry_end):
+        request_data = {'data': {'id': auction['data']['id']}}
+        response = test_case.app.patch_json(entrypoint, request_data)
 
     bid_url_pattern = '/auctions/{auction}/bids/{bid}?acc_token={token}'
 
@@ -378,7 +475,7 @@ def replaning_auction(test_case):
     # simulate outstanding auction time
     # set 'now' to 19:00 day of auctionPeriod.startDate
     outstanding_auction_time = set_specific_hour(auction_start_date, 19)
-    with patch('openprocurement.auctions.geb.models.schemas.get_now', return_value=outstanding_auction_time):
+    with freeze_time(outstanding_auction_time):
         request_data = {'data': {'id': test_case.auction['data']['id']}}
         response = test_case.app.patch_json(test_case.ENTRYPOINTS['auction_patch'], request_data)
     auction = response.json['data']

@@ -7,7 +7,8 @@ from openprocurement.auctions.core.adapters import (
     AuctionConfigurator
 )
 from openprocurement.auctions.core.utils import (
-    set_specific_hour
+    set_specific_hour,
+    get_now
 )
 from openprocurement.auctions.geb.models.schemas import (
     Auction
@@ -31,10 +32,7 @@ class Awarding(AuctionConfigurator, BaseAwarding):
         start_date = start_awarding
 
         if auction_end_date:
-            end_date = cbd(start_awarding,
-                           timedelta(days=0),
-                           self.context,
-                           specific_hour=18)
+            end_date = cbd(start_awarding, timedelta(days=0), self.context, specific_hour=18)
 
             # find the outstanding time for bringing result of module auction
             outstanding_auction_time = set_specific_hour(auction_end_date, 18)
@@ -50,8 +48,8 @@ class Awarding(AuctionConfigurator, BaseAwarding):
             # only 1 bid was in status 'active'
             # after 'active.enquiry' auction switch to 'active.qualification'
             # verificationPeriod start after end of enquiryPeriod
-            enquiry_end_date = self.context.enquiryPeriod.endDate
-            end_date = cbd(enquiry_end_date,
+            now = get_now()
+            end_date = cbd(now,
                            timedelta(days=1),
                            self.context,
                            specific_hour=18,

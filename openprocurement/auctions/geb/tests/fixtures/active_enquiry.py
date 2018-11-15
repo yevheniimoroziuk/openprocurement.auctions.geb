@@ -1,5 +1,11 @@
 from uuid import uuid4
 from copy import deepcopy
+
+from openprocurement.auctions.core.utils import (
+    get_now,
+    set_specific_hour
+)
+
 from openprocurement.auctions.geb.tests.fixtures.active_tendering import (
     END_ACTIVE_TENDERING_AUCTION_WITH_TWO_BIDS
 )
@@ -22,7 +28,6 @@ from openprocurement.auctions.geb.tests.fixtures.bids import (
     BID_PENDING_FIRST_WITH_DOCUMENT,
     BID_PENDING_SECOND
 )
-from openprocurement.auctions.core.utils import get_now
 from openprocurement.auctions.geb.tests.fixtures.calculator import (
     Calculator
 )
@@ -97,8 +102,8 @@ auction['bids'] = [BID_ACTIVE_FIRST_WITH_DOCUMENT]
 AUCTION_WITH_BID_ACTIVE_WITH_DOCUMENT = auction
 
 # auction in end 'active.enquiry' with two bid in status 'active'
-now = get_now()
-calculator = Calculator(now, 'enquiryPeriod', 'end')
+enquiry_end = set_specific_hour(get_now(), 20)
+calculator = Calculator(enquiry_end, 'enquiryPeriod', 'end')
 auction = deepcopy(AUCTION)
 auction['status'] = 'active.enquiry'
 auction["rectificationPeriod"] = {

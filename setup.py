@@ -11,6 +11,13 @@ entry_points = {
     ]
 }
 
+test_requires = [
+    'webtest',
+    'python-coveralls',
+    'mock',
+    'munch',
+    'freezegun'
+]
 
 setup(name='openprocurement.auctions.geb',
       version=version,
@@ -23,6 +30,8 @@ setup(name='openprocurement.auctions.geb',
         ],
       keywords='',
       author='Quintagroup, Ltd.',
+      tests_require=test_requires,
+      extras_require={'test': test_requires},
       author_email='info@quintagroup.com',
       license='Apache License 2.0',
       url='https://github.com/openprocurement/openprocurement.auctions.geb',
