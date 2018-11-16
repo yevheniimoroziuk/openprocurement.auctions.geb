@@ -196,6 +196,60 @@ def organizer_rejection_award(test_case):
     test_case.app.authorization = auth
 
 
+def winner_rejection_award(test_case):
+    # winner can`t reject award
+
+    auth = test_case.app.authorization
+
+    # organizer upload rejection protocol
+    document = deepcopy(test_document_data)
+    document['documentType'] = 'rejectionProtocol'
+    url = test_case.generate_docservice_url(),
+    document['url'] = url[0]
+
+    request_data = {'data': document}
+    response = test_case.app.post_json(test_case.ENTRYPOINTS['award_document_post'], request_data)
+
+    # auth as bid owner
+    test_case.app.authorization = ('Basic', ('{}'.format(test_case.bid['access']['owner']), ''))
+
+    # try to reject award
+    request_data = {"data": {"status": "unsuccessful"}}
+    pattern = '/auctions/{}/awards/{}?acc_token={}'
+    entrypoint = pattern.format(test_case.auction['data']['id'],
+                                test_case.award['data']['id'],
+                                test_case.bid['access']['token'])
+    response = test_case.app.patch_json(entrypoint, request_data, status=403)
+
+    test_case.assertEqual(response.status, '403 Forbidden')
+    test_case.app.authorization = auth
+
+
+def winner_upload_rejection_protocol(test_case):
+    # winner can`t upload rejection protocol
+
+    auth = test_case.app.authorization
+
+    # auth as bid owner
+    test_case.app.authorization = ('Basic', ('{}'.format(test_case.bid['access']['owner']), ''))
+
+    document = deepcopy(test_document_data)
+    document['documentType'] = 'rejectionProtocol'
+    url = test_case.generate_docservice_url(),
+    document['url'] = url[0]
+
+    request_data = {'data': document}
+
+    pattern = '/auctions/{}/awards/{}/documents?acc_token={}'
+    entrypoint = pattern.format(test_case.auction['data']['id'],
+                                test_case.award['data']['id'],
+                                test_case.bid['access']['token'])
+    response = test_case.app.post_json(entrypoint, request_data, status=403)
+
+    test_case.assertEqual(response.status, '403 Forbidden')
+    test_case.app.authorization = auth
+
+
 def dump_organizer_activate_award(test_case):
     document = deepcopy(test_document_data)
     document['documentType'] = 'auctionProtocol'
