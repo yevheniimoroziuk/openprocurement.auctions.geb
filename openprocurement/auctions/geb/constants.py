@@ -63,6 +63,11 @@ AUCTION_STATUSES_FOR_DELETING_BIDS = [
     'active.enquiry'
 ]
 
+# in this auction resource statuses can patch auction fields
+AUCTION_STATUSES_FOR_PATCHING_AUCTION = [
+    'active.rectification'
+]
+
 # in this auction resource statuses can patch bids
 AUCTION_STATUSES_FOR_PATCHING_BIDS = [
     'active.tendering',

@@ -23,6 +23,7 @@ from openprocurement.auctions.geb.constants import (
     AUCTION_STATUSES_FOR_CHANGING_QUESTIONS,
     AUCTION_STATUSES_FOR_DELETING_BIDS,
     AUCTION_STATUSES_FOR_MODULE_AUCTION_ADDING_DOCUMENTS,
+    AUCTION_STATUSES_FOR_PATCHING_AUCTION,
     AUCTION_STATUSES_FOR_PATCHING_BIDS,
     AUCTION_STATUSES_FOR_PATCHING_DOCUMENTS_STATUSES,
     AUCTION_STATUSES_FOR_PUT_DOCUMENTS_STATUSES,
@@ -98,6 +99,12 @@ def validate_patch_data(request, model, data):
         request.errors.add('body', 'data', err.message)
         request.errors.status = 422
         raise error_handler(request)
+
+
+def validate_patch_resource_data(request, **kwargs):
+    data = validate_json_data(request)
+    validate_patch_data(request, request.context.__class__, data)
+
 
 # patch bid validators
 
@@ -226,12 +233,49 @@ def validate_bid_delete_period(request, **kwargs):
         return False
     return True
 
+
 # patch auction validators
 
+def validate_auction_patch_phase_commit(request, **kwargs):
+    auction = kwargs['auction']
+    new_status = request.validated['json_data'].get('status')
+    status = auction.status
 
-def validate_patch_auction_data(request, **kwargs):
-    data = validate_json_data(request)
-    validate_patch_data(request, request.context.__class__, data)
+    if new_status != 'active.rectification' and status == 'draft':
+        err_msg = 'Can\'t switch to ({}) only to active.rectification'.format(new_status)
+        request.errors.add('body', 'data', err_msg)
+        request.errors.status = 403
+        return False
+    return True
+
+
+def validate_auction_patch_period(request, **kwargs):
+    # validate auction patch fields
+
+    auction = kwargs['auction']
+    status = auction['status']
+    patch_data = request.validated['data']
+
+    # if it is Adminsrtator patch, he can patch
+    if request.authenticated_role == 'Adminsrtator':
+        return True
+
+    # if it is Chronograph patch, he can patch
+    if request.authenticated_role == 'chronograph':
+        return True
+
+    # if it is activation of auction
+    # Organizer in 'draft' patch status to 'active.rectification'
+    if status == 'draft' and patch_data.get('status') == 'active.rectification':
+        return True
+
+    # if it is Organizator patch, he can patch only in 'active.rectification'
+    if status not in AUCTION_STATUSES_FOR_PATCHING_AUCTION:
+        err_msg = 'Can\'t patch auction in current ({}) auction status'.format(status)
+        request.errors.add('body', 'data', err_msg)
+        request.errors.status = 403
+        return False
+    return True
 
 
 def validate_document_adding_period(request):
@@ -314,19 +358,6 @@ def validate_bid_status_for_adding_bid_document(request, **kwargs):
         request.errors.add('body', 'data', err_msg)
         request.errors.status = 403
         return
-    return True
-
-
-def validate_phase_commit(request, **kwargs):
-    auction = kwargs['auction']
-    new_status = request.validated['json_data'].get('status')
-    status = auction.status
-
-    if new_status != 'active.rectification' and status == 'draft':
-        err_msg = 'Can\'t switch to ({}) only to active.rectification'.format(new_status)
-        request.errors.add('body', 'data', err_msg)
-        request.errors.status = 403
-        return False
     return True
 
 

@@ -23,7 +23,9 @@ from openprocurement.auctions.geb.managers.utils import (
 from openprocurement.auctions.geb.validation import (
     validate_question_changing_period,
     validate_item_changing_period,
-    validate_phase_commit,
+    # patch auction validators
+    validate_auction_patch_phase_commit,
+    validate_auction_patch_period,
     # patch auction document validators
     validate_period_auction_document_patch,
     # put auction document validators
@@ -43,7 +45,10 @@ from openprocurement.auctions.geb.managers.initializators import (
 @implementer(IAuctionChanger)
 class AuctionChanger(object):
     name = 'Auction Changer'
-    validators = [validate_phase_commit]
+    validators = [
+        validate_auction_patch_phase_commit,
+        validate_auction_patch_period
+    ]
 
     def __init__(self, request, context):
         self._request = request

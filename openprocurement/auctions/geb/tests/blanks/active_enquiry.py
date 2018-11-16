@@ -103,7 +103,11 @@ def auction_change_fields(test_case):
     new_data[field] = new_value
 
     request_data = {"data": new_data}
-    test_case.app.patch_json(test_case.ENTRYPOINTS['patch_auction'], request_data)
+    response = test_case.app.patch_json(test_case.ENTRYPOINTS['patch_auction'], request_data, status=403)
+    errors = response.json.get('errors')
+    test_case.assertIsNotNone(errors)
+
+    # ceck if field don`t change
     response = test_case.app.get(test_case.ENTRYPOINTS['get_auction'])
     auction = response.json['data']
 

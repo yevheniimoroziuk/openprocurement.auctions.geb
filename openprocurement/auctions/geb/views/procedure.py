@@ -11,7 +11,7 @@ from openprocurement.auctions.core.interfaces import (
     IAuctionManager
 )
 from openprocurement.auctions.geb.validation import (
-    validate_patch_auction_data
+    validate_patch_resource_data
 )
 
 
@@ -19,7 +19,7 @@ from openprocurement.auctions.geb.validation import (
 class AuctionResource(AuctionResource):
 
     @json_view(content_type="application/json",
-               validators=(validate_patch_auction_data,),
+               validators=(validate_patch_resource_data,),
                permission='edit_auction')
     def patch(self):
         save = False
