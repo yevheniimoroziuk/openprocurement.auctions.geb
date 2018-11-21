@@ -8,7 +8,7 @@ from openprocurement.auctions.core.views.mixins import (
     APIResource
 )
 from openprocurement.auctions.geb.validation import (
-    validate_patch_auction_data
+    validate_patch_resource_data
 )
 from openprocurement.auctions.core.interfaces import (
     IAuctionManager
@@ -20,7 +20,7 @@ from openprocurement.auctions.core.interfaces import (
             auctionsprocurementMethodType="geb")
 class AuctionAuctionResource(APIResource):
 
-    @json_view(content_type="application/json", permission='auction', validators=(validate_patch_auction_data))
+    @json_view(content_type="application/json", permission='auction', validators=(validate_patch_resource_data))
     def post(self):
         manager = self.request.registry.queryMultiAdapter((self.request, self.context), IAuctionManager)
 
@@ -42,7 +42,7 @@ class AuctionAuctionResource(APIResource):
             return
         return {'data': self.request.validated['auction'].serialize("auction_view")}
 
-    @json_view(content_type="application/json", permission='auction', validators=(validate_patch_auction_data,))
+    @json_view(content_type="application/json", permission='auction', validators=(validate_patch_resource_data,))
     def patch(self):
         manager = self.request.registry.queryMultiAdapter((self.request, self.context), IAuctionManager)
 

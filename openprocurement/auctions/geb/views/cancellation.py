@@ -13,7 +13,7 @@ from openprocurement.auctions.core.validation import (
     validate_cancellation_data,
 )
 from openprocurement.auctions.geb.validation import (
-    validate_patch_auction_data
+    validate_patch_resource_data
 )
 
 
@@ -58,7 +58,7 @@ class AuctionCancellationResource(APIResource):
         manager = self.request.registry.queryMultiAdapter((self.request, self.context), ICancellationManager)
         return manager.represent(self.request.method)
 
-    @json_view(content_type="application/json", validators=(validate_patch_auction_data,),
+    @json_view(content_type="application/json", validators=(validate_patch_resource_data,),
                permission='edit_auction')
     def patch(self):
         """
