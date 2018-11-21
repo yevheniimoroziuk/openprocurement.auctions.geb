@@ -113,7 +113,7 @@ def organizer_activate_award(test_case):
     request_data = {"data": {"status": "active"}}
 
     auth = test_case.app.authorization
-    test_case.app.authorization = ('Basic', ('{}'.format(test_case.bid['access']['owner']), ''))
+    test_case.app.authorization = ('Basic', ('{}'.format(test_case.auction['access']['owner']), ''))
     response = test_case.app.patch_json(test_case.ENTRYPOINTS['award_patch'], request_data)
     test_case.app.authorization = auth
     test_case.assertEqual(expected_http_status, response.status)
@@ -150,6 +150,25 @@ def organizer_activate_award(test_case):
 
     end_date = parse_date(auction['awardPeriod']['endDate']).replace(second=0, microsecond=0)
     test_case.assertEqual(end_date, now)
+
+
+def winner_activate_award(test_case):
+    """
+        winner can`t activate award
+    """
+    auth = test_case.app.authorization
+    test_case.app.authorization = ('Basic', ('{}'.format(test_case.bid['access']['owner']), ''))
+
+    expected_http_status = '403 Forbidden'
+    request_data = {"data": {"status": "active"}}
+    pattern = '/auctions/{}/awards/{}?acc_token={}'
+    entrypoint = pattern.format(test_case.auction['data']['id'],
+                                test_case.award['data']['id'],
+                                test_case.bid['access']['token'])
+    response = test_case.app.patch_json(entrypoint, request_data, status=403)
+    test_case.assertEqual(expected_http_status, response.status)
+
+    test_case.app.authorization = auth
 
 
 def organizer_rejection_award(test_case):
