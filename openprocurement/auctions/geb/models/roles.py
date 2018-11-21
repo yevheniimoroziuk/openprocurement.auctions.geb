@@ -219,12 +219,13 @@ auction_edit_rectification_role = whitelist(
 )
 
 question_enquiry_role = whitelist(
+    'answer',
     'date',
-    'title',
     'description',
+    'id',
     'questionOf',
     'relatedItem',
-    'id'
+    'title'
 )
 question_rectification_role = question_enquiry_role
 

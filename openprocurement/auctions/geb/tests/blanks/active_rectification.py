@@ -450,16 +450,21 @@ def add_question(test_case):
 
 def answer_question(test_case):
     expected_http_status = '200 OK'
+    answer = 'This is very original answer'
 
-    request_data = {"data": {"answer": "Test answer"}}
+    request_data = {"data": {"answer": answer}}
     response = test_case.app.patch_json(test_case.ENTRYPOINTS['patch_question'], request_data)
-
     test_case.assertEqual(response.status, expected_http_status)
+
+    # check answer
+    response = test_case.app.get(test_case.ENTRYPOINTS['get_question'])
+    question = response.json['data']
+    test_case.assertEqual(question['answer'], answer)
 
 
 def get_question(test_case):
     expected_http_status = '200 OK'
 
-    response = test_case.app.get(test_case.ENTRYPOINTS['question'])
+    response = test_case.app.get(test_case.ENTRYPOINTS['get_question'])
 
     test_case.assertEqual(response.status, expected_http_status)

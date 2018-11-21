@@ -126,8 +126,8 @@ class StatusActiveRectificationQuestionsTest(BaseWebTest):
                                                                                         self.question['data']['id'],
                                                                                         self.auction['access']['token'])
 
-        entrypoints['question'] = '/auctions/{}/questions/{}'.format(self.auction['data']['id'],
-                                                                     self.question['data']['id'])
+        entrypoints['get_question'] = '/auctions/{}/questions/{}'.format(self.auction['data']['id'],
+                                                                         self.question['data']['id'])
         self.ENTRYPOINTS = entrypoints
 
 
