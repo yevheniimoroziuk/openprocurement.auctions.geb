@@ -116,7 +116,18 @@ class StatusActiveTenderingQuestionsTest(BaseWebTest):
         context = procedure.snapshot(fixture=AUCTION_WITH_QUESTIONS)
 
         self.auction = context['auction']
-        self.questions = context['questions']
+        self.question = context['questions'][0]
+
+        entrypoints = {}
+
+        entrypoints['patch_question'] = '/auctions/{}/questions/{}?acc_token={}'.format(self.auction['data']['id'],
+                                                                                        self.question['data']['id'],
+                                                                                        self.auction['access']['token'])
+
+        entrypoints['get_question'] = '/auctions/{}/questions/{}'.format(self.auction['data']['id'],
+                                                                         self.question['data']['id'])
+
+        self.ENTRYPOINTS = entrypoints
 
 
 class StatusActiveTenderingDraftBidsTest(BaseWebTest):

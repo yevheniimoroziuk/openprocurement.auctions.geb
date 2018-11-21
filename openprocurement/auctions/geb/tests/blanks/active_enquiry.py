@@ -262,23 +262,23 @@ def add_question_to_item(test_case):
 
 def answer_question(test_case):
     expected_http_status = '200 OK'
+    answer = 'This is very original answer'
 
-    entrypoint = '/auctions/{}/questions/{}?acc_token={}'.format(test_case.auction['data']['id'],
-                                                                 test_case.questions[0]['data']['id'],
-                                                                 test_case.auction['access']['token'])
-
-    request_data = {"data": {"answer": "Test answer"}}
-    response = test_case.app.patch_json(entrypoint, request_data)
+    request_data = {"data": {"answer": answer}}
+    response = test_case.app.patch_json(test_case.ENTRYPOINTS['patch_question'], request_data)
     test_case.assertEqual(response.status, expected_http_status)
+
+    # check answer
+    response = test_case.app.get(test_case.ENTRYPOINTS['get_question'])
+    question = response.json['data']
+    test_case.assertEqual(question['answer'], answer)
 
 
 def get_question(test_case):
     expected_http_status = '200 OK'
-    question = test_case.questions[0]
-    question_url_pattern = '/auctions/{auction}/questions/{question}'
-    question_url = question_url_pattern.format(auction=test_case.auction['data']['id'],
-                                               question=question['data']['id'])
-    response = test_case.app.get(question_url)
+
+    response = test_case.app.get(test_case.ENTRYPOINTS['get_question'])
+
     test_case.assertEqual(response.status, expected_http_status)
 
 
