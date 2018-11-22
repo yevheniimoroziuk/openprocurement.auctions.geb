@@ -23,12 +23,10 @@ class Awarding(AuctionConfigurator, BaseAwarding):
     pending_admission_for_one_bid = False
     NUMBER_OF_BIDS_TO_BE_QUALIFIED = 1
 
-    @property
     def verificationPeriod(self):
-        start_awarding = self.context.awardPeriod.startDate
+        start_awarding = get_now()
         auction_end_date = self.context.auctionPeriod.endDate
 
-        # set start_date
         start_date = start_awarding
 
         if auction_end_date:
@@ -48,8 +46,7 @@ class Awarding(AuctionConfigurator, BaseAwarding):
             # only 1 bid was in status 'active'
             # after 'active.enquiry' auction switch to 'active.qualification'
             # verificationPeriod start after end of enquiryPeriod
-            now = get_now()
-            end_date = cbd(now,
+            end_date = cbd(start_awarding,
                            timedelta(days=1),
                            self.context,
                            specific_hour=18,
@@ -62,9 +59,8 @@ class Awarding(AuctionConfigurator, BaseAwarding):
         self.verification_period = verification_period
         return verification_period
 
-    @property
     def signingPeriod(self):
-        start_awarding = self.context.awardPeriod.startDate
+        start_awarding = get_now()
         auction_end_date = self.context.auctionPeriod.endDate
         verification_end_date = self.verification_period['endDate']
 
