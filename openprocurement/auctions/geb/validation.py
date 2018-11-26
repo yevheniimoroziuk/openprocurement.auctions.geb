@@ -445,3 +445,18 @@ def validate_item_changing_period(request, **kwargs):
         request.errors.status = 403
         return False
     return True
+
+
+def validate_auction_patch_blank_items(request, **kwargs):
+    """
+        Validate period in which can edit auction item
+    """
+    patch_data = request.validated['json_data']
+    items = patch_data.get('items')
+
+    if 'items' in patch_data and (not items or (type(items) == list and len(items) == 0)):
+        err_msg = 'Can`t change items, at least there should be one'
+        request.errors.add('body', 'data', err_msg)
+        request.errors.status = 403
+        return False
+    return True

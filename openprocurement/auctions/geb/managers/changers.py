@@ -34,7 +34,8 @@ from openprocurement.auctions.geb.validation import (
     validate_bid_patch_draft,
     validate_bid_patch_pending,
     validate_bid_patch_active,
-    validate_bid_patch_auction_period
+    validate_bid_patch_auction_period,
+    validate_auction_patch_blank_items
 )
 
 from openprocurement.auctions.geb.managers.initializators import (
@@ -47,6 +48,7 @@ class AuctionChanger(object):
     name = 'Auction Changer'
     validators = [
         validate_auction_patch_phase_commit,
+        validate_auction_patch_blank_items,
         validate_auction_patch_period
     ]
 
