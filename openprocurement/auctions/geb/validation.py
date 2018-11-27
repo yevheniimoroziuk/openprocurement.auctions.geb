@@ -241,11 +241,58 @@ def validate_auction_patch_phase_commit(request, **kwargs):
     new_status = request.validated['json_data'].get('status')
     status = auction.status
 
+    if not new_status:
+        return True
+
     if new_status != 'active.rectification' and status == 'draft':
         err_msg = 'Can\'t switch to ({}) only to active.rectification'.format(new_status)
         request.errors.add('body', 'data', err_msg)
         request.errors.status = 403
         return False
+
+    if len(auction.items) < 1:
+        err_msg = 'Can\'t switch to ({}) without items'.format(new_status)
+        request.errors.add('body', 'data', err_msg)
+        request.errors.status = 403
+        return False
+    return True
+
+
+def validate_auction_patch_rectification(request, **kwargs):
+
+    auction = kwargs['auction']
+
+    if auction.status != 'active.rectification':
+        return True
+
+    # validate period in which can edit auction item
+    patch_data = request.validated['json_data']
+    items = patch_data.get('items')
+    if 'items' in patch_data and (not items or (type(items) == list and len(items) == 0)):
+        err_msg = 'Can`t change items, at least there should be one'
+        request.errors.add('body', 'data', err_msg)
+        request.errors.status = 403
+        return False
+    return True
+
+
+def validate_auction_patch_draft(request, **kwargs):
+    auction = kwargs['auction']
+    new_status = request.validated['json_data'].get('status')
+    new_items = request.validated['json_data'].get('items')
+
+    if auction.status != 'draft':
+        return True
+
+    if new_status:
+        return True
+
+    if new_items is None:
+        err_msg = "In status 'draft' can`t change fields except ['status', 'items']".format(new_status)
+        request.errors.add('body', 'data', err_msg)
+        request.errors.status = 403
+        return False
+
     return True
 
 
@@ -254,19 +301,13 @@ def validate_auction_patch_period(request, **kwargs):
 
     auction = kwargs['auction']
     status = auction['status']
-    patch_data = request.validated['data']
 
     # if it is Adminsrtator patch, he can patch
-    if request.authenticated_role == 'Adminsrtator':
+    if request.authenticated_role == 'Administrator':
         return True
 
     # if it is Chronograph patch, he can patch
     if request.authenticated_role == 'chronograph':
-        return True
-
-    # if it is activation of auction
-    # Organizer in 'draft' patch status to 'active.rectification'
-    if status == 'draft' and patch_data.get('status') == 'active.rectification':
         return True
 
     # if it is Organizator patch, he can patch only in 'active.rectification'
@@ -441,21 +482,6 @@ def validate_item_changing_period(request, **kwargs):
 
     if auction.status not in AUCTION_STATUSES_FOR_CHANGING_ITEMS:
         err_msg = 'Can update question only in {}'.format(AUCTION_STATUSES_FOR_CHANGING_ITEMS)
-        request.errors.add('body', 'data', err_msg)
-        request.errors.status = 403
-        return False
-    return True
-
-
-def validate_auction_patch_blank_items(request, **kwargs):
-    """
-        Validate period in which can edit auction item
-    """
-    patch_data = request.validated['json_data']
-    items = patch_data.get('items')
-
-    if 'items' in patch_data and (not items or (type(items) == list and len(items) == 0)):
-        err_msg = 'Can`t change items, at least there should be one'
         request.errors.add('body', 'data', err_msg)
         request.errors.status = 403
         return False

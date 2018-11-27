@@ -65,6 +65,7 @@ AUCTION_STATUSES_FOR_DELETING_BIDS = [
 
 # in this auction resource statuses can patch auction fields
 AUCTION_STATUSES_FOR_PATCHING_AUCTION = [
+    'draft',
     'active.rectification'
 ]
 
