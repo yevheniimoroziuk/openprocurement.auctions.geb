@@ -1,4 +1,6 @@
 # -*- coding: utf-8 -*-
+from datetime import timedelta
+
 from schematics.exceptions import (
     ModelValidationError,
     ModelConversionError,
@@ -13,9 +15,11 @@ from openprocurement.auctions.core.validation import (
 
 from openprocurement.auctions.core.utils import (
     get_now,
-    apply_data_patch
+    apply_data_patch,
+    calculate_business_date as cbd
 )
 from openprocurement.auctions.geb.constants import (
+    AUCTION_RECTIFICATION_PERIOD_DURATION,
     AUCTION_STATUSES_FOR_ADDING_BID_DOCUMENTS,
     AUCTION_STATUSES_FOR_ADDING_DOCUMENTS,
     AUCTION_STATUSES_FOR_ADDING_QUESTIONS,
@@ -110,6 +114,9 @@ def validate_patch_resource_data(request, **kwargs):
 
 
 def validate_bid_patch_auction_period(request, **kwargs):
+    """
+        validate in which auction periods, can patch bid
+    """
     if request.authenticated_role == 'Administrator':
         return True
 
@@ -121,7 +128,10 @@ def validate_bid_patch_auction_period(request, **kwargs):
     return True
 
 
-def validate_bid_patch_draft(request, **kwargs):
+def validate_bid_activation(request, **kwargs):
+    """
+        validate bid activation(patch status to 'pending')
+    """
 
     # check if it administrator bacause he can do everything
     if request.authenticated_role == 'Administrator':
@@ -129,7 +139,7 @@ def validate_bid_patch_draft(request, **kwargs):
 
     # check if it is valid two-phase commit
     new_status = request.validated['json_data'].get('status')
-    if not new_status or new_status != 'pending':
+    if new_status != 'pending':
         err_msg = 'Can\'t update bid, in draft status are only valid change status to pending'
         request.errors.add('body', 'data', err_msg)
         request.errors.status = 403
@@ -137,25 +147,16 @@ def validate_bid_patch_draft(request, **kwargs):
     return True
 
 
-def validate_bid_patch_pending(request, **kwargs):
+def validate_bid_patch_pending_make_active_status(request, **kwargs):
+    """
+        validate patch bid(make status 'active')
+    """
 
     # check if it administrator bacause he can do everything
     if request.authenticated_role == 'Administrator':
         return True
 
-    # check if it is patch status, only to active can switch
-    new_status = request.validated['json_data'].get('status')
-    if new_status and new_status != 'active':
-        err_msg = 'Can`t update bid status. You can only switch from pending to active.'
-        request.errors.add('body', 'data', err_msg)
-        request.errors.status = 403
-        return False
-
-    # validate activation of bid
-    if not new_status:
-        return True
-
-    bid = kwargs['bid']
+    bid = kwargs['context']
     auction = kwargs['auction']
 
     now = get_now()
@@ -188,7 +189,51 @@ def validate_bid_patch_pending(request, **kwargs):
     return True
 
 
+def validate_bid_patch_pending(request, **kwargs):
+    """
+        validate bid patch in 'pending' status
+    """
+
+    # check if it administrator bacause he can do everything
+    if request.authenticated_role == 'Administrator':
+        return True
+
+    # check if it is patch status, only to active can switch
+    new_status = request.validated['json_data'].get('status')
+    if new_status and new_status != 'active':
+        err_msg = 'Can`t update bid status. You can only switch from pending to active.'
+        request.errors.add('body', 'data', err_msg)
+        request.errors.status = 403
+        return False
+
+    return True
+
+
+def validate_bid_patch_draft(request, **kwargs):
+    """
+        validate bid patch in 'draft' status
+    """
+
+    # check if it administrator bacause he can do everything
+    if request.authenticated_role == 'Administrator':
+        return True
+
+    # in bid status 'draft' can`t patch bid
+    # only can change status to 'pending'
+    patch_data = request.validated['json_data']
+    if patch_data.keys() != ['status']:
+        err_msg = 'Can\'t update bid status, in bid active status'
+        request.errors.add('body', 'data', err_msg)
+        request.errors.status = 403
+        return False
+
+    return True
+
+
 def validate_bid_patch_active(request, **kwargs):
+    """
+        validate bid patch in 'active' status
+    """
 
     # check if it administrator bacause he can do everything
     if request.authenticated_role == 'Administrator':
@@ -236,20 +281,40 @@ def validate_bid_delete_period(request, **kwargs):
 
 # patch auction validators
 
-def validate_auction_patch_phase_commit(request, **kwargs):
-    auction = kwargs['auction']
+def validate_auction_patch_draft(request, **kwargs):
+    """
+        Validate patch auction in 'draft' status
+    """
+
     new_status = request.validated['json_data'].get('status')
-    status = auction.status
+    new_items = request.validated['json_data'].get('items')
 
-    if not new_status:
-        return True
-
-    if new_status != 'active.rectification' and status == 'draft':
-        err_msg = 'Can\'t switch to ({}) only to active.rectification'.format(new_status)
+    # can switch only to 'active.rectification'
+    if new_status and new_status != 'active.rectification':
+        err_msg = "Can\'t switch to ({}) only to status 'active.rectification'".format(new_status)
         request.errors.add('body', 'data', err_msg)
         request.errors.status = 403
         return False
 
+    # in status 'draft' can patch items
+    if not new_status and new_items is None:
+        err_msg = "In status 'draft' can`t change fields except ['status', 'items']".format(new_status)
+        request.errors.add('body', 'data', err_msg)
+        request.errors.status = 403
+        return False
+
+    return True
+
+
+def validate_auction_patch_phase_commit(request, **kwargs):
+    """
+        Validate patch auction phase commit
+    """
+
+    auction = kwargs['context']
+    new_status = request.validated['json_data'].get('status')
+
+    # after status 'draft' at least there should be one item
     if len(auction.items) < 1:
         err_msg = 'Can\'t switch to ({}) without items'.format(new_status)
         request.errors.add('body', 'data', err_msg)
@@ -258,17 +323,48 @@ def validate_auction_patch_phase_commit(request, **kwargs):
     return True
 
 
+def validate_auction_patch_phase_commit_auction_period(request, **kwargs):
+    """
+        Validate patch auction phase commit
+        check created auctionPeriod.startDate
+    """
+    auction = kwargs['context']
+    now = get_now()
+
+    # check enquiryPeriod
+    start_date = now
+    end_date = cbd(auction.auctionPeriod.startDate, -timedelta(days=1), auction, specific_hour=20)
+
+    if start_date > end_date:
+        err_msg = 'auctionPeriod.startDate is incorrect, it does not allow to create periods correctly'
+        request.errors.add('body', 'data', err_msg)
+        request.errors.status = 403
+        return False
+
+    # check tenderPeriod
+    rectification_end_date = cbd(now, AUCTION_RECTIFICATION_PERIOD_DURATION, auction)
+    start_date = rectification_end_date
+    end_date = cbd(auction.auctionPeriod.startDate, -timedelta(days=4), auction, specific_hour=20, working_days=True)
+
+    if start_date > end_date:
+        err_msg = 'auctionPeriod.startDate is incorrect, it does not allow to create periods correctly'
+        request.errors.add('body', 'data', err_msg)
+        request.errors.status = 403
+        return False
+
+    return True
+
+
 def validate_auction_patch_rectification(request, **kwargs):
-
-    auction = kwargs['auction']
-
-    if auction.status != 'active.rectification':
-        return True
+    """
+        Validate patch auction in 'active.rectification'
+    """
 
     # validate period in which can edit auction item
+
     patch_data = request.validated['json_data']
     items = patch_data.get('items')
-    if 'items' in patch_data and not items:
+    if 'items' in patch_data and (not items or (type(items) == list and len(items) == 0)):
         err_msg = 'Can`t change items, at least there should be one'
         request.errors.add('body', 'data', err_msg)
         request.errors.status = 403
@@ -276,32 +372,10 @@ def validate_auction_patch_rectification(request, **kwargs):
     return True
 
 
-def validate_auction_patch_draft(request, **kwargs):
-    auction = kwargs['auction']
-    expected_data = ('items', 'status')
-    json_data = set(request.validated['json_data'].keys())
-
-    if request.authenticated_role == 'Administrator':
-        return True
-
-    if auction.status != 'draft':
-        return True
-
-    difference = json_data.difference(expected_data)
-
-    if difference and difference not in expected_data:
-        err_msg = "In status 'draft' can change only fields ['status', 'items']"
-        request.errors.add('body', 'data', err_msg)
-        request.errors.status = 403
-        return False
-
-    return True
-
-
 def validate_auction_patch_period(request, **kwargs):
     # validate auction patch fields
 
-    auction = kwargs['auction']
+    auction = kwargs['context']
     status = auction['status']
 
     # if it is Adminsrtator patch, he can patch
@@ -319,6 +393,13 @@ def validate_auction_patch_period(request, **kwargs):
         request.errors.status = 403
         return False
     return True
+
+# patch bid validators
+
+
+def validate_patch_bid_data(request, **kwargs):
+    data = validate_json_data(request)
+    validate_patch_data(request, request.context.__class__, data)
 
 
 def validate_document_adding_period(request):
@@ -349,7 +430,10 @@ def validate_question_adding_period(request):
     return True
 
 
-def validate_question_changing_period(request, **kwargs):
+def validate_patch_questions(request, **kwargs):
+    """
+        Validate patch questions
+    """
     auction = kwargs['auction']
 
     if auction.status not in AUCTION_STATUSES_FOR_CHANGING_QUESTIONS:
@@ -367,7 +451,7 @@ def cav_ps_code_validator(data, code):
 # auction post validators
 
 
-def validate_auction_post_correct_auctionPeriod(request):
+def validate_auction_post_correct_auctionPeriod(request, **kwargs):
     """
         check if auction initial data has auctionPeriod.startDate
         auctionPeriod.startDate is required for creating auction
@@ -404,15 +488,15 @@ def validate_bid_status_for_adding_bid_document(request, **kwargs):
     return True
 
 
-def validate_bid_initialization(request):
-    new_status = request.validated['json_data'].get('status')
-    if new_status != 'pending':
-        return False
-    return True
+# validate module auction actions
 
 
-def validate_auction_auction_status(request):
-    auction = request.context
+def validate_auction_auction_status(request, **kwargs):
+    """
+        Validate in wich auction 'status'
+        module auction can  brings results, and update auction urls
+    """
+    auction = kwargs.get('context')
 
     if auction.status != 'active.auction':
         msg = 'Not valid auction status'
@@ -422,8 +506,12 @@ def validate_auction_auction_status(request):
     return True
 
 
-def validate_auction_number_of_bids(request):
-    auction = request.context
+def validate_auction_number_of_bids(request, **kwargs):
+    """
+        Validate correctness of request data
+        check number of bids
+    """
+    auction = kwargs.get('context')
     bids = request.validated['data'].get('bids', [])
 
     if len(bids) != len(auction.bids):
@@ -434,8 +522,12 @@ def validate_auction_number_of_bids(request):
     return True
 
 
-def validate_auction_identity_of_bids(request):
-    auction = request.context
+def validate_auction_identity_of_bids(request, **kwargs):
+    """
+        When module auction update auction urls or brings results
+        check patch data for adentity to auction.bids.
+    """
+    auction = kwargs.get('context')
     bids = request.validated['data'].get('bids', [])
 
     if set([bid['id'] for bid in bids]) != set([bid.id for bid in auction.bids]):
@@ -448,12 +540,13 @@ def validate_auction_identity_of_bids(request):
 # auction document validators
 
 
-def validate_period_auction_document_patch(request, **kwargs):
+def validate_auction_document_patch(request, **kwargs):
     """
-    Validate period in which can edit auction document
+        Validate patch auction document
     """
     auction = kwargs['auction']
 
+    # check auction period for put auction document
     if auction.status not in AUCTION_STATUSES_FOR_PATCHING_DOCUMENTS_STATUSES:
         err_msg = 'Can`t update document in {}'.format(auction.status)
         request.errors.add('body', 'data', err_msg)
@@ -462,12 +555,13 @@ def validate_period_auction_document_patch(request, **kwargs):
     return True
 
 
-def validate_period_auction_document_put(request, **kwargs):
+def validate_auction_document_put(request, **kwargs):
     """
-    Validate period in which can put auction document
+        Validate patch auction document
     """
     auction = kwargs['auction']
 
+    # check auction period for put auction document
     if auction.status not in AUCTION_STATUSES_FOR_PUT_DOCUMENTS_STATUSES:
         err_msg = 'Can update document only in {}'.format(AUCTION_STATUSES_FOR_PUT_DOCUMENTS_STATUSES)
         request.errors.add('body', 'data', err_msg)
@@ -476,7 +570,9 @@ def validate_period_auction_document_put(request, **kwargs):
     return True
 
 
-def validate_item_changing_period(request, **kwargs):
+# patch item validators
+
+def validate_item_patch_auction_period(request, **kwargs):
     """
     Validate period in which can edit auction item
     """

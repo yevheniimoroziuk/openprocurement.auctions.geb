@@ -6,12 +6,12 @@ from openprocurement.auctions.geb.managers.main import (
     AuctionPartialManager,
     BidManager,
     BidDocumentManager,
-    DocumentManager,
+    AuctionDocumentManager,
     ItemManager,
     CancellationManager,
     QuestionManager
 )
-from openprocurement.auctions.geb.managers.main import (
+from openprocurement.auctions.geb.managers.awarding import (
     Awarding
 )
 from openprocurement.auctions.geb.constants import (
@@ -66,7 +66,7 @@ def includeme(config, plugin_map):
     config.registry.registerAdapter(QuestionManager, (IRequest, IQuestion), IQuestionManager)
     config.registry.registerAdapter(ItemManager, (IRequest, IItem), IItemManager)
     config.registry.registerAdapter(CancellationManager, (IRequest, ICancellation), ICancellationManager)
-    config.registry.registerAdapter(DocumentManager, (IRequest, IDocument), IDocumentManager)
+    config.registry.registerAdapter(AuctionDocumentManager, (IRequest, IDocument), IDocumentManager)
 
     LOGGER.info("Included openprocurement.auctions.geb plugin",
                 extra={'MESSAGE_ID': 'included_plugin'})

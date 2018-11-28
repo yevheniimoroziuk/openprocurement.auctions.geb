@@ -16,24 +16,25 @@ from openprocurement.auctions.geb.validation import (
     validate_bid_status_for_adding_bid_document,
     validate_document_adding_period,
     validate_question_adding_period,
-    # auction post validators
-    validate_auction_post_correct_auctionPeriod
 )
 from openprocurement.auctions.core.utils import (
     generate_auction_id,
-    get_now
+    get_now,
 )
 from openprocurement.auctions.geb.utils import (
     upload_file
 )
+from openprocurement.auctions.geb.managers.actions.auctions import (
+    AuctionCreateActionsFactory,
+)
 from openprocurement.auctions.geb.interfaces import (
-    IDocument,
-    IBidDocument,
-    ICancellationDocument,
     IAuction,
+    IBidDocument,
+    ICancellation,
+    ICancellationDocument,
+    IDocument,
     IItem,
-    IQuestion,
-    ICancellation
+    IQuestion
 )
 
 # resource creators
@@ -113,27 +114,25 @@ class CancellationDocumentCreator(object):
 @implementer(IAuctionCreator)
 class AuctionCreator(object):
     name = 'Auction Creator'
+    action_factory = AuctionCreateActionsFactory
     resource_interface = IAuction
-    validators = [
-        validate_auction_post_correct_auctionPeriod
-    ]
 
     def __init__(self, request, context):
         self._request = request
         self._context = context
 
-    def validate(self):
-        for validator in self.validators:
-            if not validator(self._request):
+    def _validate(self, validators):
+        for validator in validators:
+            if not validator(self._request, context=self._context):
                 return False
         return True
 
     def _generate_id(self):
         return uuid4().hex
 
-    def _systematize(self, applicant):
+    def _create(self, applicant):
         """
-            Expand applicant
+            Expand auction
             add required field:
                 - id
                 - auctionID
@@ -150,9 +149,14 @@ class AuctionCreator(object):
         return applicant
 
     def create(self, applicant):
-        if self.validate():
-            auction = self._systematize(applicant)
-            return auction
+        factory = self.action_factory()
+        actions = factory.get_actions(self._request, self._context)
+        if actions:
+            if all([self._validate(action.validators) for action in actions]):
+                auction = self._create(applicant)
+                if auction:
+                    [action(self._request, self._context).act() for action in actions]
+                return auction
 
 
 @implementer(IAuctionItemCreator)

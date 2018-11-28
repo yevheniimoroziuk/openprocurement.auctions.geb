@@ -1,6 +1,5 @@
 import unittest
 from freezegun import freeze_time
-from mock import patch
 from copy import deepcopy
 from iso8601 import parse_date
 from datetime import timedelta
@@ -471,7 +470,7 @@ def switch_to_unsuccessful(test_case):
     # simulate valid auction time
     # set 'now' to 14:00 next day of auctionPeriod.startDate
     valid_auction_time = set_specific_hour(auction_start_date + timedelta(days=1), 14)
-    with patch('openprocurement.auctions.geb.managers.auctioneers.get_now', return_value=valid_auction_time):
+    with freeze_time(valid_auction_time):
         response = test_case.app.post_json(auction_url, {'data': request_data})
     test_case.assertEqual(response.status, expected_http_status)
 
@@ -509,7 +508,7 @@ def post_result_invalid_number_of_bids(test_case):
     # simulate valid auction time
     # set 'now' to 14:00 day of auctionPeriod.startDate
     valid_auction_time = set_specific_hour(auction_start_date, 14)
-    with patch('openprocurement.auctions.geb.managers.auctioneers.get_now', return_value=valid_auction_time):
+    with freeze_time(valid_auction_time):
         response = test_case.app.post_json(auction_url, {'data': request_data}, status=422)
     test_case.assertEqual(response.status, expected_http_status)
 

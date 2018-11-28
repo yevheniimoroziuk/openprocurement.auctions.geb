@@ -200,7 +200,7 @@ class AuctionAuctionPeriod(Period):
             expected_end_time_of_auction = calc_expected_auction_end_time(auctionPeriod.startDate)
             now = get_now()
             # check if auction not happen
-            if now > expected_end_time_of_auction:  # TODO test replaning
+            if now > expected_end_time_of_auction:
                 should_start_after = expected_end_time_of_auction
         return rounding_shouldStartAfter(should_start_after, auction).isoformat()
 

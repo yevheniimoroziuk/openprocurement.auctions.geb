@@ -8,26 +8,18 @@ from openprocurement.auctions.core.managers import (
     QuestionManager
 )
 
-from openprocurement.auctions.geb.managers.initializators import (
-    AuctionInitializator,
-    BidInitializator
-)
 from openprocurement.auctions.geb.managers.changers import (
     AuctionChanger,
-    BidChanger,
-    BidDocumentChanger,
-    DocumentChanger,
-    ItemChanger,
-    CancellationChanger,
-    QuestionChanger
+    BidPatchChanger,
+    BidDocumentPatchChanger,
+    CancellationPatchChanger,
+    ChronographChanger,
+    ItemPatchChanger,
+    ModuleAuctionChanger,
+    QuestionPatchChanger,
+    AuctionDocumentPatchChanger,
+    AuctionDocumentPutChanger
 )
-from openprocurement.auctions.geb.managers.awarding import (
-    Awarding
-)
-from openprocurement.auctions.geb.managers.checkers import (
-    AuctionChecker
-)
-
 from openprocurement.auctions.geb.managers.representers import (
     AuctionSubResourceRepresenter,
     BidRepresenter,
@@ -39,10 +31,6 @@ from openprocurement.auctions.geb.managers.representers import (
 from openprocurement.auctions.geb.managers.creators import (
     Creator
 )
-from openprocurement.auctions.geb.managers.auctioneers import (
-    Auctioneer
-)
-
 from openprocurement.auctions.geb.managers.deleters import (
     BidDeleter
 )
@@ -59,35 +47,37 @@ from openprocurement.auctions.core.adapters import (
 
 
 class AuctionManager(AuctionManager):
-    Auctioneer = Auctioneer
-    Changer = AuctionChanger
-    Checker = AuctionChecker
-    Creator = Creator
-    Initializator = AuctionInitializator
-    Logger = AuctionLogger
-    Awarding = Awarding
-    SubResourceRepresenter = AuctionSubResourceRepresenter
+    creator = Creator
+    logger = AuctionLogger
+    subResourceRepresenter = AuctionSubResourceRepresenter
+
+    @property
+    def changer(self):
+        if self._request.authenticated_role == 'auction':
+            return ModuleAuctionChanger
+        if self._request.authenticated_role == 'chronograph':
+            return ChronographChanger
+        return AuctionChanger
 
 
 class BidManager(BidManager):
-    Changer = BidChanger
+    changer = BidPatchChanger
     Deleter = BidDeleter
-    Initializator = BidInitializator
     Creator = Creator
     Representer = BidRepresenter
     Logger = BidLogger
 
 
 class BidDocumentManager(BidDocumentManager):
-    Changer = BidDocumentChanger
+    changer = BidDocumentPatchChanger
 
 
 class QuestionManager(QuestionManager):
-    Changer = QuestionChanger
+    Changer = QuestionPatchChanger
 
 
 class ItemManager(ItemManager):
-    Changer = ItemChanger
+    changer = ItemPatchChanger
     Representer = ItemRepresenter
     Logger = ItemLogger
     Creator = Creator
@@ -95,14 +85,19 @@ class ItemManager(ItemManager):
 
 class CancellationManager(CancellationManager):
     Creator = Creator
-    Changer = CancellationChanger
+    changer = CancellationPatchChanger
     Representer = CancellationRepresenter
     Logger = CancellationLogger
     SubResourceRepresenter = CancellationSubResourceRepresenter
 
 
-class DocumentManager(DocumentManager):
-    Changer = DocumentChanger
+class AuctionDocumentManager(DocumentManager):
+
+    @property
+    def changer(self):
+        if self._request.method == 'PUT':
+            return AuctionDocumentPutChanger
+        return AuctionDocumentPatchChanger
 
 
 class AuctionPartialManager(AuctionManagerAdapter):

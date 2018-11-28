@@ -24,17 +24,16 @@ class AuctionAuctionResource(APIResource):
     def post(self):
         manager = self.request.registry.queryMultiAdapter((self.request, self.context), IAuctionManager)
 
-        manager.auction_report()
-        manager.award()
-
+        manager.report()
         save = manager.save()
+
         if save:
             extra = context_unpack(self.request, {'MESSAGE_ID': 'auction_auction_post'})
             self.LOGGER.info('Report auction results', extra=extra)
             return {'data': self.request.validated['auction'].serialize("auction_view")}
 
     @json_view(permission='auction')
-    def get(self):
+    def get(self):                                                              # TODO refactoring
         if self.request.validated['auction_status'] != 'active.auction':
             self.request.errors.add('body', 'data', 'Can\'t get auction info in current ({}) auction status'.format(
                 self.request.validated['auction_status']))
@@ -46,7 +45,7 @@ class AuctionAuctionResource(APIResource):
     def patch(self):
         manager = self.request.registry.queryMultiAdapter((self.request, self.context), IAuctionManager)
 
-        manager.update_auction_urls()
+        manager.change()
         save = manager.save()
 
         if save:

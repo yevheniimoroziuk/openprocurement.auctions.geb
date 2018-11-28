@@ -4,7 +4,7 @@ from openprocurement.auctions.core.utils import (
     json_view
 )
 from openprocurement.auctions.core.views.mixins import AuctionBidResource
-from openprocurement.auctions.core.validation import (
+from openprocurement.auctions.geb.validation import (
     validate_patch_bid_data
 )
 from openprocurement.auctions.core.interfaces import (
@@ -26,7 +26,6 @@ class AuctionBidResource(AuctionBidResource):
         manager = self.request.registry.queryMultiAdapter((self.request, self.context), IBidManager)
 
         manager.change()
-        manager.initialize()
         save = manager.save()
 
         if save:
