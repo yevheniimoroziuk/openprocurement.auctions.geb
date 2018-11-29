@@ -236,7 +236,7 @@ status: active.qualification
 ----------------------------
 Auction owner can upload auction protocol:
 
-.. include:: tutorial/active_qualification_organize_upload_protocol.http
+.. include:: tutorial/active_qualification_organizer_upload_protocol.http
     :code:
 
 Bidder owner can upload auction protocol:
