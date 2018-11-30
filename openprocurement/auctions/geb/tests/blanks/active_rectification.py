@@ -201,6 +201,27 @@ def items_patch_collections(test_case):
     test_case.assertEqual(auction['items'][order][field], new_value)
 
 
+def items_patch_collections_blank_items(test_case):
+
+    response = test_case.app.get(test_case.ENTRYPOINTS['get_auction'])
+    auction = response.json['data']
+    items_before = auction['items']
+
+    request_data = {"data": {'items': None}}
+    response = test_case.app.patch_json(test_case.ENTRYPOINTS['patch_auction'], request_data, status=403)
+    test_case.assertEqual(response.status, '403 Forbidden')
+
+    request_data = {"data": {'items': []}}
+    response = test_case.app.patch_json(test_case.ENTRYPOINTS['patch_auction'], request_data, status=403)
+    test_case.assertEqual(response.status, '403 Forbidden')
+
+    response = test_case.app.get(test_case.ENTRYPOINTS['get_auction'])
+    auction = response.json['data']
+    items_after = auction['items']
+
+    test_case.assertEqual(len(items_before), len(items_after))
+
+
 def item_post(test_case):
     expected_http_status = '201 Created'
 

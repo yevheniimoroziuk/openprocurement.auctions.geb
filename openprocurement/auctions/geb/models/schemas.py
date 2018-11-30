@@ -80,6 +80,7 @@ from openprocurement.auctions.geb.models.roles import (
     auction_edit_enquiry_role,
     auction_edit_rectification_role,
     auction_edit_tendering_role,
+    auction_edit_draft_role,
     auction_enquiry_role,
     auction_rectification_role,
     auction_tendering_role,
@@ -237,7 +238,7 @@ class Bid(Model):
     date = IsoDateTimeType()
     documents = ListType(ModelType(BidDocument), default=list())
     id = MD5Type(required=True, default=lambda: uuid4().hex)
-    modified = False
+    changed = False
     owner = StringType()
     owner_token = StringType()
     participationUrl = URLType()
@@ -331,7 +332,10 @@ class Auction(BaseAuction):
     class Options:
         roles = {
             'create': auction_create_role,
+
             'draft': auction_draft_role,
+            'edit_draft': auction_edit_draft_role,
+
             'active.rectification': auction_rectification_role,
             'edit_active.rectification': auction_edit_rectification_role,
 
@@ -375,7 +379,7 @@ class Auction(BaseAuction):
     lotIdentifier = StringType(required=True)
     minNumberOfQualifiedBids = IntType(choices=[1, 2], default=2)
     mode = StringType()
-    modified = False
+    changed = False
     procurementMethod = StringType(choices=['open'], default='open')
     procurementMethodType = StringType(required=True)
     questions = ListType(ModelType(Question), default=list())

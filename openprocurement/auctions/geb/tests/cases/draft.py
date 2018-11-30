@@ -6,13 +6,16 @@ from openprocurement.auctions.geb.tests.base import (
     BaseWebTest,
 )
 from openprocurement.auctions.geb.tests.blanks.draft import (
-    phase_commit,
+    auction_patch_items,
+    check_generated_enquiry_period,
     check_generated_rectification_period,
     check_generated_tender_period,
-    check_generated_enquiry_period,
-    item_post,
     invalid_phase_commit,
+    item_post,
+    item_post_collections,
+    phase_commit,
     phase_commit_invalid_auctionPeriod,
+    phase_commit_without_items
 )
 from openprocurement.auctions.geb.tests.blanks.cancellations import (
     cancellation_post
@@ -43,6 +46,7 @@ class StatusDraftTest(BaseWebTest):
     test_check_generated_rectification_period = snitch(check_generated_rectification_period)
     test_check_generated_tender_period = snitch(check_generated_tender_period)
     test_check_generated_enquiry_period = snitch(check_generated_enquiry_period)
+    test_auction_patch_items = snitch(auction_patch_items)
     test_invalid_phase_commit = snitch(invalid_phase_commit)
 
     def setUp(self):
@@ -67,6 +71,8 @@ class StatusDraftTest(BaseWebTest):
 
 class StatusDraftWithoutItemsTest(BaseWebTest):
     test_item_post = snitch(item_post)
+    test_item_post_collections = snitch(item_post_collections)
+    test_phase_commit_without_items = snitch(phase_commit_without_items)
 
     def setUp(self):
         super(StatusDraftWithoutItemsTest, self).setUp()
@@ -82,6 +88,9 @@ class StatusDraftWithoutItemsTest(BaseWebTest):
         entrypoints['get_auction'] = '/auctions/{}'.format(auction['data']['id'])
         entrypoints['item_post'] = '/auctions/{}/items?acc_token={}'.format(auction['data']['id'],
                                                                             auction['access']['token'])
+
+        entrypoints['patch_auction'] = '/auctions/{}?acc_token={}'.format(auction['data']['id'],
+                                                                          auction['access']['token'])
         self.auction = auction
         self.ENTRYPOINTS = entrypoints
 

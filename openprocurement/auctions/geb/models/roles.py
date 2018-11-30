@@ -193,6 +193,8 @@ auction_enquiry_role = whitelist(
     'value'
 )
 
+auction_edit_draft_role = whitelist('status', 'items')
+
 auction_edit_enquiry_role = whitelist()
 
 auction_edit_tendering_role = whitelist()

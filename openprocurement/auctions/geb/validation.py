@@ -241,11 +241,57 @@ def validate_auction_patch_phase_commit(request, **kwargs):
     new_status = request.validated['json_data'].get('status')
     status = auction.status
 
+    if not new_status:
+        return True
+
     if new_status != 'active.rectification' and status == 'draft':
         err_msg = 'Can\'t switch to ({}) only to active.rectification'.format(new_status)
         request.errors.add('body', 'data', err_msg)
         request.errors.status = 403
         return False
+
+    if len(auction.items) < 1:
+        err_msg = 'Can\'t switch to ({}) without items'.format(new_status)
+        request.errors.add('body', 'data', err_msg)
+        request.errors.status = 403
+        return False
+    return True
+
+
+def validate_auction_patch_rectification(request, **kwargs):
+
+    auction = kwargs['auction']
+
+    if auction.status != 'active.rectification':
+        return True
+
+    # validate period in which can edit auction item
+    patch_data = request.validated['json_data']
+    items = patch_data.get('items')
+    if 'items' in patch_data and not items:
+        err_msg = 'Can`t change items, at least there should be one'
+        request.errors.add('body', 'data', err_msg)
+        request.errors.status = 403
+        return False
+    return True
+
+
+def validate_auction_patch_draft(request, **kwargs):
+    auction = kwargs['auction']
+    expected_data = ('items', 'status')
+    json_data = set(request.validated['json_data'].keys())
+
+    if auction.status != 'draft':
+        return True
+
+    difference = json_data.difference(expected_data)
+
+    if difference and difference not in expected_data:
+        err_msg = "In status 'draft' can change only fields ['status', 'items']"
+        request.errors.add('body', 'data', err_msg)
+        request.errors.status = 403
+        return False
+
     return True
 
 
@@ -254,19 +300,13 @@ def validate_auction_patch_period(request, **kwargs):
 
     auction = kwargs['auction']
     status = auction['status']
-    patch_data = request.validated['data']
 
     # if it is Adminsrtator patch, he can patch
-    if request.authenticated_role == 'Adminsrtator':
+    if request.authenticated_role == 'Administrator':
         return True
 
     # if it is Chronograph patch, he can patch
     if request.authenticated_role == 'chronograph':
-        return True
-
-    # if it is activation of auction
-    # Organizer in 'draft' patch status to 'active.rectification'
-    if status == 'draft' and patch_data.get('status') == 'active.rectification':
         return True
 
     # if it is Organizator patch, he can patch only in 'active.rectification'

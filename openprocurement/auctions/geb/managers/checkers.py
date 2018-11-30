@@ -107,5 +107,5 @@ class AuctionChecker(object):
         except StopChecks:
             pass
         self._set_next_status()
-        self._context.modified = True
+        self._context.changed = True
         return True

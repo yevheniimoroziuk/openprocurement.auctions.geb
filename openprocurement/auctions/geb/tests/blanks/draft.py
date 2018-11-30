@@ -1,5 +1,7 @@
 import unittest
+from copy import deepcopy
 from iso8601 import parse_date
+from uuid import uuid4
 from datetime import timedelta, time
 from openprocurement.auctions.core.utils import (
     get_now,
@@ -125,6 +127,42 @@ def phase_commit(test_case):
     test_case.assertEqual(next_status, response.json['data']['status'])
 
 
+def phase_commit_without_items(test_case):
+    """
+        Can`t switch procedure to 'active.rectification' without items
+    """
+    auth = test_case.app.authorization
+    test_case.app.authorization = ('Basic', ('{}'.format(test_case.auction['access']['owner']), ''))
+
+    next_status = 'active.rectification'
+    request_data = {"data": {'status': next_status}}
+
+    response = test_case.app.patch_json(test_case.ENTRYPOINTS['patch_auction'], request_data, status=403)
+    test_case.assertEqual(response.status, '403 Forbidden')
+
+    test_case.app.authorization = auth
+
+
+def auction_patch_items(test_case):
+    """
+        Can patch items in 'draft' status
+    """
+    auth = test_case.app.authorization
+    test_case.app.authorization = ('Basic', ('{}'.format(test_case.auction['access']['owner']), ''))
+
+    new_item = deepcopy(TEST_ITEM)
+    new_item['id'] = uuid4().hex
+    request_data = {"data": {'items': [new_item]}}
+
+    test_case.app.patch_json(test_case.ENTRYPOINTS['patch_auction'], request_data)
+    response = test_case.app.get(test_case.ENTRYPOINTS['get_auction'])
+
+    auction_items = [item['id'] for item in response.json['data']['items']]
+    test_case.assertIn(new_item['id'], auction_items)
+
+    test_case.app.authorization = auth
+
+
 @unittest.skipIf(SANDBOX_MODE, 'If sandbox mode is it enabled generating correct periods')
 def phase_commit_invalid_auctionPeriod(test_case):
 
@@ -185,3 +223,16 @@ def item_post(test_case):
     entrypoint = '/auctions/{}/items/{}'.format(test_case.auction['data']['id'], item['id'])
     response = test_case.app.get(entrypoint, request_data)
     test_case.assertEqual(response.status, '200 OK')
+
+
+def item_post_collections(test_case):
+
+    request_data = {'data': {'items': [TEST_ITEM]}}
+    response = test_case.app.patch_json(test_case.ENTRYPOINTS['patch_auction'], request_data)
+    expected_http_status = '200 OK'
+    test_case.assertEqual(response.status, expected_http_status)
+
+    response = test_case.app.get(test_case.ENTRYPOINTS['get_auction'])
+    items = response.json['data']['items']
+    items_ids = [item['id'] for item in items]
+    test_case.assertIn(TEST_ITEM['id'], items_ids)

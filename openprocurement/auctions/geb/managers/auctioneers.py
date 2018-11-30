@@ -45,16 +45,16 @@ class Auctioneer(object):
 
     def update_auction_urls(self):
         if self.validate():
-            self._context.modified = apply_patch(self._request, save=False, src=self._context.serialize())
+            self._context.changed = apply_patch(self._request, save=False, src=self._context.serialize())
 
     def report(self):
         if self.validate():
             self._context.auctionPeriod['endDate'] = self._now
-            self._context.modified = apply_patch(self._request, save=False, src=self._context.serialize())
-        return self._context.modified
+            self._context.changed = apply_patch(self._request, save=False, src=self._context.serialize())
+        return self._context.changed
 
     def award(self):
-        if self._context.modified:
+        if self._context.changed:
             if any([bid.status == 'active' for bid in self._context.bids]):
                 return True
             else:
