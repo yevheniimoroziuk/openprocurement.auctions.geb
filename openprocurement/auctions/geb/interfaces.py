@@ -20,7 +20,7 @@ class IContract(Interface):
     """Interface for Geb Contract"""
 
 
-class IDocument(Interface):
+class IAuctionDocument(Interface):
     """Interface for Geb Document"""
 
 
@@ -62,6 +62,10 @@ class IBidDocumentAction(ISubResourceAction):
     """Interface for Bid Document Action"""
 
 
+class ICancellationDocumentAction(ISubResourceAction):
+    """Interface for Cancellation Document Action"""
+
+
 class IQuestionAction(ISubResourceAction):
     """Interface for Question Action"""
 
@@ -91,14 +95,57 @@ class IInitializator(Interface):
 
 
 class IResourceChanger(Interface):
-    """Interface for Module Auction changer"""
+    """interface for module auction changer"""
 
 
 class ISubResourceChanger(Interface):
-    """Interface for Module Auction changer"""
+    """interface for module auction changer"""
 
 # creators interfaces
 
 
-class IAuctionResultsCreator(Interface):
-    """Interface for Auction Action"""
+class IBasicCreator(Interface):
+    """Interface for resource creator"""
+
+
+class IDerivativeCreator(Interface):
+    """Interface for resource creator"""
+
+
+class IBasicResourceCreator(Interface):
+    """Interface for resource creator"""
+
+
+class IDerivativeResourceCreator(Interface):
+    """Interface for resource creator"""
+
+# representers interfaces
+
+
+class IResourceCreatedRepresenter(Interface):
+    """Interface for resource creator"""
+
+
+class ICreatedRepresenter(Interface):
+    """Interface for resource creator"""
+
+
+class ICreatedRepresentersFactory(Interface):
+    """Interface for resource creator"""
+
+
+# managers interfaces
+
+# listings
+
+
+class IResourceListingRepresenter(Interface):
+    """Interface for Auction Listing Representer"""
+
+
+class IListingRepresenter(Interface):
+    """Interface for Listings Representer"""
+
+
+class IListingRepresentersFactory(Interface):
+    """Interface for Listings Representers Factory"""

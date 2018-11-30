@@ -2,13 +2,14 @@ import logging
 from pyramid.interfaces import IRequest
 
 from openprocurement.auctions.geb.managers.main import (
+    AuctionDocumentManager,
     AuctionManager,
     AuctionPartialManager,
-    BidManager,
     BidDocumentManager,
-    AuctionDocumentManager,
-    ItemManager,
+    BidManager,
+    CancellationDocumentManager,
     CancellationManager,
+    ItemManager,
     QuestionManager
 )
 from openprocurement.auctions.geb.managers.awarding import (
@@ -26,18 +27,20 @@ from openprocurement.auctions.core.interfaces import (
     IAuctionManager,
     IBidManager,
     IBidDocumentManager,
-    ICancellationManager,
     IContentConfigurator,
     IDocumentManager,
     IItemManager,
+    ICancellationManager,
+    ICancellationDocumentManager,
     IQuestionManager
 )
 from openprocurement.auctions.geb.interfaces import (
     IAuction,
+    IAuctionDocument,
     IBid,
     IBidDocument,
     ICancellation,
-    IDocument,
+    ICancellationDocument,
     IItem,
     IQuestion
 )
@@ -66,7 +69,8 @@ def includeme(config, plugin_map):
     config.registry.registerAdapter(QuestionManager, (IRequest, IQuestion), IQuestionManager)
     config.registry.registerAdapter(ItemManager, (IRequest, IItem), IItemManager)
     config.registry.registerAdapter(CancellationManager, (IRequest, ICancellation), ICancellationManager)
-    config.registry.registerAdapter(AuctionDocumentManager, (IRequest, IDocument), IDocumentManager)
+    config.registry.registerAdapter(CancellationDocumentManager, (IRequest, ICancellationDocument), ICancellationDocumentManager)
+    config.registry.registerAdapter(AuctionDocumentManager, (IRequest, IAuctionDocument), IDocumentManager)
 
     LOGGER.info("Included openprocurement.auctions.geb plugin",
                 extra={'MESSAGE_ID': 'included_plugin'})

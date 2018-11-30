@@ -419,8 +419,11 @@ def validate_document_adding_period(request):
     return True
 
 
-def validate_question_adding_period(request):
-    auction = request.context
+def validate_questions_post(request, **kwargs):
+    """
+        Validator for question post
+    """
+    auction = kwargs['auction']
 
     if auction.status not in AUCTION_STATUSES_FOR_ADDING_QUESTIONS:
         err_msg = 'Can add question only in {}'.format(AUCTION_STATUSES_FOR_ADDING_QUESTIONS)

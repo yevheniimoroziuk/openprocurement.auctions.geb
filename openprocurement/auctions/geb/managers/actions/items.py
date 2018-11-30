@@ -28,7 +28,7 @@ class ItemPatchAction(object):
 
     @classmethod
     def demand(cls, request, context):
-        # check if it is a bid patch
+        # check if it is a item patch
 
         if request.method == 'PATCH':
             return cls
@@ -38,7 +38,37 @@ class ItemPatchAction(object):
         pass
 
 
-class ItemChangeActionFactory(ActionFactory):
+@implementer(IItemAction)
+class ItemPostAction(object):
+    """
+        This action triggered then create(post) item
+    """
+    validators = []
+
+    def __init__(self, request, auction, context):
+        self._request = request
+        self._context = context
+        self._auction = auction
+
+    @classmethod
+    def demand(cls, request, context):
+        if request.method == 'POST':
+            return cls
+        return False
+
+    def act(self):
+        pass
+
+# factories
+
+
+class ItemChangeActionsFactory(ActionFactory):
     actions = (
         ItemPatchAction,
+    )
+
+
+class ItemCreateActionsFactory(ActionFactory):
+    actions = (
+        ItemPostAction,
     )

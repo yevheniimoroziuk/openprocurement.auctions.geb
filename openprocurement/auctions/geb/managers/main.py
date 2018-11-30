@@ -2,10 +2,14 @@ from openprocurement.auctions.core.managers import (
     AuctionManager,
     BidManager,
     BidDocumentManager,
+    CancellationDocumentManager,
     DocumentManager,
     ItemManager,
     CancellationManager,
     QuestionManager
+)
+from openprocurement.auctions.core.adapters import (
+    AuctionManagerAdapter
 )
 
 from openprocurement.auctions.geb.managers.changers import (
@@ -21,15 +25,18 @@ from openprocurement.auctions.geb.managers.changers import (
     AuctionDocumentPutChanger
 )
 from openprocurement.auctions.geb.managers.representers import (
-    AuctionSubResourceRepresenter,
     BidRepresenter,
     CancellationRepresenter,
-    CancellationSubResourceRepresenter,
-    ItemRepresenter
+    ItemRepresenter,
+    CancellationDocumentRepresenter,
+    CancellationListingRepresenter,
+    CancellationCreatedRepresenter
 )
 
 from openprocurement.auctions.geb.managers.creators import (
-    Creator
+    AuctionCreator,
+    CancellationCreator,
+
 )
 from openprocurement.auctions.geb.managers.deleters import (
     BidDeleter
@@ -39,17 +46,14 @@ from openprocurement.auctions.geb.managers.loggers import (
     AuctionLogger,
     BidLogger,
     CancellationLogger,
-    ItemLogger
-)
-from openprocurement.auctions.core.adapters import (
-    AuctionManagerAdapter
+    ItemLogger,
+    CancellationDocumentLogger
 )
 
 
 class AuctionManager(AuctionManager):
-    creator = Creator
+    creator = AuctionCreator
     logger = AuctionLogger
-    subResourceRepresenter = AuctionSubResourceRepresenter
 
     @property
     def changer(self):
@@ -63,7 +67,6 @@ class AuctionManager(AuctionManager):
 class BidManager(BidManager):
     changer = BidPatchChanger
     Deleter = BidDeleter
-    Creator = Creator
     Representer = BidRepresenter
     Logger = BidLogger
 
@@ -80,15 +83,20 @@ class ItemManager(ItemManager):
     changer = ItemPatchChanger
     Representer = ItemRepresenter
     Logger = ItemLogger
-    Creator = Creator
 
 
 class CancellationManager(CancellationManager):
-    Creator = Creator
+    creator = CancellationCreator
     changer = CancellationPatchChanger
     Representer = CancellationRepresenter
-    Logger = CancellationLogger
-    SubResourceRepresenter = CancellationSubResourceRepresenter
+    log = CancellationLogger
+    listing_representer = CancellationListingRepresenter
+    created_representer = CancellationCreatedRepresenter
+
+
+class CancellationDocumentManager(CancellationDocumentManager):
+    representer = CancellationDocumentRepresenter
+    logger = CancellationDocumentLogger
 
 
 class AuctionDocumentManager(DocumentManager):

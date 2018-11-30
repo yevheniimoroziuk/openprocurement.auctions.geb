@@ -7,7 +7,7 @@ from openprocurement.auctions.core.validation import (
     validate_file_upload
 )
 from openprocurement.auctions.core.interfaces import (
-    ICancellationManager
+    ICancellationManager,
 )
 from openprocurement.auctions.core.utils import opresource
 from openprocurement.auctions.core.views.mixins import (
@@ -28,21 +28,19 @@ class AuctionCancellationDocumentResource(AuctionCancellationDocumentResource):
 
         manager = self.request.registry.queryMultiAdapter((self.request, self.context), ICancellationManager)
         document_type = type(manager.context).documents.model_class
-        return manager.represent_subresources_listing(implementedBy(document_type))
+        return manager.listing(implementedBy(document_type))
 
     @json_view(validators=(validate_file_upload,), permission='edit_auction')
     def collection_post(self):
         """
-        Auction Cancellation Document Upload
+        Auction Cancellation Document Post
         """
-        save = None
 
-        applicant = self.request.validated['document']
+        import ipdb; ipdb.set_trace()  # XXX BREAKPOINT
         manager = self.request.registry.queryMultiAdapter((self.request, self.context), ICancellationManager)
-        document = manager.create(applicant)
-        save = manager.save()
+        document = manager.create(self.request.validated['document'])
 
-        if save:
+        if manager.save():
             msg = 'Create auction cancellation document {}'.format(document['id'])
-            manager.log_action('auction_cancellation_document_create', msg)
-            return manager.represent_subresource_created(document)
+            manager.log('auction_cancellation_document_create', msg)
+            return manager.represent_created(document)

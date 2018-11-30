@@ -54,7 +54,7 @@ from openprocurement.auctions.geb.interfaces import (
     IBid,
     ICancellation,
     ICancellationDocument,
-    IDocument,
+    IAuctionDocument,
     IBidDocument,
     IItem,
     IContract,
@@ -110,7 +110,7 @@ from openprocurement.auctions.geb.utils import (
 )
 
 
-@implementer(IDocument)
+@implementer(IAuctionDocument)
 class AuctionDocument(BaseDocument):
 
     documentOf = StringType(required=True, choices=['auction'], default='auction')
