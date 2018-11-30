@@ -268,7 +268,7 @@ def validate_auction_patch_rectification(request, **kwargs):
     # validate period in which can edit auction item
     patch_data = request.validated['json_data']
     items = patch_data.get('items')
-    if 'items' in patch_data and (not items or (type(items) == list and len(items) == 0)):
+    if 'items' in patch_data and not items:
         err_msg = 'Can`t change items, at least there should be one'
         request.errors.add('body', 'data', err_msg)
         request.errors.status = 403
@@ -278,17 +278,16 @@ def validate_auction_patch_rectification(request, **kwargs):
 
 def validate_auction_patch_draft(request, **kwargs):
     auction = kwargs['auction']
-    new_status = request.validated['json_data'].get('status')
-    new_items = request.validated['json_data'].get('items')
+    expected_data = ('items', 'status')
+    json_data = set(request.validated['json_data'].keys())
 
     if auction.status != 'draft':
         return True
 
-    if new_status:
-        return True
+    difference = json_data.difference(expected_data)
 
-    if new_items is None:
-        err_msg = "In status 'draft' can`t change fields except ['status', 'items']".format(new_status)
+    if difference and difference not in expected_data:
+        err_msg = "In status 'draft' can change only fields ['status', 'items']"
         request.errors.add('body', 'data', err_msg)
         request.errors.status = 403
         return False
