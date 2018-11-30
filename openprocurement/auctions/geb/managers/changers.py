@@ -66,8 +66,8 @@ class AuctionChanger(object):
 
     def change(self):
         if self.validate():
-            self._context.modified = apply_patch(self._request, save=False, src=self._request.validated['auction_src'])
-            return self._context.modified
+            self._context.changed = apply_patch(self._request, save=False, src=self._request.validated['auction_src'])
+            return self._context.changed
 
 
 @implementer(IBidChanger)
@@ -115,8 +115,8 @@ class BidChanger(object):
 
     def change(self):
         if self._validate(self._context.status):
-            self._auction.modified = apply_patch(self._request, save=False, src=self._context.serialize())
-            return self._auction.modified
+            self._auction.changed = apply_patch(self._request, save=False, src=self._context.serialize())
+            return self._auction.changed
 
 
 @implementer(IDocumentChanger)
@@ -138,14 +138,14 @@ class DocumentChanger(object):
 
     def change(self):
         if self.validate(self.patch_validators):
-            self._auction.modified = apply_patch(self._request, save=False, src=self._context.serialize())
-            return self._auction.modified
+            self._auction.changed = apply_patch(self._request, save=False, src=self._context.serialize())
+            return self._auction.changed
 
     def put(self):
         if self.validate(self.put_validators):
             document = upload_file(self._request)
             self._auction.documents.append(document)
-            self._auction.modified = True
+            self._auction.changed = True
             return document
 
 
@@ -163,8 +163,8 @@ class BidDocumentChanger(object):
 
     def change(self):
         if self.validate():
-            self._auction.modified = apply_patch(self._request, save=False, src=self._context.serialize())
-            return self._auction.modified
+            self._auction.changed = apply_patch(self._request, save=False, src=self._context.serialize())
+            return self._auction.changed
 
 
 @implementer(IQuestionChanger)
@@ -185,8 +185,8 @@ class QuestionChanger(object):
 
     def change(self):
         if self.validate():
-            self._auction.modified = apply_patch(self._request, save=False, src=self._context.serialize())
-            return self._auction.modified
+            self._auction.changed = apply_patch(self._request, save=False, src=self._context.serialize())
+            return self._auction.changed
 
 
 @implementer(IItemChanger)
@@ -207,8 +207,8 @@ class ItemChanger(object):
 
     def change(self):
         if self.validate():
-            self._auction.modified = apply_patch(self._request, save=False, src=self._context.serialize())
-            return self._auction.modified
+            self._auction.changed = apply_patch(self._request, save=False, src=self._context.serialize())
+            return self._auction.changed
 
 
 @implementer(ICancellationChanger)
@@ -226,15 +226,15 @@ class CancellationChanger(object):
         return True
 
     def _change(self):
-        modified = apply_patch(self._request, save=False, src=self._context.serialize())
-        return modified
+        changed = apply_patch(self._request, save=False, src=self._context.serialize())
+        return changed
 
     def _initialize(self):
         self._initializator.initialize()
 
     def change(self):
         if self.validate():
-            self._auction.modified = self._change()
-            if self._auction.modified:
+            self._auction.changed = self._change()
+            if self._auction.changed:
                 self._initialize()
-            return self._auction.modified
+            return self._auction.changed

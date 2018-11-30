@@ -59,7 +59,7 @@ class AuctionDocumentCreator(object):
         if self.validate():
             document = upload_file(self._request, document)
             self._context.documents.append(document)
-            self._context.modified = True
+            self._context.changed = True
             return document
 
 
@@ -85,7 +85,7 @@ class BidDocumentCreator(object):
         if self.validate():
             document = upload_file(self._request, document)
             self._context.documents.append(document)
-            self._auction.modified = True
+            self._auction.changed = True
             return document
 
 
@@ -106,7 +106,7 @@ class CancellationDocumentCreator(object):
         if self.validate():
             document = upload_file(self._request, document)
             self._context.documents.append(document)
-            self._auction.modified = True
+            self._auction.changed = True
             return document
 
 
@@ -137,7 +137,7 @@ class AuctionCreator(object):
             add required field:
                 - id
                 - auctionID
-                - modified = True
+                - changed = True
         """
         auction_id = self._generate_id()
         db = self._request.registry.db
@@ -145,7 +145,7 @@ class AuctionCreator(object):
 
         applicant.id = auction_id
         applicant.auctionID = generate_auction_id(get_now(), db, server_id)
-        applicant.modified = True
+        applicant.changed = True
 
         return applicant
 
@@ -170,7 +170,7 @@ class AuctionItemCreator(object):
     def create(self, item):
         if self._validate():
             self._context.items.append(item)
-            self._context.modified = True
+            self._context.changed = True
             return item
 
 
@@ -193,7 +193,7 @@ class AuctionQuestionCreator(object):
     def create(self, question):
         if self.validate():
             self._context.questions.append(question)
-            self._context.modified = True
+            self._context.changed = True
             return question
 
 
@@ -218,7 +218,7 @@ class AuctionCancellationCreator(object):
     def create(self, cancellation):
         if self.validate():
             cancellation = self._add_cancellation()
-            self._context.modified = True
+            self._context.changed = True
             return cancellation
 
 # creator factory

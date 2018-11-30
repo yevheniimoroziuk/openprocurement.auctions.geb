@@ -137,7 +137,7 @@ class BidInitializator(object):
         return True
 
     def initialize(self):
-        if self._auction.modified and self.validate():
+        if self._auction.changed and self.validate():
             self._initialize_qualified()
             self._initialize_date()
 
