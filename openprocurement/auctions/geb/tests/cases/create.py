@@ -19,9 +19,6 @@ from openprocurement.auctions.geb.tests.blanks.create import (
 from openprocurement.auctions.geb.tests.fixtures.create import (
     AUCTION_WITHOUT_ITEMS
 )
-from openprocurement.auctions.geb.tests.helpers import (
-    change_machine_state
-)
 from openprocurement.auctions.geb.tests.states import (
     ProcedureMachine
 )
@@ -41,7 +38,7 @@ class CreateAuctionResourceTest(BaseWebTest):
         super(CreateAuctionResourceTest, self).setUp()
         procedure = ProcedureMachine()
         procedure.set_db_connector(self.db)
-        change_machine_state(procedure, 'create')
+        procedure.toggle('create')
         context = procedure.snapshot(dump=False)
 
         entrypoints = {}
@@ -59,7 +56,7 @@ class CreateAuctionResourceWithoutItemsTest(BaseWebTest):
         super(CreateAuctionResourceWithoutItemsTest, self).setUp()
         procedure = ProcedureMachine()
         procedure.set_db_connector(self.db)
-        change_machine_state(procedure, 'create')
+        procedure.toggle('create')
         context = procedure.snapshot(fixture=AUCTION_WITHOUT_ITEMS, dump=False)
 
         entrypoints = {}

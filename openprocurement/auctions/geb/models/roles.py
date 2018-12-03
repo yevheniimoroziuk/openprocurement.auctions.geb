@@ -1,5 +1,14 @@
 
 from schematics.transforms import whitelist
+from openprocurement.auctions.core.models import (
+    Administrator_role
+)
+
+auction_administrator_role = Administrator_role + whitelist(
+    'tenderPeriod',
+    'awards',
+    'rectificationPeriod'
+)
 
 auction_draft_role = whitelist(
     'auctionID',

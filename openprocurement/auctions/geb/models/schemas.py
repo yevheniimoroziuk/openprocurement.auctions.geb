@@ -3,7 +3,6 @@ from datetime import datetime, timedelta, time
 from uuid import uuid4
 
 from schematics.exceptions import ValidationError
-from schematics.transforms import whitelist
 from schematics.types import (
     StringType,
     IntType,
@@ -19,7 +18,6 @@ from zope.interface import implementer
 
 from openprocurement.auctions.core.models import (
     Administrator_bid_role,
-    Administrator_role,
     Auction as BaseAuction,
     BankAccount,
     BaseOrganization,
@@ -74,6 +72,7 @@ from openprocurement.auctions.geb.constants import (
 )
 
 from openprocurement.auctions.geb.models.roles import (
+    auction_administrator_role,
     auction_contractTerms_create_role,
     auction_create_role,
     auction_draft_role,
@@ -208,9 +207,6 @@ class AuctionAuctionPeriod(Period):
 
 class RectificationPeriod(Period):
     invalidationDate = IsoDateTimeType()
-
-
-Administrator_role = (Administrator_role + whitelist('awards'))
 
 
 @implementer(IBid)
@@ -348,7 +344,7 @@ class Auction(BaseAuction):
             'active.enquiry': auction_enquiry_role,
             'edit_active.enquiry': auction_edit_enquiry_role,
 
-            'Administrator': (whitelist('rectificationPeriod') + Administrator_role),
+            'Administrator': auction_administrator_role,
         }
 
     def __local_roles__(self):                                                  # TODO rm black box

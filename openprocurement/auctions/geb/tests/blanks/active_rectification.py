@@ -1,5 +1,9 @@
 from copy import deepcopy
 
+from openprocurement.auctions.core.tests.base import (
+    test_document_data
+)
+
 from openprocurement.auctions.geb.tests.fixtures.common import (
     # test_item,
     test_procuringEntity,
@@ -14,10 +18,6 @@ from openprocurement.auctions.geb.tests.fixtures.active_rectification import (
 )
 from openprocurement.auctions.geb.tests.fixtures.items import (
     TEST_ITEM
-)
-
-from openprocurement.auctions.core.tests.base import (
-    test_document_data
 )
 
 

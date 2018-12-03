@@ -7,9 +7,6 @@ from openprocurement.auctions.geb.tests.base import (
     BaseWebTest
 )
 
-from openprocurement.auctions.geb.tests.helpers import (
-    change_machine_state
-)
 from openprocurement.auctions.geb.tests.states import (
     ProcedureMachine
 )
@@ -25,8 +22,9 @@ from openprocurement.auctions.geb.tests.blanks.cancellations import (
     cancellation_post
 )
 from openprocurement.auctions.geb.tests.blanks.mixins import (
+    BaseAdministratorTestMixin,
+    CancellationDocumentsWorkFlowMixin,
     CancellationWorkFlowMixin,
-    CancellationDocumentsWorkFlowMixin
 )
 
 from openprocurement.auctions.geb.tests.blanks.active_rectification import (
@@ -62,7 +60,7 @@ from openprocurement.auctions.geb.tests.blanks.active_rectification import (
 )
 
 
-class StatusActiveRectificationTest(BaseWebTest):
+class ActiveRectificationTest(BaseWebTest):
 
     test_add_question = snitch(add_question)
     test_cancellation_post = snitch(cancellation_post)
@@ -83,11 +81,11 @@ class StatusActiveRectificationTest(BaseWebTest):
     test_change_one_field_rest_same = snitch(change_one_field_rest_same)
 
     def setUp(self):
-        super(StatusActiveRectificationTest, self).setUp()
+        super(ActiveRectificationTest, self).setUp()
 
         procedure = ProcedureMachine()
         procedure.set_db_connector(self.db)
-        change_machine_state(procedure, 'active.rectification')
+        procedure.toggle('active.rectification')
         context = procedure.snapshot()
         auction = context['auction']
         items = context['items']
@@ -105,13 +103,13 @@ class StatusActiveRectificationTest(BaseWebTest):
         self.ENTRYPOINTS = entrypoints
 
 
-class StatusActiveRectificationQuestionsTest(BaseWebTest):
+class ActiveRectificationQuestionsTest(BaseWebTest):
 
     test_answer_question = snitch(answer_question)
     test_get_question = snitch(get_question)
 
     def setUp(self):
-        super(StatusActiveRectificationQuestionsTest, self).setUp()
+        super(ActiveRectificationQuestionsTest, self).setUp()
 
         procedure = ProcedureMachine()
         procedure.set_db_connector(self.db)
@@ -132,7 +130,7 @@ class StatusActiveRectificationQuestionsTest(BaseWebTest):
         self.ENTRYPOINTS = entrypoints
 
 
-class StatusActiveRectificationItemsTest(BaseWebTest):
+class ActiveRectificationItemsTest(BaseWebTest):
 
     test_item_get = snitch(item_get)
     test_item_patch = snitch(item_patch)
@@ -141,7 +139,7 @@ class StatusActiveRectificationItemsTest(BaseWebTest):
     test_items_patch_collections_blank_items = snitch(items_patch_collections_blank_items)
 
     def setUp(self):
-        super(StatusActiveRectificationItemsTest, self).setUp()
+        super(ActiveRectificationItemsTest, self).setUp()
 
         procedure = ProcedureMachine()
         procedure.set_db_connector(self.db)
@@ -173,14 +171,14 @@ class StatusActiveRectificationItemsTest(BaseWebTest):
         self.ENTRYPOINTS = entrypoints
 
 
-class StatusDraftWithoutItemsTest(BaseWebTest):
+class ActiveRectificationWithoutItemsTest(BaseWebTest):
     test_item_post = snitch(item_post)
 
     def setUp(self):
-        super(StatusDraftWithoutItemsTest, self).setUp()
+        super(ActiveRectificationWithoutItemsTest, self).setUp()
         procedure = ProcedureMachine()
         procedure.set_db_connector(self.db)
-        change_machine_state(procedure, 'active.rectification')
+        procedure.toggle('active.rectification')
         context = procedure.snapshot(fixture=AUCTION_WITHOUT_ITEMS)
 
         auction = context['auction']
@@ -194,7 +192,7 @@ class StatusDraftWithoutItemsTest(BaseWebTest):
         self.ENTRYPOINTS = entrypoints
 
 
-class StatusActiveRectificationDocumentTest(BaseWebTest):
+class ActiveRectificationDocumentTest(BaseWebTest):
     docservice = True
 
     test_add_online_document = snitch(add_document)
@@ -204,19 +202,19 @@ class StatusActiveRectificationDocumentTest(BaseWebTest):
     test_download_document = snitch(download_document)
 
     def setUp(self):
-        super(StatusActiveRectificationDocumentTest, self).setUp()
+        super(ActiveRectificationDocumentTest, self).setUp()
 
         procedure = ProcedureMachine()
         procedure.set_db_connector(self.db)
-        change_machine_state(procedure, 'active.rectification')
+        procedure.toggle('active.rectification')
         self.procedure = procedure
 
 
-class StatusActiveRectificationCancellationsTest(BaseWebTest, CancellationWorkFlowMixin):
+class ActiveRectificationCancellationsTest(BaseWebTest, CancellationWorkFlowMixin):
     docservice = True
 
     def setUp(self):
-        super(StatusActiveRectificationCancellationsTest, self).setUp()
+        super(ActiveRectificationCancellationsTest, self).setUp()
 
         procedure = ProcedureMachine()
         procedure.set_db_connector(self.db)
@@ -247,15 +245,15 @@ class StatusActiveRectificationCancellationsTest(BaseWebTest, CancellationWorkFl
         self.ENTRYPOINTS = entrypoints
 
 
-class StatusActiveRectificationCancellationsDocumentsTest(BaseWebTest, CancellationDocumentsWorkFlowMixin):
+class ActiveRectificationCancellationsDocumentsTest(BaseWebTest, CancellationDocumentsWorkFlowMixin):
     docservice = True
 
     def setUp(self):
-        super(StatusActiveRectificationCancellationsDocumentsTest, self).setUp()
+        super(ActiveRectificationCancellationsDocumentsTest, self).setUp()
 
         procedure = ProcedureMachine()
         procedure.set_db_connector(self.db)
-        procedure.toggle('draft')
+        procedure.toggle('active.rectification')
         context = procedure.snapshot(fixture=AUCTION_WITH_CANCELLATION_WITH_DOCUMENTS)
 
         auction = context['auction']
@@ -279,15 +277,34 @@ class StatusActiveRectificationCancellationsDocumentsTest(BaseWebTest, Cancellat
         self.ENTRYPOINTS = entrypoints
 
 
+class ActiveRectificationAdministratorTest(BaseWebTest, BaseAdministratorTestMixin):
+
+    def setUp(self):
+        super(ActiveRectificationAdministratorTest, self).setUp()
+        procedure = ProcedureMachine()
+        procedure.set_db_connector(self.db)
+        procedure.toggle('active.rectification')
+        context = procedure.snapshot()
+
+        auction = context['auction']
+
+        entrypoints = {}
+
+        entrypoints['get_auction'] = '/auctions/{}'.format(auction['data']['id'])
+        entrypoints['patch_auction'] = '/auctions/{}'.format(auction['data']['id'])
+        self.auction = auction
+        self.ENTRYPOINTS = entrypoints
+
+
 def suite():
     suite = unittest.TestSuite()
-    suite.addTest(unittest.makeSuite(StatusActiveRectificationTest))
-    suite.addTest(unittest.makeSuite(StatusActiveRectificationDocumentTest))
-    suite.addTest(unittest.makeSuite(StatusActiveRectificationQuestionsTest))
-    suite.addTest(unittest.makeSuite(StatusActiveRectificationItemsTest))
-    suite.addTest(unittest.makeSuite(StatusDraftWithoutItemsTest))
-    suite.addTest(unittest.makeSuite(StatusActiveRectificationCancellationsTest))
-    suite.addTest(unittest.makeSuite(StatusActiveRectificationCancellationsDocumentsTest))
+    suite.addTest(unittest.makeSuite(ActiveRectificationAdministratorTest))
+    suite.addTest(unittest.makeSuite(ActiveRectificationCancellationsDocumentsTest))
+    suite.addTest(unittest.makeSuite(ActiveRectificationDocumentTest))
+    suite.addTest(unittest.makeSuite(ActiveRectificationItemsTest))
+    suite.addTest(unittest.makeSuite(ActiveRectificationQuestionsTest))
+    suite.addTest(unittest.makeSuite(ActiveRectificationTest))
+    suite.addTest(unittest.makeSuite(ActiveRectificationWithoutItemsTest))
     return suite
 
 

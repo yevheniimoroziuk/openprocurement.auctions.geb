@@ -11,8 +11,9 @@ from openprocurement.auctions.geb.tests.states import (
     ProcedureMachine
 )
 from openprocurement.auctions.geb.tests.blanks.mixins import (
-    CancellationWorkFlowMixin,
-    CancellationDocumentsWorkFlowMixin
+    BaseAdministratorTestMixin,
+    CancellationDocumentsWorkFlowMixin,
+    CancellationWorkFlowMixin
 )
 from openprocurement.auctions.geb.tests.fixtures.active_enquiry import (
     AUCTION_WITH_BIDS_WITH_CANCELLATION,
@@ -61,7 +62,7 @@ from openprocurement.auctions.geb.tests.blanks.cancellations import (
 )
 
 
-class StatusActiveEnquiryTest(BaseWebTest):
+class ActiveEnquiryTest(BaseWebTest):
     docservice = True
 
     test_bid_add = snitch(bid_add)
@@ -73,7 +74,7 @@ class StatusActiveEnquiryTest(BaseWebTest):
     test_auction_change_fields = snitch(auction_change_fields)
 
     def setUp(self):
-        super(StatusActiveEnquiryTest, self).setUp()
+        super(ActiveEnquiryTest, self).setUp()
 
         procedure = ProcedureMachine()
         procedure.set_db_connector(self.db)
@@ -93,13 +94,13 @@ class StatusActiveEnquiryTest(BaseWebTest):
         self.ENTRYPOINTS = entrypoints
 
 
-class StatusActiveEnquiryQuestionsTest(BaseWebTest):
+class ActiveEnquiryQuestionsTest(BaseWebTest):
 
     test_answer_question = snitch(answer_question)
     test_get_question = snitch(get_question)
 
     def setUp(self):
-        super(StatusActiveEnquiryQuestionsTest, self).setUp()
+        super(ActiveEnquiryQuestionsTest, self).setUp()
 
         procedure = ProcedureMachine()
         procedure.set_db_connector(self.db)
@@ -120,7 +121,7 @@ class StatusActiveEnquiryQuestionsTest(BaseWebTest):
         self.ENTRYPOINTS = entrypoints
 
 
-class StatusActiveEnquiryPendingBidsTest(BaseWebTest):
+class ActiveEnquiryPendingBidsTest(BaseWebTest):
     docservice = True
 
     test_bid_patch_in_pending_status = snitch(bid_patch_in_pending_status)
@@ -131,7 +132,7 @@ class StatusActiveEnquiryPendingBidsTest(BaseWebTest):
     test_bid_patch_in_pending_status = snitch(bid_patch_in_pending_status)
 
     def setUp(self):
-        super(StatusActiveEnquiryPendingBidsTest, self).setUp()
+        super(ActiveEnquiryPendingBidsTest, self).setUp()
 
         procedure = ProcedureMachine()
         procedure.set_db_connector(self.db)
@@ -157,7 +158,7 @@ class StatusActiveEnquiryPendingBidsTest(BaseWebTest):
         self.auction = auction
 
 
-class StatusActiveEnquiryActiveBidsTest(BaseWebTest):
+class ActiveEnquiryActiveBidsTest(BaseWebTest):
     docservice = True
 
     test_bid_patch_in_active_status = snitch(bid_patch_in_active_status)
@@ -167,7 +168,7 @@ class StatusActiveEnquiryActiveBidsTest(BaseWebTest):
     test_bid_patch_in_active_status = snitch(bid_patch_in_active_status)
 
     def setUp(self):
-        super(StatusActiveEnquiryActiveBidsTest, self).setUp()
+        super(ActiveEnquiryActiveBidsTest, self).setUp()
 
         procedure = ProcedureMachine()
         procedure.set_db_connector(self.db)
@@ -193,7 +194,7 @@ class StatusActiveEnquiryActiveBidsTest(BaseWebTest):
         self.auction = auction
 
 
-class StatusActiveEnquiryDocumentsTest(BaseWebTest):
+class ActiveEnquiryDocumentsTest(BaseWebTest):
     docservice = True
 
     test_auction_document_patch = snitch(auction_document_patch)
@@ -201,7 +202,7 @@ class StatusActiveEnquiryDocumentsTest(BaseWebTest):
     test_auction_document_put = snitch(auction_document_put)
 
     def setUp(self):
-        super(StatusActiveEnquiryDocumentsTest, self).setUp()
+        super(ActiveEnquiryDocumentsTest, self).setUp()
 
         procedure = ProcedureMachine()
         procedure.set_db_connector(self.db)
@@ -225,11 +226,11 @@ class StatusActiveEnquiryDocumentsTest(BaseWebTest):
         self.ENTRYPOINTS = entrypoints
 
 
-class StatusActiveEnquiryCancellationsTest(BaseWebTest, CancellationWorkFlowMixin):
+class ActiveEnquiryCancellationsTest(BaseWebTest, CancellationWorkFlowMixin):
     docservice = True
 
     def setUp(self):
-        super(StatusActiveEnquiryCancellationsTest, self).setUp()
+        super(ActiveEnquiryCancellationsTest, self).setUp()
 
         procedure = ProcedureMachine()
         procedure.set_db_connector(self.db)
@@ -260,11 +261,11 @@ class StatusActiveEnquiryCancellationsTest(BaseWebTest, CancellationWorkFlowMixi
         self.ENTRYPOINTS = entrypoints
 
 
-class StatusActiveEnquiryWithBidsCancellationsTest(BaseWebTest):
+class ActiveEnquiryWithBidsCancellationsTest(BaseWebTest):
     test_cancellation_make_clean_bids = snitch(cancellation_make_clean_bids)
 
     def setUp(self):
-        super(StatusActiveEnquiryWithBidsCancellationsTest, self).setUp()
+        super(ActiveEnquiryWithBidsCancellationsTest, self).setUp()
 
         procedure = ProcedureMachine()
         procedure.set_db_connector(self.db)
@@ -288,13 +289,13 @@ class StatusActiveEnquiryWithBidsCancellationsTest(BaseWebTest):
         self.ENTRYPOINTS = entrypoints
 
 
-class StatusActiveEnquiryDraftBidsWithDocumentTest(BaseWebTest):
+class ActiveEnquiryDraftBidsWithDocumentTest(BaseWebTest):
 
     test_bid_draft_get_document = snitch(bid_draft_get_document)
     test_bid_draft_patch_document = snitch(bid_draft_patch_document)
 
     def setUp(self):
-        super(StatusActiveEnquiryDraftBidsWithDocumentTest, self).setUp()
+        super(ActiveEnquiryDraftBidsWithDocumentTest, self).setUp()
 
         procedure = ProcedureMachine()
         procedure.set_db_connector(self.db)
@@ -315,13 +316,13 @@ class StatusActiveEnquiryDraftBidsWithDocumentTest(BaseWebTest):
         self.auction = auction
 
 
-class StatusActiveEnquiryPendingBidsWithDocumentTest(BaseWebTest):
+class ActiveEnquiryPendingBidsWithDocumentTest(BaseWebTest):
 
     test_bid_pending_get_document = snitch(bid_pending_get_document)
     test_bid_pending_patch_document = snitch(bid_pending_patch_document)
 
     def setUp(self):
-        super(StatusActiveEnquiryPendingBidsWithDocumentTest, self).setUp()
+        super(ActiveEnquiryPendingBidsWithDocumentTest, self).setUp()
 
         procedure = ProcedureMachine()
         procedure.set_db_connector(self.db)
@@ -342,13 +343,13 @@ class StatusActiveEnquiryPendingBidsWithDocumentTest(BaseWebTest):
         self.auction = auction
 
 
-class StatusActiveEnquiryActiveBidsWithDocumentTest(BaseWebTest):
+class ActiveEnquiryActiveBidsWithDocumentTest(BaseWebTest):
 
     test_bid_active_get_document = snitch(bid_active_get_document)
     test_bid_active_patch_document = snitch(bid_active_patch_document)
 
     def setUp(self):
-        super(StatusActiveEnquiryActiveBidsWithDocumentTest, self).setUp()
+        super(ActiveEnquiryActiveBidsWithDocumentTest, self).setUp()
 
         procedure = ProcedureMachine()
         procedure.set_db_connector(self.db)
@@ -369,11 +370,11 @@ class StatusActiveEnquiryActiveBidsWithDocumentTest(BaseWebTest):
         self.auction = auction
 
 
-class StatusActiveEnquiryCancellationsDocumentsTest(BaseWebTest, CancellationDocumentsWorkFlowMixin):
+class ActiveEnquiryCancellationsDocumentsTest(BaseWebTest, CancellationDocumentsWorkFlowMixin):
     docservice = True
 
     def setUp(self):
-        super(StatusActiveEnquiryCancellationsDocumentsTest, self).setUp()
+        super(ActiveEnquiryCancellationsDocumentsTest, self).setUp()
 
         procedure = ProcedureMachine()
         procedure.set_db_connector(self.db)
@@ -401,19 +402,39 @@ class StatusActiveEnquiryCancellationsDocumentsTest(BaseWebTest, CancellationDoc
         self.ENTRYPOINTS = entrypoints
 
 
+class ActiveEnquiryAdministratorTest(BaseWebTest, BaseAdministratorTestMixin):
+
+    def setUp(self):
+        super(ActiveEnquiryAdministratorTest, self).setUp()
+        procedure = ProcedureMachine()
+        procedure.set_db_connector(self.db)
+        procedure.toggle('active.tendering')
+        context = procedure.snapshot()
+
+        auction = context['auction']
+
+        entrypoints = {}
+
+        entrypoints['get_auction'] = '/auctions/{}'.format(auction['data']['id'])
+        entrypoints['patch_auction'] = '/auctions/{}'.format(auction['data']['id'])
+        self.auction = auction
+        self.ENTRYPOINTS = entrypoints
+
+
 def suite():
     suite = unittest.TestSuite()
-    suite.addTest(unittest.makeSuite(StatusActiveEnquiryTest))
-    suite.addTest(unittest.makeSuite(StatusActiveEnquiryQuestionsTest))
-    suite.addTest(unittest.makeSuite(StatusActiveEnquiryDocumentsTest))
-    suite.addTest(unittest.makeSuite(StatusActiveEnquiryPendingBidsTest))
-    suite.addTest(unittest.makeSuite(StatusActiveEnquiryActiveBidsTest))
-    suite.addTest(unittest.makeSuite(StatusActiveEnquiryDraftBidsWithDocumentTest))
-    suite.addTest(unittest.makeSuite(StatusActiveEnquiryPendingBidsWithDocumentTest))
-    suite.addTest(unittest.makeSuite(StatusActiveEnquiryActiveBidsWithDocumentTest))
-    suite.addTest(unittest.makeSuite(StatusActiveEnquiryCancellationsTest))
-    suite.addTest(unittest.makeSuite(StatusActiveEnquiryCancellationsDocumentsTest))
-    suite.addTest(unittest.makeSuite(StatusActiveEnquiryWithBidsCancellationsTest))
+    suite.addTest(unittest.makeSuite(ActiveEnquiryActiveBidsTest))
+    suite.addTest(unittest.makeSuite(ActiveEnquiryActiveBidsWithDocumentTest))
+    suite.addTest(unittest.makeSuite(ActiveEnquiryCancellationsDocumentsTest))
+    suite.addTest(unittest.makeSuite(ActiveEnquiryCancellationsTest))
+    suite.addTest(unittest.makeSuite(ActiveEnquiryDocumentsTest))
+    suite.addTest(unittest.makeSuite(ActiveEnquiryDraftBidsWithDocumentTest))
+    suite.addTest(unittest.makeSuite(ActiveEnquiryPendingBidsTest))
+    suite.addTest(unittest.makeSuite(ActiveEnquiryPendingBidsWithDocumentTest))
+    suite.addTest(unittest.makeSuite(ActiveEnquiryQuestionsTest))
+    suite.addTest(unittest.makeSuite(ActiveEnquiryTest))
+    suite.addTest(unittest.makeSuite(ActiveEnquiryWithBidsCancellationsTest))
+    suite.addTest(unittest.makeSuite(ActiveEnquiryAdministratorTest))
     return suite
 
 

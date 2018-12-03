@@ -281,6 +281,9 @@ def validate_auction_patch_draft(request, **kwargs):
     expected_data = ('items', 'status')
     json_data = set(request.validated['json_data'].keys())
 
+    if request.authenticated_role == 'Administrator':
+        return True
+
     if auction.status != 'draft':
         return True
 
