@@ -7,9 +7,6 @@ from openprocurement.auctions.geb.tests.base import (
     BaseWebTest
 )
 
-from openprocurement.auctions.geb.tests.helpers import (
-    change_machine_state
-)
 from openprocurement.auctions.geb.tests.states import (
     ProcedureMachine
 )
@@ -32,12 +29,13 @@ class StatusCancelledTest(BaseWebTest):
 
         procedure = ProcedureMachine()
         procedure.set_db_connector(self.db)
-        change_machine_state(procedure, 'active.rectification')
+        procedure.toggle('cancelled')
         context = procedure.snapshot(fixture=AUCTION_CANCELLED)
         auction = context['auction']
 
         entrypoints = {}
         entrypoints['auction_get'] = '/auctions/{}'.format(auction['data']['id'])
+
         self.auction = auction
         self.ENTRYPOINTS = entrypoints
 

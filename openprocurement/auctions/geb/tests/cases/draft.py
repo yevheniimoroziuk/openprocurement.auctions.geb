@@ -22,10 +22,8 @@ from openprocurement.auctions.geb.tests.blanks.cancellations import (
 )
 from openprocurement.auctions.geb.tests.blanks.mixins import (
     CancellationWorkFlowMixin,
-    CancellationDocumentsWorkFlowMixin
-)
-from openprocurement.auctions.geb.tests.helpers import (
-    change_machine_state
+    CancellationDocumentsWorkFlowMixin,
+    BaseAdministratorTestMixin
 )
 from openprocurement.auctions.geb.tests.states import (
     ProcedureMachine
@@ -39,7 +37,7 @@ from openprocurement.auctions.geb.tests.fixtures.draft import (
 )
 
 
-class StatusDraftTest(BaseWebTest):
+class DraftTest(BaseWebTest):
 
     test_phase_commit = snitch(phase_commit)
     test_cancellation_post = snitch(cancellation_post)
@@ -50,10 +48,10 @@ class StatusDraftTest(BaseWebTest):
     test_invalid_phase_commit = snitch(invalid_phase_commit)
 
     def setUp(self):
-        super(StatusDraftTest, self).setUp()
+        super(DraftTest, self).setUp()
         procedure = ProcedureMachine()
         procedure.set_db_connector(self.db)
-        change_machine_state(procedure, 'draft')
+        procedure.toggle('draft')
         context = procedure.snapshot()
 
         auction = context['auction']
@@ -69,16 +67,16 @@ class StatusDraftTest(BaseWebTest):
         self.ENTRYPOINTS = entrypoints
 
 
-class StatusDraftWithoutItemsTest(BaseWebTest):
+class DraftWithoutItemsTest(BaseWebTest):
     test_item_post = snitch(item_post)
     test_item_post_collections = snitch(item_post_collections)
     test_phase_commit_without_items = snitch(phase_commit_without_items)
 
     def setUp(self):
-        super(StatusDraftWithoutItemsTest, self).setUp()
+        super(DraftWithoutItemsTest, self).setUp()
         procedure = ProcedureMachine()
         procedure.set_db_connector(self.db)
-        change_machine_state(procedure, 'draft')
+        procedure.toggle('draft')
         context = procedure.snapshot(fixture=AUCTION_WITHOUT_ITEMS)
 
         auction = context['auction']
@@ -95,15 +93,15 @@ class StatusDraftWithoutItemsTest(BaseWebTest):
         self.ENTRYPOINTS = entrypoints
 
 
-class StatusDraftInvalidAuctionPeriodTest(BaseWebTest):
+class DraftInvalidAuctionPeriodTest(BaseWebTest):
 
     test_phase_commit_invalid_auctionPeriod = snitch(phase_commit_invalid_auctionPeriod)
 
     def setUp(self):
-        super(StatusDraftInvalidAuctionPeriodTest, self).setUp()
+        super(DraftInvalidAuctionPeriodTest, self).setUp()
         procedure = ProcedureMachine()
         procedure.set_db_connector(self.db)
-        change_machine_state(procedure, 'draft')
+        procedure.toggle('draft')
         context = procedure.snapshot(fixture=AUCTION_WITH_INVALID_AUCTON_PERIOD)
 
         auction = context['auction']
@@ -116,11 +114,11 @@ class StatusDraftInvalidAuctionPeriodTest(BaseWebTest):
         self.ENTRYPOINTS = entrypoints
 
 
-class StatusDraftCancellationsTest(BaseWebTest, CancellationWorkFlowMixin):
+class DraftCancellationsTest(BaseWebTest, CancellationWorkFlowMixin):
     docservice = True
 
     def setUp(self):
-        super(StatusDraftCancellationsTest, self).setUp()
+        super(DraftCancellationsTest, self).setUp()
 
         procedure = ProcedureMachine()
         procedure.set_db_connector(self.db)
@@ -155,11 +153,11 @@ class StatusDraftCancellationsTest(BaseWebTest, CancellationWorkFlowMixin):
         self.ENTRYPOINTS = entrypoints
 
 
-class StatusDraftCancellationsDocumentsTest(BaseWebTest, CancellationDocumentsWorkFlowMixin):
+class DraftCancellationsDocumentsTest(BaseWebTest, CancellationDocumentsWorkFlowMixin):
     docservice = True
 
     def setUp(self):
-        super(StatusDraftCancellationsDocumentsTest, self).setUp()
+        super(DraftCancellationsDocumentsTest, self).setUp()
 
         procedure = ProcedureMachine()
         procedure.set_db_connector(self.db)
@@ -187,13 +185,34 @@ class StatusDraftCancellationsDocumentsTest(BaseWebTest, CancellationDocumentsWo
         self.ENTRYPOINTS = entrypoints
 
 
+class DraftAdministratorTest(BaseWebTest, BaseAdministratorTestMixin):
+
+    def setUp(self):
+        super(DraftAdministratorTest, self).setUp()
+        procedure = ProcedureMachine()
+        procedure.set_db_connector(self.db)
+        procedure.toggle('draft')
+        context = procedure.snapshot()
+
+        auction = context['auction']
+
+        entrypoints = {}
+
+        entrypoints['get_auction'] = '/auctions/{}'.format(auction['data']['id'])
+        entrypoints['patch_auction'] = '/auctions/{}'.format(auction['data']['id'])
+
+        self.auction = auction
+        self.ENTRYPOINTS = entrypoints
+
+
 def suite():
     suite = unittest.TestSuite()
-    suite.addTest(unittest.makeSuite(StatusDraftTest))
-    suite.addTest(unittest.makeSuite(StatusDraftInvalidAuctionPeriodTest))
-    suite.addTest(unittest.makeSuite(StatusDraftCancellationsTest))
-    suite.addTest(unittest.makeSuite(StatusDraftCancellationsDocumentsTest))
-    suite.addTest(unittest.makeSuite(StatusDraftWithoutItemsTest))
+    suite.addTest(unittest.makeSuite(DraftAdministratorTest))
+    suite.addTest(unittest.makeSuite(DraftCancellationsDocumentsTest))
+    suite.addTest(unittest.makeSuite(DraftCancellationsTest))
+    suite.addTest(unittest.makeSuite(DraftInvalidAuctionPeriodTest))
+    suite.addTest(unittest.makeSuite(DraftTest))
+    suite.addTest(unittest.makeSuite(DraftWithoutItemsTest))
     return suite
 
 

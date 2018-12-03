@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 import unittest
 
 from openprocurement.auctions.core.tests.base import snitch
@@ -28,9 +27,6 @@ from openprocurement.auctions.geb.tests.blanks.active_tendering import (
 )
 from openprocurement.auctions.geb.tests.blanks.active_auction import (
     get_auction_urls_dump
-)
-from openprocurement.auctions.geb.tests.helpers import (
-    change_machine_state
 )
 from openprocurement.auctions.geb.tests.states import (
     ProcedureMachine
@@ -63,7 +59,7 @@ class CreateAuctionDumpTest(BaseWebDocsTest):
         super(CreateAuctionDumpTest, self).setUp()
         procedure = ProcedureMachine()
         procedure.set_db_connector(self.db)
-        change_machine_state(procedure, 'create')
+        procedure.toggle(procedure, 'create')
         context = procedure.snapshot(dump=False)
         self.auction = context['auction']['data']
 
@@ -78,7 +74,7 @@ class DraftAuctionDumpTest(BaseWebDocsTest):
 
         procedure = ProcedureMachine()
         procedure.set_db_connector(self.db)
-        change_machine_state(procedure, 'draft')
+        procedure.toggle(procedure, 'draft')
         context = procedure.snapshot()
         self.auction = context['auction']
 
@@ -92,7 +88,7 @@ class RectificationAuctionDumpTest(BaseWebDocsTest):
 
         procedure = ProcedureMachine()
         procedure.set_db_connector(self.db)
-        change_machine_state(procedure, 'active.rectification')
+        procedure.toggle(procedure, 'active.rectification')
         context = procedure.snapshot()
         self.auction = context['auction']
         self.ENTRYPOINT = '/auctions/{}?acc_token={}'.format(self.auction['data']['id'],
@@ -109,7 +105,7 @@ class RectificationAuctionDocumentsDumpTest(BaseWebDocsTest):
 
         procedure = ProcedureMachine()
         procedure.set_db_connector(self.db)
-        change_machine_state(procedure, 'active.rectification')
+        procedure.toggle('active.rectification')
         context = procedure.snapshot()
         self.auction = context['auction']
         self.ENTRYPOINT = '/auctions/{}/documents?acc_token={}'.format(self.auction['data']['id'],

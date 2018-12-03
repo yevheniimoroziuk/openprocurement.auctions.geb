@@ -11,7 +11,8 @@ from openprocurement.auctions.geb.tests.states import (
 )
 from openprocurement.auctions.geb.tests.blanks.mixins import (
     CancellationWorkFlowMixin,
-    CancellationDocumentsWorkFlowMixin
+    CancellationDocumentsWorkFlowMixin,
+    BaseAdministratorTestMixin
 )
 from openprocurement.auctions.geb.tests.fixtures.active_tendering import (
     AUCTION_WITH_BIDS_WITH_CANCELLATION,
@@ -68,7 +69,7 @@ from openprocurement.auctions.geb.tests.blanks.cancellations import (
 )
 
 
-class StatusActiveTenderingTest(BaseWebTest):
+class ActiveTenderingTest(BaseWebTest):
     docservice = True
 
     test_auction_document_post_offline = snitch(auction_document_post_offline)
@@ -81,7 +82,7 @@ class StatusActiveTenderingTest(BaseWebTest):
     test_add_invalid_bid = snitch(add_invalid_bid)
 
     def setUp(self):
-        super(StatusActiveTenderingTest, self).setUp()
+        super(ActiveTenderingTest, self).setUp()
 
         procedure = ProcedureMachine()
         procedure.set_db_connector(self.db)
@@ -102,13 +103,13 @@ class StatusActiveTenderingTest(BaseWebTest):
         self.ENTRYPOINTS = entrypoints
 
 
-class StatusActiveTenderingQuestionsTest(BaseWebTest):
+class ActiveTenderingQuestionsTest(BaseWebTest):
 
     test_answer_question = snitch(answer_question)
     test_get_question = snitch(get_question)
 
     def setUp(self):
-        super(StatusActiveTenderingQuestionsTest, self).setUp()
+        super(ActiveTenderingQuestionsTest, self).setUp()
 
         procedure = ProcedureMachine()
         procedure.set_db_connector(self.db)
@@ -130,7 +131,7 @@ class StatusActiveTenderingQuestionsTest(BaseWebTest):
         self.ENTRYPOINTS = entrypoints
 
 
-class StatusActiveTenderingDraftBidsTest(BaseWebTest):
+class ActiveTenderingDraftBidsTest(BaseWebTest):
     docservice = True
 
     test_bid_patch_in_draft_status = snitch(bid_patch_in_draft_status)
@@ -141,7 +142,7 @@ class StatusActiveTenderingDraftBidsTest(BaseWebTest):
     test_bid_patch_in_draft_status = snitch(bid_patch_in_draft_status)
 
     def setUp(self):
-        super(StatusActiveTenderingDraftBidsTest, self).setUp()
+        super(ActiveTenderingDraftBidsTest, self).setUp()
 
         procedure = ProcedureMachine()
         procedure.set_db_connector(self.db)
@@ -167,7 +168,7 @@ class StatusActiveTenderingDraftBidsTest(BaseWebTest):
         self.auction = auction
 
 
-class StatusActiveTenderingPendingBidsTest(BaseWebTest):
+class ActiveTenderingPendingBidsTest(BaseWebTest):
     docservice = True
 
     test_bid_patch_in_pending_status = snitch(bid_patch_in_pending_status)
@@ -179,7 +180,7 @@ class StatusActiveTenderingPendingBidsTest(BaseWebTest):
     test_bid_patch_in_pending_status = snitch(bid_patch_in_pending_status)
 
     def setUp(self):
-        super(StatusActiveTenderingPendingBidsTest, self).setUp()
+        super(ActiveTenderingPendingBidsTest, self).setUp()
 
         procedure = ProcedureMachine()
         procedure.set_db_connector(self.db)
@@ -208,7 +209,7 @@ class StatusActiveTenderingPendingBidsTest(BaseWebTest):
         self.auction = auction
 
 
-class StatusActiveTenderingActiveBidsTest(BaseWebTest):
+class ActiveTenderingActiveBidsTest(BaseWebTest):
     docservice = True
 
     test_bid_patch_in_active_status = snitch(bid_patch_in_active_status)
@@ -218,7 +219,7 @@ class StatusActiveTenderingActiveBidsTest(BaseWebTest):
     test_bid_patch_in_active_status = snitch(bid_patch_in_active_status)
 
     def setUp(self):
-        super(StatusActiveTenderingActiveBidsTest, self).setUp()
+        super(ActiveTenderingActiveBidsTest, self).setUp()
 
         procedure = ProcedureMachine()
         procedure.set_db_connector(self.db)
@@ -244,13 +245,13 @@ class StatusActiveTenderingActiveBidsTest(BaseWebTest):
         self.auction = auction
 
 
-class StatusActiveTenderingDraftBidsWithDocumentTest(BaseWebTest):
+class ActiveTenderingDraftBidsWithDocumentTest(BaseWebTest):
 
     test_bid_get_document_in_active_status = snitch(bid_draft_get_document)
     test_bid_patch_document_in_active_status = snitch(bid_draft_patch_document)
 
     def setUp(self):
-        super(StatusActiveTenderingDraftBidsWithDocumentTest, self).setUp()
+        super(ActiveTenderingDraftBidsWithDocumentTest, self).setUp()
 
         procedure = ProcedureMachine()
         procedure.set_db_connector(self.db)
@@ -271,13 +272,13 @@ class StatusActiveTenderingDraftBidsWithDocumentTest(BaseWebTest):
         self.auction = auction
 
 
-class StatusActiveTenderingPendingBidsWithDocumentTest(BaseWebTest):
+class ActiveTenderingPendingBidsWithDocumentTest(BaseWebTest):
 
     test_bid_get_document_in_active_status = snitch(bid_pending_get_document)
     test_bid_patch_document_in_active_status = snitch(bid_pending_patch_document)
 
     def setUp(self):
-        super(StatusActiveTenderingPendingBidsWithDocumentTest, self).setUp()
+        super(ActiveTenderingPendingBidsWithDocumentTest, self).setUp()
 
         procedure = ProcedureMachine()
         procedure.set_db_connector(self.db)
@@ -298,13 +299,13 @@ class StatusActiveTenderingPendingBidsWithDocumentTest(BaseWebTest):
         self.auction = auction
 
 
-class StatusActiveTenderingActiveBidsWithDocumentTest(BaseWebTest):
+class ActiveTenderingActiveBidsWithDocumentTest(BaseWebTest):
 
     test_bid_get_document_in_active_status = snitch(bid_active_get_document)
     test_bid_patch_document_in_active_status = snitch(bid_active_patch_document)
 
     def setUp(self):
-        super(StatusActiveTenderingActiveBidsWithDocumentTest, self).setUp()
+        super(ActiveTenderingActiveBidsWithDocumentTest, self).setUp()
 
         procedure = ProcedureMachine()
         procedure.set_db_connector(self.db)
@@ -325,7 +326,7 @@ class StatusActiveTenderingActiveBidsWithDocumentTest(BaseWebTest):
         self.auction = auction
 
 
-class StatusActiveTenderingDocumentsTest(BaseWebTest):
+class ActiveTenderingDocumentsTest(BaseWebTest):
     docservice = True
 
     test_auction_document_patch = snitch(auction_document_patch)
@@ -333,7 +334,7 @@ class StatusActiveTenderingDocumentsTest(BaseWebTest):
     test_auction_document_download = snitch(auction_document_download)
 
     def setUp(self):
-        super(StatusActiveTenderingDocumentsTest, self).setUp()
+        super(ActiveTenderingDocumentsTest, self).setUp()
 
         procedure = ProcedureMachine()
         procedure.set_db_connector(self.db)
@@ -357,11 +358,11 @@ class StatusActiveTenderingDocumentsTest(BaseWebTest):
         self.ENTRYPOINTS = entrypoints
 
 
-class StatusActiveTenderingCancellationsTest(BaseWebTest, CancellationWorkFlowMixin):
+class ActiveTenderingCancellationsTest(BaseWebTest, CancellationWorkFlowMixin):
     docservice = True
 
     def setUp(self):
-        super(StatusActiveTenderingCancellationsTest, self).setUp()
+        super(ActiveTenderingCancellationsTest, self).setUp()
 
         procedure = ProcedureMachine()
         procedure.set_db_connector(self.db)
@@ -392,11 +393,11 @@ class StatusActiveTenderingCancellationsTest(BaseWebTest, CancellationWorkFlowMi
         self.ENTRYPOINTS = entrypoints
 
 
-class StatusActiveTenderingWithBidsCancellationsTest(BaseWebTest):
+class ActiveTenderingWithBidsCancellationsTest(BaseWebTest):
     test_cancellation_make_active_clean_bids = snitch(cancellation_make_clean_bids)
 
     def setUp(self):
-        super(StatusActiveTenderingWithBidsCancellationsTest, self).setUp()
+        super(ActiveTenderingWithBidsCancellationsTest, self).setUp()
 
         procedure = ProcedureMachine()
         procedure.set_db_connector(self.db)
@@ -420,11 +421,11 @@ class StatusActiveTenderingWithBidsCancellationsTest(BaseWebTest):
         self.ENTRYPOINTS = entrypoints
 
 
-class StatusActiveTenderingCancellationsDocumentsTest(BaseWebTest, CancellationDocumentsWorkFlowMixin):
+class ActiveTenderingCancellationsDocumentsTest(BaseWebTest, CancellationDocumentsWorkFlowMixin):
     docservice = True
 
     def setUp(self):
-        super(StatusActiveTenderingCancellationsDocumentsTest, self).setUp()
+        super(ActiveTenderingCancellationsDocumentsTest, self).setUp()
 
         procedure = ProcedureMachine()
         procedure.set_db_connector(self.db)
@@ -452,20 +453,40 @@ class StatusActiveTenderingCancellationsDocumentsTest(BaseWebTest, CancellationD
         self.ENTRYPOINTS = entrypoints
 
 
+class ActiveTenderingAdministratorTest(BaseWebTest, BaseAdministratorTestMixin):
+
+    def setUp(self):
+        super(ActiveTenderingAdministratorTest, self).setUp()
+        procedure = ProcedureMachine()
+        procedure.set_db_connector(self.db)
+        procedure.toggle('active.tendering')
+        context = procedure.snapshot()
+
+        auction = context['auction']
+
+        entrypoints = {}
+
+        entrypoints['get_auction'] = '/auctions/{}'.format(auction['data']['id'])
+        entrypoints['patch_auction'] = '/auctions/{}'.format(auction['data']['id'])
+        self.auction = auction
+        self.ENTRYPOINTS = entrypoints
+
+
 def suite():
     suite = unittest.TestSuite()
-    suite.addTest(unittest.makeSuite(StatusActiveTenderingTest))
-    suite.addTest(unittest.makeSuite(StatusActiveTenderingQuestionsTest))
-    suite.addTest(unittest.makeSuite(StatusActiveTenderingDraftBidsTest))
-    suite.addTest(unittest.makeSuite(StatusActiveTenderingPendingBidsTest))
-    suite.addTest(unittest.makeSuite(StatusActiveTenderingActiveBidsTest))
-    suite.addTest(unittest.makeSuite(StatusActiveTenderingDraftBidsWithDocumentTest))
-    suite.addTest(unittest.makeSuite(StatusActiveTenderingPendingBidsWithDocumentTest))
-    suite.addTest(unittest.makeSuite(StatusActiveTenderingActiveBidsWithDocumentTest))
-    suite.addTest(unittest.makeSuite(StatusActiveTenderingDocumentsTest))
-    suite.addTest(unittest.makeSuite(StatusActiveTenderingCancellationsTest))
-    suite.addTest(unittest.makeSuite(StatusActiveTenderingCancellationsDocumentsTest))
-    suite.addTest(unittest.makeSuite(StatusActiveTenderingWithBidsCancellationsTest))
+    suite.addTest(unittest.makeSuite(ActiveTenderingActiveBidsTest))
+    suite.addTest(unittest.makeSuite(ActiveTenderingActiveBidsWithDocumentTest))
+    suite.addTest(unittest.makeSuite(ActiveTenderingAdministratorTest))
+    suite.addTest(unittest.makeSuite(ActiveTenderingCancellationsDocumentsTest))
+    suite.addTest(unittest.makeSuite(ActiveTenderingCancellationsTest))
+    suite.addTest(unittest.makeSuite(ActiveTenderingDocumentsTest))
+    suite.addTest(unittest.makeSuite(ActiveTenderingDraftBidsTest))
+    suite.addTest(unittest.makeSuite(ActiveTenderingDraftBidsWithDocumentTest))
+    suite.addTest(unittest.makeSuite(ActiveTenderingPendingBidsTest))
+    suite.addTest(unittest.makeSuite(ActiveTenderingPendingBidsWithDocumentTest))
+    suite.addTest(unittest.makeSuite(ActiveTenderingQuestionsTest))
+    suite.addTest(unittest.makeSuite(ActiveTenderingTest))
+    suite.addTest(unittest.makeSuite(ActiveTenderingWithBidsCancellationsTest))
     return suite
 
 
