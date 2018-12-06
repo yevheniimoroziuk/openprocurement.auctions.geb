@@ -402,7 +402,7 @@ def validate_patch_bid_data(request, **kwargs):
     validate_patch_data(request, request.context.__class__, data)
 
 
-def validate_document_adding_period(request):
+def validate_auction_document_post(request):
     status = request.context.status
     role = request.authenticated_role
 
@@ -419,7 +419,7 @@ def validate_document_adding_period(request):
     return True
 
 
-def validate_questions_post(request, **kwargs):
+def validate_question_post(request, **kwargs):
     """
         Validator for question post
     """
@@ -454,7 +454,7 @@ def cav_ps_code_validator(data, code):
 # auction post validators
 
 
-def validate_auction_post_correct_auctionPeriod(request, **kwargs):
+def validate_auction_post(request, **kwargs):
     """
         check if auction initial data has auctionPeriod.startDate
         auctionPeriod.startDate is required for creating auction
@@ -480,8 +480,15 @@ def validate_auction_status_for_adding_bid_document(request, **kwargs):
     return True
 
 
-def validate_bid_status_for_adding_bid_document(request, **kwargs):
+def validate_bid_document_post(request, **kwargs):
     bid = kwargs['bid']
+    auction = kwargs['auction']
+
+    if auction.status not in AUCTION_STATUSES_FOR_ADDING_BID_DOCUMENTS:
+        err_msg = 'Can\'t document in current ({}) auction status'.format(auction.status)
+        request.errors.add('body', 'data', err_msg)
+        request.errors.status = 403
+        return
 
     if bid.status not in BID_STATUSES_FOR_ADDING_BID_DOCUMENTS:
         err_msg = 'Can\'t add document in current ({}) bid status'.format(bid.status)

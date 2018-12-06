@@ -6,14 +6,10 @@ from openprocurement.auctions.geb.managers.actions.main import (
 from openprocurement.auctions.geb.interfaces import (
     IAuctionDocumentAction,
     IBidDocumentAction,
-    ICancellationDocumentAction
 )
 from openprocurement.auctions.geb.validation import (
     validate_auction_document_patch,
     validate_auction_document_put,
-    validate_document_adding_period,
-    validate_auction_status_for_adding_bid_document,                        # TODO rename all
-    validate_bid_status_for_adding_bid_document
 )
 
 # auction documents actions
@@ -63,30 +59,6 @@ class AuctionDocumentPutAction(object):
         pass
 
 
-@implementer(IAuctionDocumentAction)
-class AuctionDocumentPostAction(object):
-    """
-        This action triggered then create(post) auction document
-    """
-    validators = [validate_document_adding_period]
-
-    def __init__(self, request, auction, context):
-        self._request = request
-        self._context = context
-        self._auction = auction
-
-    @classmethod
-    def demand(cls, request, context):
-        if request.method == 'POST':
-            return cls
-        return False
-
-    def act(self):
-        pass
-
-# bid documents actions
-
-
 @implementer(IBidDocumentAction)
 class BidDocumentPatchAction(object):
     """
@@ -109,54 +81,6 @@ class BidDocumentPatchAction(object):
         pass
 
 
-@implementer(IBidDocumentAction)
-class BidDocumentPostAction(object):
-    """
-        This action triggered then create(post) bid document
-    """
-    validators = [
-        validate_auction_status_for_adding_bid_document,
-        validate_bid_status_for_adding_bid_document
-    ]
-
-    def __init__(self, request, auction, context):
-        self._request = request
-        self._context = context
-        self._auction = auction
-
-    @classmethod
-    def demand(cls, request, context):
-        if request.method == 'POST':
-            return cls
-        return False
-
-    def act(self):
-        pass
-
-# cancellation document actions
-
-
-@implementer(ICancellationDocumentAction)
-class CancellationDocumentPostAction(object):
-    """
-        This action triggered then create(post) cancellation document
-    """
-    validators = []
-
-    def __init__(self, request, auction, context):
-        self._request = request
-        self._context = context
-        self._auction = auction
-
-    @classmethod
-    def demand(cls, request, context):
-        if request.method == 'POST':
-            return cls
-        return False
-
-    def act(self):
-        pass
-
 # auction document actions factories
 
 
@@ -172,30 +96,10 @@ class AuctionDocumentPutActionsFactory(ActionFactory):
     )
 
 
-class AuctionDocumentCreateActionsFactory(ActionFactory):
-    actions = (
-         AuctionDocumentPostAction,
-    )
-
-
 # bid document actions factories
 
 
 class BidDocumentPatchActionsFactory(ActionFactory):
     actions = (
          BidDocumentPatchAction,
-    )
-
-
-class BidDocumentCreateActionsFactory(ActionFactory):
-    actions = (
-         BidDocumentPostAction,
-    )
-
-
-# Cancellation document actions factories
-
-class CancellationDocumentCreateActionsFactory(ActionFactory):
-    actions = (
-         CancellationDocumentPostAction,
     )

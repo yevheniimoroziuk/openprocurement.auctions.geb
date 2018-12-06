@@ -38,37 +38,10 @@ class ItemPatchAction(object):
         pass
 
 
-@implementer(IItemAction)
-class ItemPostAction(object):
-    """
-        This action triggered then create(post) item
-    """
-    validators = []
-
-    def __init__(self, request, auction, context):
-        self._request = request
-        self._context = context
-        self._auction = auction
-
-    @classmethod
-    def demand(cls, request, context):
-        if request.method == 'POST':
-            return cls
-        return False
-
-    def act(self):
-        pass
-
 # factories
 
 
 class ItemChangeActionsFactory(ActionFactory):
     actions = (
         ItemPatchAction,
-    )
-
-
-class ItemCreateActionsFactory(ActionFactory):
-    actions = (
-        ItemPostAction,
     )

@@ -33,9 +33,9 @@ from openprocurement.auctions.geb.managers.representers import (
     CancellationCreatedRepresenter
 )
 
-from openprocurement.auctions.geb.managers.creators import (
-    AuctionCreator,
-    CancellationCreator,
+from openprocurement.auctions.geb.managers.creators.managers import (
+    AuctionCreationManager,
+    CancellationCreationManager
 
 )
 from openprocurement.auctions.geb.managers.deleters import (
@@ -52,7 +52,7 @@ from openprocurement.auctions.geb.managers.loggers import (
 
 
 class AuctionManager(AuctionManager):
-    creator = AuctionCreator
+    creation_manager = AuctionCreationManager
     logger = AuctionLogger
 
     @property
@@ -86,7 +86,7 @@ class ItemManager(ItemManager):
 
 
 class CancellationManager(CancellationManager):
-    creator = CancellationCreator
+    creation_manager = CancellationCreationManager
     changer = CancellationPatchChanger
     Representer = CancellationRepresenter
     log = CancellationLogger

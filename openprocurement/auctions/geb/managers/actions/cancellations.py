@@ -52,35 +52,8 @@ class CancellationActivationAction(object):
             self._auction.bids = []
 
 
-@implementer(ICancellationAction)
-class CancellationPostAction(object):
-    """
-        This action triggered then create(post) question
-    """
-    validators = []
-
-    def __init__(self, request, auction, context):
-        self._request = request
-        self._context = context
-        self._auction = auction
-
-    @classmethod
-    def demand(cls, request, context):
-        if request.method == 'POST':
-            return cls
-        return False
-
-    def act(self):
-        pass
-
 # factories
 
 
 class CancellationChangeActionsFactory(ActionFactory):
     actions = (CancellationActivationAction,)
-
-
-class CancellationCreateActionsFactory(ActionFactory):
-    actions = (
-        CancellationPostAction,
-    )

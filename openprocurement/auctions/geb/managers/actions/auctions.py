@@ -16,14 +16,12 @@ from openprocurement.auctions.geb.interfaces import (
     IAuctionAction
 )
 from openprocurement.auctions.geb.constants import (
-    AUCTION_PARAMETERS_TYPE,
     AUCTION_RECTIFICATION_PERIOD_DURATION,
 )
 from openprocurement.auctions.geb.validation import (
     validate_auction_patch_draft,
     validate_auction_patch_rectification,
     validate_auction_identity_of_bids,
-    validate_auction_post_correct_auctionPeriod,
     validate_auction_auction_status,
     validate_auction_number_of_bids,
     validate_auction_patch_period,
@@ -212,38 +210,6 @@ class AuctionPatchAction(object):
 
 
 @implementer(IAuctionAction)
-class AuctionCreateAction(object):
-    """
-        This action triggered then was created auction resource
-    """
-    validators = [
-        validate_auction_post_correct_auctionPeriod
-    ]
-
-    def __init__(self, request, context):
-        self._request = request
-        self._context = context
-
-    @classmethod
-    def demand(cls, request, context):
-        if context.status != 'draft':
-            return False
-
-        if request.method != 'POST':
-            return False
-        return cls
-
-    def act(self):
-        now = get_now()
-
-        # initialize auctionParameters
-        self._context.auctionParameters = {'type': AUCTION_PARAMETERS_TYPE}
-
-        # initialize date
-        self._context.date = now
-
-
-@implementer(IAuctionAction)
 class ModuleAuctionBringsAction(object):
     """
         This action triggered then moudule auction brings result of auction
@@ -293,12 +259,6 @@ class AuctionActionsFactory(ActionFactory):
         AuctionPatchDraftAction,
         AuctionPatchActiveRectificationAction,
         AuctionPatchAction
-    )
-
-
-class AuctionCreateActionsFactory(ActionFactory):
-    actions = (
-        AuctionCreateAction,
     )
 
 

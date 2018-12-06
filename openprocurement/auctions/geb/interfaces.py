@@ -104,19 +104,19 @@ class ISubResourceChanger(Interface):
 # creators interfaces
 
 
-class IBasicCreator(Interface):
+class IAuctionCreationManager(Interface):
     """Interface for resource creator"""
 
 
-class IDerivativeCreator(Interface):
+class ISubAuctionCreationManager(Interface):
     """Interface for resource creator"""
 
 
-class IBasicResourceCreator(Interface):
+class IAuctionCreator(Interface):
     """Interface for resource creator"""
 
 
-class IDerivativeResourceCreator(Interface):
+class ISubAuctionCreator(Interface):
     """Interface for resource creator"""
 
 # representers interfaces

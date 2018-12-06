@@ -1,7 +1,7 @@
 import logging
 from pyramid.interfaces import IRequest
 
-from openprocurement.auctions.geb.managers.main import (
+from openprocurement.auctions.geb.managers.base import (
     AuctionDocumentManager,
     AuctionManager,
     AuctionPartialManager,
