@@ -40,15 +40,18 @@ class AuctionCancellationResource(APIResource):
         if save:
             msg = 'Create auction cancellation {}'.format(cancellation['id'])
             manager.log_action('auction_cancellation_create', msg)
-            return manager.represent_subresource_created(cancellation)
+            representation_manager = manager.get_representation_manager()
+            return representation_manager.represent_created(implementedBy(cancellation))
 
     @json_view(permission='view_auction')
     def collection_get(self):
         """Auction Cancellations List"""
 
         manager = self.request.registry.queryMultiAdapter((self.request, self.context), IAuctionManager)
+
+        representation_manager = manager.get_representation_manager()
         cancellation_type = type(manager.context).cancellations.model_class
-        return manager.represent_subresources_listing(implementedBy(cancellation_type))
+        return representation_manager.represent_listing(implementedBy(cancellation_type))
 
     @json_view(permission='view_auction')
     def get(self):
@@ -56,7 +59,8 @@ class AuctionCancellationResource(APIResource):
         Auction Cancellation Get
         """
         manager = self.request.registry.queryMultiAdapter((self.request, self.context), ICancellationManager)
-        return manager.represent(self.request.method)
+        representation_manager = manager.get_representation_manager()
+        return representation_manager.represent()
 
     @json_view(content_type="application/json", validators=(validate_patch_resource_data,),
                permission='edit_auction')
@@ -72,4 +76,5 @@ class AuctionCancellationResource(APIResource):
         if save:
             msg = 'Updated auction cancellation {}'.format(manager.context.id)
             manager.log_action('auction_cancellation_patch', msg)
-            return manager.represent(self.request.method)
+            representation_manager = manager.get_representation_manager()
+            return representation_manager.represent()

@@ -104,25 +104,17 @@ class ISubResourceChanger(Interface):
 # creators interfaces
 
 
-class IAuctionCreationManager(Interface):
+class ICreationManager(Interface):
     """Interface for resource creator"""
 
 
-class ISubAuctionCreationManager(Interface):
-    """Interface for resource creator"""
-
-
-class IAuctionCreator(Interface):
-    """Interface for resource creator"""
-
-
-class ISubAuctionCreator(Interface):
+class IResourceCreator(Interface):
     """Interface for resource creator"""
 
 # representers interfaces
 
 
-class IResourceCreatedRepresenter(Interface):
+class IResourceRepresenter(Interface):
     """Interface for resource creator"""
 
 
@@ -130,22 +122,13 @@ class ICreatedRepresenter(Interface):
     """Interface for resource creator"""
 
 
-class ICreatedRepresentersFactory(Interface):
+class IListingRepresenter(Interface):
     """Interface for resource creator"""
 
 
-# managers interfaces
-
-# listings
-
-
-class IResourceListingRepresenter(Interface):
-    """Interface for Auction Listing Representer"""
+class IRepresentersFactory(Interface):
+    """Interface for resource creator"""
 
 
-class IListingRepresenter(Interface):
-    """Interface for Listings Representer"""
-
-
-class IListingRepresentersFactory(Interface):
-    """Interface for Listings Representers Factory"""
+class IRepresentationManager(Interface):
+    """Interface for resource creator"""

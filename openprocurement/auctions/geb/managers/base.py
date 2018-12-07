@@ -24,17 +24,18 @@ from openprocurement.auctions.geb.managers.changers import (
     AuctionDocumentPatchChanger,
     AuctionDocumentPutChanger
 )
-from openprocurement.auctions.geb.managers.representers import (
-    BidRepresenter,
-    CancellationRepresenter,
-    ItemRepresenter,
-    CancellationDocumentRepresenter,
-    CancellationListingRepresenter,
-    CancellationCreatedRepresenter
+from openprocurement.auctions.geb.managers.representers.representers import (
+    ItemRepresenter
+)
+from openprocurement.auctions.geb.managers.representers.managers import (
+    AuctionRepresentationManager,
+    BidRepresentationManager,
+    CancellationRepresentationManager
 )
 
 from openprocurement.auctions.geb.managers.creators.managers import (
     AuctionCreationManager,
+    BidCreationManager,
     CancellationCreationManager
 
 )
@@ -53,21 +54,23 @@ from openprocurement.auctions.geb.managers.loggers import (
 
 class AuctionManager(AuctionManager):
     creation_manager = AuctionCreationManager
+    representation_manager = AuctionRepresentationManager
     logger = AuctionLogger
 
     @property
     def changer(self):
-        if self._request.authenticated_role == 'auction':
+        if self.request.authenticated_role == 'auction':
             return ModuleAuctionChanger
-        if self._request.authenticated_role == 'chronograph':
+        if self.request.authenticated_role == 'chronograph':
             return ChronographChanger
         return AuctionChanger
 
 
 class BidManager(BidManager):
     changer = BidPatchChanger
+    creation_manager = BidCreationManager
     Deleter = BidDeleter
-    Representer = BidRepresenter
+    representation_manager = BidRepresentationManager
     Logger = BidLogger
 
 
@@ -88,14 +91,11 @@ class ItemManager(ItemManager):
 class CancellationManager(CancellationManager):
     creation_manager = CancellationCreationManager
     changer = CancellationPatchChanger
-    Representer = CancellationRepresenter
     log = CancellationLogger
-    listing_representer = CancellationListingRepresenter
-    created_representer = CancellationCreatedRepresenter
+    representation_manager = CancellationRepresentationManager
 
 
 class CancellationDocumentManager(CancellationDocumentManager):
-    representer = CancellationDocumentRepresenter
     logger = CancellationDocumentLogger
 
 
@@ -103,7 +103,7 @@ class AuctionDocumentManager(DocumentManager):
 
     @property
     def changer(self):
-        if self._request.method == 'PUT':
+        if self.request.method == 'PUT':
             return AuctionDocumentPutChanger
         return AuctionDocumentPatchChanger
 

@@ -402,8 +402,9 @@ def validate_patch_bid_data(request, **kwargs):
     validate_patch_data(request, request.context.__class__, data)
 
 
-def validate_auction_document_post(request):
-    status = request.context.status
+def validate_auction_document_post(request, **kwargs):
+    auction = request.auction
+    status = auction.status
     role = request.authenticated_role
 
     if role != 'auction':
@@ -423,7 +424,7 @@ def validate_question_post(request, **kwargs):
     """
         Validator for question post
     """
-    auction = kwargs['auction']
+    auction = request.auction
 
     if auction.status not in AUCTION_STATUSES_FOR_ADDING_QUESTIONS:
         err_msg = 'Can add question only in {}'.format(AUCTION_STATUSES_FOR_ADDING_QUESTIONS)
@@ -450,8 +451,6 @@ def validate_patch_questions(request, **kwargs):
 def cav_ps_code_validator(data, code):
     if code not in CAV_PS_CODES:
         raise ValidationError(BaseType.MESSAGES['choices'].format(CAV_PS_CODES))
-
-# auction post validators
 
 
 def validate_auction_post(request, **kwargs):
@@ -481,8 +480,8 @@ def validate_auction_status_for_adding_bid_document(request, **kwargs):
 
 
 def validate_bid_document_post(request, **kwargs):
-    bid = kwargs['bid']
-    auction = kwargs['auction']
+    bid = kwargs['context']
+    auction = request.auction
 
     if auction.status not in AUCTION_STATUSES_FOR_ADDING_BID_DOCUMENTS:
         err_msg = 'Can\'t document in current ({}) auction status'.format(auction.status)

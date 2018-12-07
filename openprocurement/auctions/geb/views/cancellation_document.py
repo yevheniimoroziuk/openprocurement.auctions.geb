@@ -27,8 +27,10 @@ class AuctionCancellationDocumentResource(AuctionCancellationDocumentResource):
         """Auction Cancellation Documents List"""
 
         manager = self.request.registry.queryMultiAdapter((self.request, self.context), ICancellationManager)
+        representation_manager = manager.get_representation_manager()
+
         document_type = type(manager.context).documents.model_class
-        return manager.listing(implementedBy(document_type))
+        return representation_manager.represent_listing(implementedBy(document_type))
 
     @json_view(validators=(validate_file_upload,), permission='edit_auction')
     def collection_post(self):
@@ -36,11 +38,11 @@ class AuctionCancellationDocumentResource(AuctionCancellationDocumentResource):
         Auction Cancellation Document Post
         """
 
-        import ipdb; ipdb.set_trace()  # XXX BREAKPOINT
         manager = self.request.registry.queryMultiAdapter((self.request, self.context), ICancellationManager)
         document = manager.create(self.request.validated['document'])
 
         if manager.save():
             msg = 'Create auction cancellation document {}'.format(document['id'])
             manager.log('auction_cancellation_document_create', msg)
-            return manager.represent_created(document)
+            representation_manager = manager.get_representation_manager()
+            return representation_manager.represent_created(document)

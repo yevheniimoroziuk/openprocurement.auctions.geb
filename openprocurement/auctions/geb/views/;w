@@ -38,18 +38,18 @@ class AuctionBidResource(AuctionBidResource):
         Auction Bid Get
         """
         manager = self.request.registry.queryMultiAdapter((self.request, self.context), IBidManager)
-        representation_manager = manager.get_representation_manager()
-        return representation_manager.represent()
+        return manager.represent(self.request.method)
 
     @json_view(permission='edit_bid')
     def delete(self):
+        save = None
 
         manager = self.request.registry.queryMultiAdapter((self.request, self.context), IBidManager)
 
         manager.delete()
+        save = manager.save()
 
-        if manager.save():
+        if save:
             msg = 'Delete auction bid {}'.format(manager.context.id)
             manager.log_action('auction_bid_delete', msg)
-            representation_manager = manager.get_representation_manager()
-            return representation_manager.represent()
+            return manager.represent(self.request.method)

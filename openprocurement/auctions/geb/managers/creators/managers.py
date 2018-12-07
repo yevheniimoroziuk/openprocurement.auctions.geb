@@ -1,11 +1,11 @@
 from openprocurement.auctions.geb.managers.creators.base import (
-    BaseAuctionCreationManager,
-    BaseSubAuctionCreationManager
+    BaseCreationManager,
 )
 
 from openprocurement.auctions.geb.managers.creators.creators import (
     AuctionCreator,
     AuctionDocumentCreator,
+    BidDocumentCreator,
     CancellationCreator,
     CancellationDocumentCreator,
     ItemCreator,
@@ -13,7 +13,7 @@ from openprocurement.auctions.geb.managers.creators.creators import (
 )
 
 
-class AuctionCreationManager(BaseAuctionCreationManager):
+class AuctionCreationManager(BaseCreationManager):
     creators = (
         AuctionCreator,
         AuctionDocumentCreator,
@@ -23,6 +23,10 @@ class AuctionCreationManager(BaseAuctionCreationManager):
     )
 
 
-class CancellationCreationManager(BaseSubAuctionCreationManager):
+class CancellationCreationManager(BaseCreationManager):
 
     creators = (CancellationDocumentCreator, )
+
+
+class BidCreationManager(BaseCreationManager):
+    creators = (BidDocumentCreator, )
