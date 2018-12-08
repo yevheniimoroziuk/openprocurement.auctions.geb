@@ -34,8 +34,8 @@ class EndActiveRectificationAction(BaseAction):
     def act(self):
         # switch procedure to 'active.tendering'
 
-        self._context.status = 'active.tendering'
-        self._context.modified = True
+        self.context.status = 'active.tendering'
+        self.context.modified = True
 
 
 class EndActiveTenderingAction(BaseAction):
@@ -58,34 +58,34 @@ class EndActiveTenderingAction(BaseAction):
         return False
 
     def act(self):
-        bids = self._context.bids
+        bids = self.context.bids
         active_bids = [bid for bid in bids if bid.status in ['pending', 'active']]
 
         # if no any bids in status 'active' or 'pending'
         # switch procedure to status 'unsuccessful'
         if not active_bids:
-            self._context.status = 'unsuccessful'
-            self._context.modified = True
+            self.context.status = 'unsuccessful'
+            self.context.modified = True
             return True
 
         # if minNumberOfQualifiedBids is 2 and is only 1 bid
         # switch procedure to status 'unsuccessful'
-        min_number = self._context.minNumberOfQualifiedBids
+        min_number = self.context.minNumberOfQualifiedBids
 
         if min_number == 2 and len(active_bids) == 1:
-            self._context.status = 'unsuccessful'
-            self._context.modified = True
+            self.context.status = 'unsuccessful'
+            self.context.modified = True
             return True
 
         # after tendering period, all bids in status 'draft' are delete
         for bid in bids:
             if bid.status == 'draft':
-                remove_bid(self._request, self._context, bid)
+                remove_bid(self.request, self.context, bid)
 
         # switch procedure to 'active.enquiry'
-        self._context.status = 'active.enquiry'
+        self.context.status = 'active.enquiry'
 
-        self._context.modified = True
+        self.context.modified = True
 
 
 class EndActiveEnquiryAction(BaseAction):
@@ -110,38 +110,38 @@ class EndActiveEnquiryAction(BaseAction):
     def act(self):
         # check enquiry minNumberOfQualifiedBids
 
-        min_number = self._context.minNumberOfQualifiedBids
-        bids = self._context.bids
+        min_number = self.context.minNumberOfQualifiedBids
+        bids = self.context.bids
         active_bids = [bid for bid in bids if bid.status == 'active']
 
         if min_number == 1:
             if len(active_bids) == 0:
-                self._context.status = 'unsuccessful'
+                self.context.status = 'unsuccessful'
             elif len(active_bids) == 1:
-                self._context.status = 'active.qualification'
+                self.context.status = 'active.qualification'
                 # start awarding
                 reg = get_current_registry()
-                awarding = reg.queryMultiAdapter((self._context, self._request), IContentConfigurator)
+                awarding = reg.queryMultiAdapter((self.context, self.request), IContentConfigurator)
                 awarding.start_awarding()
 
             elif len(active_bids) >= 2:
-                self._context.status = 'active.auction'
+                self.context.status = 'active.auction'
         elif min_number == 2:
             if len(active_bids) == 0:
-                self._context.status = 'unsuccessful'
+                self.context.status = 'unsuccessful'
             elif len(active_bids) == 1:
-                self._context.status = 'unsuccessful'
+                self.context.status = 'unsuccessful'
             elif len(active_bids) >= 2:
-                self._context.status = 'active.auction'
+                self.context.status = 'active.auction'
 
         # in the end of enquiry period
         # all bids that are in status 'draft/pending'
         # switch to 'unsuccessful' status
-        for bid in self._context['bids']:
+        for bid in self.context['bids']:
             if bid.status in ['draft', 'pending']:
                 bid.status = 'unsuccessful'
 
-        self._context.modified = True
+        self.context.modified = True
 
 
 class SetAuctionPeriodStartDateAction(BaseAction):

@@ -12,13 +12,11 @@ from openprocurement.auctions.core.adapters import (
     AuctionManagerAdapter
 )
 
-from openprocurement.auctions.geb.managers.representers.representers import (
-    ItemRepresenter
-)
 from openprocurement.auctions.geb.managers.representers.managers import (
     AuctionRepresentationManager,
     BidRepresentationManager,
-    CancellationRepresentationManager
+    CancellationRepresentationManager,
+    ItemRepresentationManager
 )
 
 from openprocurement.auctions.geb.managers.changers.managers import (
@@ -26,6 +24,7 @@ from openprocurement.auctions.geb.managers.changers.managers import (
     AuctionDocumentChangionManager,
     BidChangionManager,
     BidDocumentChangionManager,
+    CancellationChangionManager,
     ItemChangionManager,
     QuestionChangionManager
 )
@@ -35,11 +34,11 @@ from openprocurement.auctions.geb.managers.creators.managers import (
     CancellationCreationManager
 
 )
-from openprocurement.auctions.geb.managers.deleters import (
-    BidDeleter
+from openprocurement.auctions.geb.managers.deleters.managers import (
+    BidDeletionManager
 )
 
-from openprocurement.auctions.geb.managers.loggers import (
+from openprocurement.auctions.geb.managers.loggers.loggers import (
     AuctionLogger,
     BidLogger,
     CancellationLogger,
@@ -52,15 +51,15 @@ class AuctionManager(AuctionManager):
     creation_manager = AuctionCreationManager
     changion_manager = AuctionChangionManager
     representation_manager = AuctionRepresentationManager
-    logger = AuctionLogger
+    log = AuctionLogger
 
 
 class BidManager(BidManager):
     changion_manager = BidChangionManager
     creation_manager = BidCreationManager
-    Deleter = BidDeleter
+    deletion_manager = BidDeletionManager
     representation_manager = BidRepresentationManager
-    Logger = BidLogger
+    log = BidLogger
 
 
 class BidDocumentManager(BidDocumentManager):
@@ -73,18 +72,19 @@ class QuestionManager(QuestionManager):
 
 class ItemManager(ItemManager):
     changion_manager = ItemChangionManager
-    Representer = ItemRepresenter
-    Logger = ItemLogger
+    representation_manager = ItemRepresentationManager
+    log = ItemLogger
 
 
 class CancellationManager(CancellationManager):
     creation_manager = CancellationCreationManager
-    log = CancellationLogger
+    changion_manager = CancellationChangionManager
     representation_manager = CancellationRepresentationManager
+    log = CancellationLogger
 
 
 class CancellationDocumentManager(CancellationDocumentManager):
-    logger = CancellationDocumentLogger
+    log = CancellationDocumentLogger
 
 
 class AuctionDocumentManager(DocumentManager):

@@ -64,7 +64,7 @@ class CancellationDocumentCreatedRepresenter(BaseCreatedRepresenter):
         location = self.request.current_route_url(_route_name=route, document_id=document['id'], _query={})
         self.request.response.headers['Location'] = location
 
-        return {'data': self.context.serialize('view')}
+        return {'data': document.serialize('view')}
 
 
 class CancellationCreatedRepresenter(BaseCreatedRepresenter):
@@ -76,7 +76,7 @@ class CancellationCreatedRepresenter(BaseCreatedRepresenter):
         location = self.request.current_route_url(_route_name=route, cancellation_id=cancellation['id'], _query={})
         self.request.response.headers['Location'] = location
 
-        return {'data': self.context.serialize('view')}
+        return {'data': cancellation.serialize('view')}
 
 
 class ItemCreatedRepresenter(BaseCreatedRepresenter):
@@ -88,7 +88,7 @@ class ItemCreatedRepresenter(BaseCreatedRepresenter):
         location = self.request.current_route_url(_route_name=route, item_id=item['id'], _query={})
         self.request.response.headers['Location'] = location
 
-        return {'data': self.context.serialize('view')}
+        return {'data': item.serialize('view')}
 
 
 class AuctionDocumentCreatedRepresenter(BaseCreatedRepresenter):
@@ -100,7 +100,7 @@ class AuctionDocumentCreatedRepresenter(BaseCreatedRepresenter):
         location = self.request.current_route_url(_route_name=route, document_id=document['id'], _query={})
         self.request.response.headers['Location'] = location
 
-        return {'data': self.context.serialize('view')}
+        return {'data': document.serialize('view')}
 
 
 class BidCreatedRepresenter(BaseCreatedRepresenter):
@@ -112,7 +112,7 @@ class BidCreatedRepresenter(BaseCreatedRepresenter):
         location = self.request.current_route_url(_route_name=route, bid_id=bid['id'], _query={})
         self.request.response.headers['Location'] = location
 
-        return {'data': self.context.serialize('view')}
+        return {'data': bid.serialize('view')}
 
 
 class QuestionCreatedRepresenter(BaseCreatedRepresenter):
@@ -124,7 +124,7 @@ class QuestionCreatedRepresenter(BaseCreatedRepresenter):
         location = self.request.current_route_url(_route_name=route, question_id=question['id'], _query={})
         self.request.response.headers['Location'] = location
 
-        return {'data': self.context.serialize('view')}
+        return {'data': question.serialize('view')}
 
 # listing representers
 

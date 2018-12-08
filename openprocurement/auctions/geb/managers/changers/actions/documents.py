@@ -1,8 +1,3 @@
-from zope.interface import implementer
-
-from openprocurement.auctions.geb.interfaces import (
-    IAuctionDocumentAction,
-)
 from openprocurement.auctions.geb.validation import (
     validate_auction_document_patch,
     validate_auction_document_put,
@@ -28,8 +23,7 @@ class AuctionDocumentPatchAction(BaseAction):
         pass
 
 
-@implementer(IAuctionDocumentAction)
-class AuctionDocumentPutAction(object):
+class AuctionDocumentPutAction(BaseAction):
     """
         This action triggered then put auction document
     """

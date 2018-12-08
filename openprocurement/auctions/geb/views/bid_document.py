@@ -13,8 +13,7 @@ from openprocurement.auctions.core.validation import (
 )
 
 from openprocurement.auctions.core.interfaces import (
-    IBidManager,
-    IBidDocumentManager
+    IManager
 )
 
 
@@ -32,7 +31,7 @@ class AuctionBidDocumentResource(AuctionBidDocumentResource):
         save = None
 
         applicant = self.request.validated['document']
-        manager = self.request.registry.queryMultiAdapter((self.request, self.context), IBidManager)
+        manager = self.request.registry.queryMultiAdapter((self.request, self.context), IManager)
         document = manager.create(applicant)
         save = manager.save()
 
@@ -53,7 +52,7 @@ class AuctionBidDocumentResource(AuctionBidDocumentResource):
         """Auction Bid Document Update"""
         save = None
 
-        manager = self.request.registry.queryMultiAdapter((self.request, self.context), IBidDocumentManager)
+        manager = self.request.registry.queryMultiAdapter((self.request, self.context), IManager)
 
         manager.change()
         save = manager.save()

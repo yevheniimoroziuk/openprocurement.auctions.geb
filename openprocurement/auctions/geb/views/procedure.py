@@ -8,7 +8,7 @@ from openprocurement.auctions.core.views.mixins import (
     AuctionResource
 )
 from openprocurement.auctions.core.interfaces import (
-    IAuctionManager
+    IManager
 )
 from openprocurement.auctions.geb.validation import (
     validate_patch_resource_data
@@ -22,7 +22,7 @@ class AuctionResource(AuctionResource):
                validators=(validate_patch_resource_data,),
                permission='edit_auction')
     def patch(self):
-        manager = self.request.registry.queryMultiAdapter((self.request, self.context), IAuctionManager)
+        manager = self.request.registry.queryMultiAdapter((self.request, self.context), IManager)
 
         manager.change()
         save = manager.save()

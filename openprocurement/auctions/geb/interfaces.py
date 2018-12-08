@@ -39,58 +39,6 @@ class ICancellation(Interface):
 class ICancellationDocument(Interface):
     """Interface for Geb Cancellation Document"""
 
-# actions interfaces
-
-
-class IResourceAction(Interface):
-    """Interface for Resource action"""
-
-
-class ISubResourceAction(Interface):
-    """Interface for SubResource action"""
-
-
-class IAuctionAction(IResourceAction):
-    """Interface for Auction Action"""
-
-
-class IAuctionDocumentAction(ISubResourceAction):
-    """Interface for Auction Document Action"""
-
-
-class IBidDocumentAction(ISubResourceAction):
-    """Interface for Bid Document Action"""
-
-
-class ICancellationDocumentAction(ISubResourceAction):
-    """Interface for Cancellation Document Action"""
-
-
-class IQuestionAction(ISubResourceAction):
-    """Interface for Question Action"""
-
-
-class IItemAction(ISubResourceAction):
-    """Interface for Item Action"""
-
-
-class IBidAction(ISubResourceAction):
-    """Interface for Bid Action"""
-
-
-class ICancellationAction(ISubResourceAction):
-    """Interface for Cancellation Action"""
-
-
-class IActionFactory(Interface):
-    """Interface for ActionFactory"""
-
-# initializators interfaces
-
-
-class IInitializator(Interface):
-    """Interface for Initializators"""
-
 # changers interfaces
 
 
@@ -98,8 +46,12 @@ class IResourceChanger(Interface):
     """interface for module auction changer"""
 
 
-class ISubResourceChanger(Interface):
-    """interface for module auction changer"""
+class IChangionManager(Interface):
+    """Interface for resource creator"""
+
+
+class IAction(Interface):
+    """Interface for resource creator"""
 
 # creators interfaces
 
@@ -109,6 +61,16 @@ class ICreationManager(Interface):
 
 
 class IResourceCreator(Interface):
+    """Interface for resource creator"""
+
+# deletors interfaces
+
+
+class IDeletionManager(Interface):
+    """Interface for resource creator"""
+
+
+class IResourceDeleter(Interface):
     """Interface for resource creator"""
 
 # representers interfaces
@@ -131,4 +93,8 @@ class IRepresentersFactory(Interface):
 
 
 class IRepresentationManager(Interface):
+    """Interface for resource creator"""
+
+
+class IResourceLogger(Interface):
     """Interface for resource creator"""

@@ -41,7 +41,7 @@ class AuctionCreator(BaseCreator):
     def _create(self, auction):
         auction_id = uuid4().hex
         now = get_now()
-        db = self._request.registry.db
+        db = self.request.registry.db
         server_id = self.request.registry.server_id
 
         auction.id = auction_id
@@ -64,7 +64,6 @@ class AuctionDocumentCreator(BaseCreator):
     def _create(self, document):
         uploaded_document = upload_file(self.request, document)
         self.context.documents.append(uploaded_document)
-        self.context.modified = True
         return document
 
 
@@ -79,7 +78,6 @@ class BidDocumentCreator(BaseCreator):
     def _create(self, document):
         uploaded_document = upload_file(self.request, document)
         self.context.documents.append(uploaded_document)
-        self.context.modified = True
         return document
 
 
@@ -93,7 +91,6 @@ class CancellationDocumentCreator(BaseCreator):
     def _create(self, document):
         uploaded_document = upload_file(self.request, document)
         self.context.documents.append(uploaded_document)
-        self.context.modified = True
         return document
 
 
@@ -106,7 +103,6 @@ class ItemCreator(BaseCreator):
 
     def _create(self, item):
         self.context.items.append(item)
-        self.context.modified = True
         return item
 
 
@@ -118,9 +114,8 @@ class QuestionCreator(BaseCreator):
     resource_interface = IQuestion
     validators = [validate_question_post]
 
-    def create(self, question):
+    def _create(self, question):
         self.context.questions.append(question)
-        self.context.modified = True
         return question
 
 
@@ -133,5 +128,4 @@ class CancellationCreator(BaseCreator):
 
     def create(self, cancellation):
         self.context.cancellations.append(cancellation)
-        self.context.modified = True
         return cancellation

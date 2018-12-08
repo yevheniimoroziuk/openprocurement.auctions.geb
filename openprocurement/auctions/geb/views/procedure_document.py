@@ -12,8 +12,7 @@ from openprocurement.auctions.core.validation import (
 from openprocurement.auctions.core.views.mixins import AuctionDocumentResource
 
 from openprocurement.auctions.core.interfaces import (
-    IAuctionManager,
-    IDocumentManager
+    IManager
 )
 
 from openprocurement.auctions.core.utils import (
@@ -33,7 +32,7 @@ class AuctionDocumentResource(AuctionDocumentResource):
         """Auction Document Upload"""
         save = None
 
-        manager = self.request.registry.queryMultiAdapter((self.request, self.context), IAuctionManager)
+        manager = self.request.registry.queryMultiAdapter((self.request, self.context), IManager)
 
         applicant = self.request.validated['document']
         document = manager.create(applicant)
@@ -74,7 +73,7 @@ class AuctionDocumentResource(AuctionDocumentResource):
         """Auction Document Update"""
         save = None
 
-        manager = self.request.registry.queryMultiAdapter((self.request, self.context), IDocumentManager)
+        manager = self.request.registry.queryMultiAdapter((self.request, self.context), IManager)
 
         manager.change()
         save = manager.save()
@@ -89,7 +88,7 @@ class AuctionDocumentResource(AuctionDocumentResource):
     def put(self):
         save = None
 
-        manager = self.request.registry.queryMultiAdapter((self.request, self.context), IDocumentManager)
+        manager = self.request.registry.queryMultiAdapter((self.request, self.context), IManager)
 
         document = manager.put()
         save = manager.save()

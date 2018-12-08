@@ -11,7 +11,8 @@ from openprocurement.auctions.geb.managers.changers.changers import (
     ChronographChanger,
     ItemChanger,
     ModuleAuctionChanger,
-    QuestionChanger
+    QuestionChanger,
+    CancellationChanger
 
 )
 
@@ -41,6 +42,10 @@ class QuestionChangionManager(BaseChangionManager):
 
 class ItemChangionManager(BaseChangionManager):
     changer = ItemChanger
+
+
+class CancellationChangionManager(BaseChangionManager):
+    changer = CancellationChanger
 
 
 class AuctionDocumentChangionManager(BaseChangionManager):

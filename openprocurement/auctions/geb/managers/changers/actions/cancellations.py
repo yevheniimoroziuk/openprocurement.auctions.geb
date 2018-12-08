@@ -30,7 +30,7 @@ class CancellationActivationAction(BaseAction):
         return False
 
     def act(self):
-        auction = self.request
+        auction = self.request.auction
 
         # pendify auction status
         status = 'cancelled'

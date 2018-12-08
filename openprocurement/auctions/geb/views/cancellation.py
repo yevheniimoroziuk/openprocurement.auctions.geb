@@ -6,8 +6,7 @@ from openprocurement.auctions.core.utils import (
     opresource
 )
 from openprocurement.auctions.core.interfaces import (
-    IAuctionManager,
-    ICancellationManager
+    IManager
 )
 from openprocurement.auctions.core.validation import (
     validate_cancellation_data,
@@ -31,7 +30,7 @@ class AuctionCancellationResource(APIResource):
         """
         save = None
 
-        manager = self.request.registry.queryMultiAdapter((self.request, self.context), IAuctionManager)
+        manager = self.request.registry.queryMultiAdapter((self.request, self.context), IManager)
 
         applicant = self.request.validated['cancellation']
         cancellation = manager.create(applicant)
@@ -39,15 +38,15 @@ class AuctionCancellationResource(APIResource):
 
         if save:
             msg = 'Create auction cancellation {}'.format(cancellation['id'])
-            manager.log_action('auction_cancellation_create', msg)
+            manager.log('auction_cancellation_create', msg)
             representation_manager = manager.get_representation_manager()
-            return representation_manager.represent_created(implementedBy(cancellation))
+            return representation_manager.represent_created(cancellation)
 
     @json_view(permission='view_auction')
     def collection_get(self):
         """Auction Cancellations List"""
 
-        manager = self.request.registry.queryMultiAdapter((self.request, self.context), IAuctionManager)
+        manager = self.request.registry.queryMultiAdapter((self.request, self.context), IManager)
 
         representation_manager = manager.get_representation_manager()
         cancellation_type = type(manager.context).cancellations.model_class
@@ -58,7 +57,7 @@ class AuctionCancellationResource(APIResource):
         """
         Auction Cancellation Get
         """
-        manager = self.request.registry.queryMultiAdapter((self.request, self.context), ICancellationManager)
+        manager = self.request.registry.queryMultiAdapter((self.request, self.context), IManager)
         representation_manager = manager.get_representation_manager()
         return representation_manager.represent()
 
@@ -68,13 +67,13 @@ class AuctionCancellationResource(APIResource):
         """
         Patch the cancellation
         """
-        manager = self.request.registry.queryMultiAdapter((self.request, self.context), ICancellationManager)
+        manager = self.request.registry.queryMultiAdapter((self.request, self.context), IManager)
 
         manager.change()
         save = manager.save()
 
         if save:
             msg = 'Updated auction cancellation {}'.format(manager.context.id)
-            manager.log_action('auction_cancellation_patch', msg)
+            manager.log('auction_cancellation_patch', msg)
             representation_manager = manager.get_representation_manager()
             return representation_manager.represent()

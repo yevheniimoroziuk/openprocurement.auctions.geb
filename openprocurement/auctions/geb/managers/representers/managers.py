@@ -7,38 +7,36 @@ from openprocurement.auctions.geb.managers.representers.representers import (
     AuctionListingCancellationRepresenter,
     AuctionListingItemRepresenter,
     BidRepresenter,
+    CancellationCreatedRepresenter,
     CancellationDocumentCreatedRepresenter,
     CancellationListingDocumentRepresenter,
-    CancellationRepresenter
+    CancellationRepresenter,
+    ItemCreatedRepresenter,
+    ItemRepresenter
 )
 
 # listing representers
 
 
 class AuctionRepresentationManager(BaseRepresentationManager):
-    """
-        Auction listings representer
-    """
+
     listing_representers = (
         AuctionListingItemRepresenter,
         AuctionListingCancellationRepresenter,
     )
     created_representers = (
         AuctionDocumentCreatedRepresenter,
+        CancellationCreatedRepresenter,
+        ItemCreatedRepresenter
     )
 
 
 class BidRepresentationManager(BaseRepresentationManager):
-    """
-        Bid representer
-    """
     representer = BidRepresenter
 
 
 class CancellationRepresentationManager(BaseRepresentationManager):
-    """
-        Cancellation listings representer
-    """
+
     listing_representers = (
         CancellationListingDocumentRepresenter,
     )
@@ -46,3 +44,8 @@ class CancellationRepresentationManager(BaseRepresentationManager):
         CancellationDocumentCreatedRepresenter,
     )
     representer = CancellationRepresenter
+
+
+class ItemRepresentationManager(BaseRepresentationManager):
+
+    representer = ItemRepresenter

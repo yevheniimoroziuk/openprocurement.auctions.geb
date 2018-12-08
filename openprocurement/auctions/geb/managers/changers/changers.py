@@ -6,20 +6,22 @@ from openprocurement.auctions.core.utils import (
 from openprocurement.auctions.geb.managers.changers.base import (
     BaseResourceChanger
 )
-from openprocurement.auctions.geb.managers.changers.actions.auction import (
-    AuctionPhaseCommitAction,
-    AuctionPatchDraftAction,
-    AuctionPatchActiveRectificationAction,
+from openprocurement.auctions.geb.managers.changers.actions.auctions import (
     AuctionPatchAction,
+    AuctionPatchActiveRectificationAction,
+    AuctionPatchDraftAction,
+    AuctionPhaseCommitAction,
     ModuleAuctionBringsAction,
     ModuleAuctionUpdateUrlsAction,
+)
+from openprocurement.auctions.geb.managers.changers.actions.chronograph import (
     ChronographPatchAction,
     EndActiveEnquiryAction,
     EndActiveRectificationAction,
     EndActiveTenderingAction,
     SetAuctionPeriodStartDateAction
 )
-from openprocurement.auctions.geb.managers.changers.actions.auction import (
+from openprocurement.auctions.geb.managers.changers.actions.bids import (
     BidActivationAction,
     BidActivePatchAction,
     BidDraftPatchAction,
@@ -28,14 +30,12 @@ from openprocurement.auctions.geb.managers.changers.actions.auction import (
     BidPendingPatchAction
 )
 
-from openprocurement.auctions.geb.managers.changers.actions.cancellation import (
+from openprocurement.auctions.geb.managers.changers.actions.cancellations import (
     CancellationActivationAction
 )
 from openprocurement.auctions.geb.managers.changers.actions.documents import (
     AuctionDocumentPutAction,
-    AuctionDocumentPatchAction
-)
-from openprocurement.auctions.geb.managers.changers.actions.bid import (
+    AuctionDocumentPatchAction,
     BidDocumentPatchAction
 )
 from openprocurement.auctions.geb.managers.changers.actions.questions import (
@@ -143,9 +143,11 @@ class AuctionDocumentPutChanger(BaseResourceChanger):
     )
 
     def _change(self):
-        document = upload_file(self._request)
-        self._auction.documents.append(document)
-        self._auction.modified = True
+        document = upload_file(self.request)
+        auction = self.request.auction
+
+        auction.documents.append(document)
+        auction.modified = True
         return document
 
 

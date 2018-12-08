@@ -157,7 +157,7 @@ def validate_bid_patch_pending_make_active_status(request, **kwargs):
         return True
 
     bid = kwargs['context']
-    auction = kwargs['auction']
+    auction = request.auction
 
     now = get_now()
     bid_documents = bid.documents
@@ -251,27 +251,22 @@ def validate_bid_patch_active(request, **kwargs):
 # delete bid validaators
 
 
-def validate_bid_delete_auction_period(request, **kwargs):
-    auction = kwargs['auction']
-    status = auction['status']
-
-    if status not in AUCTION_STATUSES_FOR_DELETING_BIDS:
-        err_msg = 'Can\'t delete bid in current ({}) auction status'.format(status)
-        request.errors.add('body', 'data', err_msg)
-        request.errors.status = 403
-        return False
-    return True
-
-
-def validate_bid_delete_period(request, **kwargs):
-    bid = kwargs['bid']
-
-    status = bid.status
+def validate_bid_delete(request, **kwargs):
+    bid = kwargs['context']
+    auction = request.auction
+    bid_status = bid.status
+    auction_status = auction.status
 
     if request.authenticated_role == 'Administrator':
         return True
 
-    if status not in BID_STATUSES_FOR_DELETING:
+    if auction_status not in AUCTION_STATUSES_FOR_DELETING_BIDS:
+        err_msg = 'Can\'t delete bid in current ({}) auction status'.format(auction_status)
+        request.errors.add('body', 'data', err_msg)
+        request.errors.status = 403
+        return False
+
+    if bid_status not in BID_STATUSES_FOR_DELETING:
         err_msg = 'Can\'t delete bid, it can be done only in {} statuses'.format(BID_STATUSES_FOR_PATCHING)
         request.errors.add('body', 'data', err_msg)
         request.errors.status = 403
@@ -438,7 +433,7 @@ def validate_patch_questions(request, **kwargs):
     """
         Validate patch questions
     """
-    auction = kwargs['auction']
+    auction = request.auction
 
     if auction.status not in AUCTION_STATUSES_FOR_CHANGING_QUESTIONS:
         err_msg = 'Can update question only in {}'.format(AUCTION_STATUSES_FOR_CHANGING_QUESTIONS)
@@ -469,7 +464,7 @@ def validate_auction_post(request, **kwargs):
 
 
 def validate_auction_status_for_adding_bid_document(request, **kwargs):
-    auction = kwargs['auction']
+    auction = request.auction
 
     if auction.status not in AUCTION_STATUSES_FOR_ADDING_BID_DOCUMENTS:
         err_msg = 'Can\'t document in current ({}) auction status'.format(auction.status)
@@ -553,7 +548,7 @@ def validate_auction_document_patch(request, **kwargs):
     """
         Validate patch auction document
     """
-    auction = kwargs['auction']
+    auction = request.auction
 
     # check auction period for put auction document
     if auction.status not in AUCTION_STATUSES_FOR_PATCHING_DOCUMENTS_STATUSES:
@@ -568,7 +563,7 @@ def validate_auction_document_put(request, **kwargs):
     """
         Validate patch auction document
     """
-    auction = kwargs['auction']
+    auction = request.auction
 
     # check auction period for put auction document
     if auction.status not in AUCTION_STATUSES_FOR_PUT_DOCUMENTS_STATUSES:
@@ -585,7 +580,7 @@ def validate_item_patch_auction_period(request, **kwargs):
     """
     Validate period in which can edit auction item
     """
-    auction = kwargs['auction']
+    auction = request.auction
 
     if auction.status not in AUCTION_STATUSES_FOR_CHANGING_ITEMS:
         err_msg = 'Can update question only in {}'.format(AUCTION_STATUSES_FOR_CHANGING_ITEMS)

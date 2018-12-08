@@ -11,7 +11,7 @@ from openprocurement.auctions.geb.validation import (
     validate_patch_resource_data
 )
 from openprocurement.auctions.core.interfaces import (
-    IAuctionManager
+    IManager
 )
 
 
@@ -22,12 +22,11 @@ class AuctionAuctionResource(APIResource):
 
     @json_view(content_type="application/json", permission='auction', validators=(validate_patch_resource_data))
     def post(self):
-        manager = self.request.registry.queryMultiAdapter((self.request, self.context), IAuctionManager)
+        manager = self.request.registry.queryMultiAdapter((self.request, self.context), IManager)
 
         manager.report()
-        save = manager.save()
 
-        if save:
+        if manager.save():
             extra = context_unpack(self.request, {'MESSAGE_ID': 'auction_auction_post'})
             self.LOGGER.info('Report auction results', extra=extra)
             return {'data': self.request.validated['auction'].serialize("auction_view")}
@@ -43,7 +42,7 @@ class AuctionAuctionResource(APIResource):
 
     @json_view(content_type="application/json", permission='auction', validators=(validate_patch_resource_data,))
     def patch(self):
-        manager = self.request.registry.queryMultiAdapter((self.request, self.context), IAuctionManager)
+        manager = self.request.registry.queryMultiAdapter((self.request, self.context), IManager)
 
         manager.change()
         save = manager.save()

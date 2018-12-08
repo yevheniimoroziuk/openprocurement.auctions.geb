@@ -12,7 +12,7 @@ from openprocurement.auctions.geb.interfaces import (
 
 @implementer(IResourceChanger)
 class BaseResourceChanger(object):
-    action_factory = None
+    actions = []
 
     def __init__(self, request, context):
         self.request = request
@@ -24,6 +24,16 @@ class BaseResourceChanger(object):
                 return False
         return True
 
+    def get_actions(self):
+        actions = []
+
+        for action_type in self.actions:
+            action = action_type.demand(self.request, self.context)
+            if action:
+                action_obj = action(self.request, self.context)
+                actions.append(action_obj)
+        return actions
+
     def _change(self):
         modified = apply_patch(self.request, save=False, src=self.context.serialize())
         if modified:
@@ -31,25 +41,26 @@ class BaseResourceChanger(object):
         return modified
 
     def change(self):
-        factory = self.action_factory()
-        actions = factory.get_actions(self.request, self.context)
+        actions = self.get_actions()
         if actions:
             if all([self._validate(action.validators) for action in actions]):
                 change = self._change()
                 if change:
-                    [action(self.request, self.context).act() for action in actions]
+                    [action.act() for action in actions]
                 return change
 
 
 @implementer(IChangionManager)
 class BaseChangionManager(object):
+    changer = None
 
-    def get_changer(self):
-        pass
+    def __init__(self, request, context):
+        self.request = request
+        self.context = context
 
     def manage(self):
         changer = self.changer(self.request, self.context)
-        changer.change()
+        return changer.change()
 
 
 @implementer(IAction)

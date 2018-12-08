@@ -25,14 +25,9 @@ from openprocurement.auctions.geb.models.schemas import (
 
 from openprocurement.auctions.core.interfaces import (
     IAuctionManager,
-    IBidManager,
-    IBidDocumentManager,
     IContentConfigurator,
-    IDocumentManager,
-    IItemManager,
-    ICancellationManager,
-    ICancellationDocumentManager,
-    IQuestionManager
+    IManager
+
 )
 from openprocurement.auctions.geb.interfaces import (
     IAuction,
@@ -62,15 +57,15 @@ def includeme(config, plugin_map):
 
     # register adapters
     config.registry.registerAdapter(Awarding, (IAuction, IRequest), IContentConfigurator)
-    config.registry.registerAdapter(AuctionManager, (IRequest, IAuction), IAuctionManager)
+    config.registry.registerAdapter(AuctionManager, (IRequest, IAuction), IManager)
     config.registry.registerAdapter(AuctionPartialManager, (IAuction,), IAuctionManager)
-    config.registry.registerAdapter(BidManager, (IRequest, IBid), IBidManager)
-    config.registry.registerAdapter(BidDocumentManager, (IRequest, IBidDocument), IBidDocumentManager)
-    config.registry.registerAdapter(QuestionManager, (IRequest, IQuestion), IQuestionManager)
-    config.registry.registerAdapter(ItemManager, (IRequest, IItem), IItemManager)
-    config.registry.registerAdapter(CancellationManager, (IRequest, ICancellation), ICancellationManager)
-    config.registry.registerAdapter(CancellationDocumentManager, (IRequest, ICancellationDocument), ICancellationDocumentManager)
-    config.registry.registerAdapter(AuctionDocumentManager, (IRequest, IAuctionDocument), IDocumentManager)
+    config.registry.registerAdapter(BidManager, (IRequest, IBid), IManager)
+    config.registry.registerAdapter(BidDocumentManager, (IRequest, IBidDocument), IManager)
+    config.registry.registerAdapter(QuestionManager, (IRequest, IQuestion), IManager)
+    config.registry.registerAdapter(ItemManager, (IRequest, IItem), IManager)
+    config.registry.registerAdapter(CancellationManager, (IRequest, ICancellation), IManager)
+    config.registry.registerAdapter(CancellationDocumentManager, (IRequest, ICancellationDocument), IManager)
+    config.registry.registerAdapter(AuctionDocumentManager, (IRequest, IAuctionDocument), IManager)
 
     LOGGER.info("Included openprocurement.auctions.geb plugin",
                 extra={'MESSAGE_ID': 'included_plugin'})

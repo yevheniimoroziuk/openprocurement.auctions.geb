@@ -7,7 +7,7 @@ from openprocurement.auctions.core.validation import (
     validate_file_upload
 )
 from openprocurement.auctions.core.interfaces import (
-    ICancellationManager,
+    IManager
 )
 from openprocurement.auctions.core.utils import opresource
 from openprocurement.auctions.core.views.mixins import (
@@ -26,7 +26,7 @@ class AuctionCancellationDocumentResource(AuctionCancellationDocumentResource):
     def collection_get(self):
         """Auction Cancellation Documents List"""
 
-        manager = self.request.registry.queryMultiAdapter((self.request, self.context), ICancellationManager)
+        manager = self.request.registry.queryMultiAdapter((self.request, self.context), IManager)
         representation_manager = manager.get_representation_manager()
 
         document_type = type(manager.context).documents.model_class
@@ -38,7 +38,7 @@ class AuctionCancellationDocumentResource(AuctionCancellationDocumentResource):
         Auction Cancellation Document Post
         """
 
-        manager = self.request.registry.queryMultiAdapter((self.request, self.context), ICancellationManager)
+        manager = self.request.registry.queryMultiAdapter((self.request, self.context), IManager)
         document = manager.create(self.request.validated['document'])
 
         if manager.save():
