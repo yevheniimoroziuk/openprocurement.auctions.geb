@@ -1,18 +1,12 @@
-from zope.interface import implementer
-
-from openprocurement.auctions.geb.managers.actions.main import (
-    ActionFactory
-)
-from openprocurement.auctions.geb.interfaces import (
-    ICancellationAction
-)
 from openprocurement.auctions.geb.constants import (
     AUCTION_STATUSES_FOR_CLEAN_BIDS_IN_CANCELLATION
 )
+from openprocurement.auctions.geb.managers.changers.base import (
+    BaseAction
+)
 
 
-@implementer(ICancellationAction)
-class CancellationActivationAction(object):
+class CancellationActivationAction(BaseAction):
     """
     Cancellation Activation action
     when auction owner activate cancellation (patch status to 'active'):
@@ -22,11 +16,6 @@ class CancellationActivationAction(object):
         delete all bids
     """
     validators = []
-
-    def __init__(self, request, auction, context):
-        self._request = request
-        self._auction = auction
-        self._context = context
 
     @classmethod
     def demand(cls, request, context):
@@ -41,19 +30,14 @@ class CancellationActivationAction(object):
         return False
 
     def act(self):
+        auction = self.request
+
         # pendify auction status
         status = 'cancelled'
-        self._auction.status = status
+        auction.status = status
 
         # clean bids after cancellation procedure
-        auction_status = self._request.validated['auction_src']['status']
+        auction_status = self.request.validated['auction_src']['status']
 
         if auction_status in AUCTION_STATUSES_FOR_CLEAN_BIDS_IN_CANCELLATION:
-            self._auction.bids = []
-
-
-# factories
-
-
-class CancellationChangeActionsFactory(ActionFactory):
-    actions = (CancellationActivationAction,)
+            auction.bids = []

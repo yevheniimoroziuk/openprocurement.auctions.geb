@@ -1,4 +1,3 @@
-from zope.interface import implementer
 from pyramid.threadlocal import get_current_registry
 from openprocurement.auctions.core.interfaces import (
     IContentConfigurator
@@ -8,25 +7,17 @@ from openprocurement.auctions.core.utils import (
     remove_bid
 )
 
-from openprocurement.auctions.geb.interfaces import (
-    IAuctionAction
-)
-from openprocurement.auctions.geb.managers.actions.main import (
-    ActionFactory
+from openprocurement.auctions.geb.managers.changers.base import (
+    BaseAction
 )
 
 
-@implementer(IAuctionAction)
-class EndActiveRectificationAction(object):
+class EndActiveRectificationAction(BaseAction):
     """
         Chronograph action
         trigger when chronograph come in end of 'active.rectification'
     """
     validators = []
-
-    def __init__(self, request, context):
-        self._request = request
-        self._context = context
 
     @classmethod
     def demand(cls, request, context):
@@ -47,17 +38,12 @@ class EndActiveRectificationAction(object):
         self._context.modified = True
 
 
-@implementer(IAuctionAction)
-class EndActiveTenderingAction(object):
+class EndActiveTenderingAction(BaseAction):
     """
         Chronograph action
         trigger when chronograph come in end of 'active.tendering'
     """
     validators = []
-
-    def __init__(self, request, context):
-        self._request = request
-        self._context = context
 
     @classmethod
     def demand(cls, request, context):
@@ -102,17 +88,12 @@ class EndActiveTenderingAction(object):
         self._context.modified = True
 
 
-@implementer(IAuctionAction)
-class EndActiveEnquiryAction(object):
+class EndActiveEnquiryAction(BaseAction):
     """
         Chronograph action
         trigger when chronograph come in end of 'active.enquiry'
     """
     validators = []
-
-    def __init__(self, request, context):
-        self._request = request
-        self._context = context
 
     @classmethod
     def demand(cls, request, context):
@@ -163,17 +144,12 @@ class EndActiveEnquiryAction(object):
         self._context.modified = True
 
 
-@implementer(IAuctionAction)
-class SetAuctionPeriodStartDateAction(object):
+class SetAuctionPeriodStartDateAction(BaseAction):
     """
         Chronograph action
         trigger when chronograph come in end of 'active.enquiry'
     """
     validators = []
-
-    def __init__(self, request, context):
-        self._request = request
-        self._context = context
 
     @classmethod
     def demand(cls, request, context):
@@ -189,16 +165,11 @@ class SetAuctionPeriodStartDateAction(object):
         pass
 
 
-@implementer(IAuctionAction)
-class ChronographPatchAction(object):
+class ChronographPatchAction(BaseAction):
     """
         Chronograph patch actions
     """
     validators = []
-
-    def __init__(self, request, context):
-        self._request = request
-        self._context = context
 
     @classmethod
     def demand(cls, request, context):
@@ -211,13 +182,3 @@ class ChronographPatchAction(object):
 
     def act(self):
         pass
-
-
-class ChronographActionsFactory(ActionFactory):
-    actions = (
-        ChronographPatchAction,
-        EndActiveEnquiryAction,
-        EndActiveRectificationAction,
-        EndActiveTenderingAction,
-        SetAuctionPeriodStartDateAction
-    )

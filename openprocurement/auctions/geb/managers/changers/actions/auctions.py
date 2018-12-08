@@ -1,4 +1,3 @@
-from zope.interface import implementer
 from pyramid.threadlocal import get_current_registry
 from datetime import timedelta
 
@@ -8,12 +7,6 @@ from openprocurement.auctions.core.utils import (
 )
 from openprocurement.auctions.core.interfaces import (
     IContentConfigurator
-)
-from openprocurement.auctions.geb.managers.actions.main import (
-    ActionFactory
-)
-from openprocurement.auctions.geb.interfaces import (
-    IAuctionAction
 )
 from openprocurement.auctions.geb.constants import (
     AUCTION_RECTIFICATION_PERIOD_DURATION,
@@ -29,9 +22,12 @@ from openprocurement.auctions.geb.validation import (
     validate_auction_patch_phase_commit_auction_period
 )
 
+from openprocurement.auctions.geb.managers.changers.base import (
+    BaseAction
+)
 
-@implementer(IAuctionAction)
-class AuctionPhaseCommitAction(object):
+
+class AuctionPhaseCommitAction(BaseAction):
     """
     Auction phase commit action
     when auction owner activate auction (patch status to 'active.rectification'):
@@ -41,10 +37,6 @@ class AuctionPhaseCommitAction(object):
         validate_auction_patch_phase_commit,
         validate_auction_patch_phase_commit_auction_period
     ]
-
-    def __init__(self, request, context):
-        self._request = request
-        self._context = context
 
     @classmethod
     def demand(cls, request, context):
@@ -56,75 +48,70 @@ class AuctionPhaseCommitAction(object):
         return False
 
     def _initialize_enquiryPeriod(self):
-        period = self._context.__class__.enquiryPeriod.model_class()
+        period = self.context.__class__.enquiryPeriod.model_class()
 
-        start_date = self._now
-        end_date = calculate_business_date(self._context.auctionPeriod.startDate,
+        start_date = self.now
+        end_date = calculate_business_date(self.context.auctionPeriod.startDate,
                                            -timedelta(days=1),
-                                           self._context,
+                                           self.context,
                                            specific_hour=20)
 
         period.startDate = start_date
         period.endDate = end_date
 
-        self._context.enquiryPeriod = period
+        self.context.enquiryPeriod = period
 
     def _initialize_tenderPeriod(self):
-        period = self._context.__class__.tenderPeriod.model_class()
+        period = self.context.__class__.tenderPeriod.model_class()
 
-        start_date = self._context.rectificationPeriod.endDate
-        end_date = calculate_business_date(self._context.auctionPeriod.startDate,
+        start_date = self.context.rectificationPeriod.endDate
+        end_date = calculate_business_date(self.context.auctionPeriod.startDate,
                                            -timedelta(days=4),
-                                           self._context,
+                                           self.context,
                                            specific_hour=20,
                                            working_days=True)
 
         period.startDate = start_date
         period.endDate = end_date
 
-        self._context.tenderPeriod = period
+        self.context.tenderPeriod = period
 
     def _initialize_rectificationPeriod(self):
-        period = self._context.__class__.rectificationPeriod.model_class()
+        period = self.context.__class__.rectificationPeriod.model_class()
 
-        start_date = self._now
-        end_date = calculate_business_date(self._now,
+        start_date = self.now
+        end_date = calculate_business_date(self.now,
                                            AUCTION_RECTIFICATION_PERIOD_DURATION,
-                                           self._context)
+                                           self.context)
 
         period.startDate = start_date
         period.endDate = end_date
 
-        self._context.rectificationPeriod = period
+        self.context.rectificationPeriod = period
 
     def _clean_auctionPeriod(self):
-        self._context.auctionPeriod.startDate = None
-        self._context.auctionPeriod.endDate = None
+        self.context.auctionPeriod.startDate = None
+        self.context.auctionPeriod.endDate = None
 
     def act(self):
-        self._now = get_now()
+        self.now = get_now()
         self._initialize_rectificationPeriod()
         self._initialize_tenderPeriod()
         self._initialize_enquiryPeriod()
         self._clean_auctionPeriod()
 
 
-@implementer(IAuctionAction)
-class AuctionPatchDraftAction(object):
+class AuctionPatchDraftAction(BaseAction):
     """
     Auction patch auction in 'draft' status
     """
     validators = [validate_auction_patch_draft]
 
-    def __init__(self, request, context):
-        self._request = request
-        self._context = context
-
     @classmethod
     def demand(cls, request, context):
         # check if patch in auction 'draft' status
 
-        if request.method == 'PATCH' and context.status == 'draft':
+        if context.status == 'draft':
             return cls
         return False
 
@@ -132,22 +119,17 @@ class AuctionPatchDraftAction(object):
         pass
 
 
-@implementer(IAuctionAction)
-class AuctionPatchActiveRectificationAction(object):
+class AuctionPatchActiveRectificationAction(BaseAction):
     """
         Auction patch auction in 'active.rectification' status
     """
     validators = [validate_auction_patch_rectification]
 
-    def __init__(self, request, context):
-        self._request = request
-        self._context = context
-
     @classmethod
     def demand(cls, request, context):
         # check if patch in auction 'active.rectification' status
 
-        if request.method == 'PATCH' and context.status == 'active.rectification':
+        if context.status == 'active.rectification':
             return cls
         return False
 
@@ -155,17 +137,12 @@ class AuctionPatchActiveRectificationAction(object):
         pass
 
 
-@implementer(IAuctionAction)
-class ModuleAuctionUpdateUrlsAction(object):
+class ModuleAuctionUpdateUrlsAction(BaseAction):
     """
         This action triggered then module auction
         update urls for auction
     """
     validators = [validate_auction_identity_of_bids]
-
-    def __init__(self, request, context):
-        self._request = request
-        self._context = context
 
     @classmethod
     def demand(cls, request, context):
@@ -187,30 +164,22 @@ class ModuleAuctionUpdateUrlsAction(object):
         pass
 
 
-@implementer(IAuctionAction)
-class AuctionPatchAction(object):
+class AuctionPatchAction(BaseAction):
     """
         This action triggered then was patch auction
     """
     validators = [validate_auction_patch_period]
 
-    def __init__(self, request, context):
-        self._request = request
-        self._context = context
-
     @classmethod
     def demand(cls, request, context):
         # this action is for common patch auction resource
-        if request.method != 'PATCH':
-            return False
         return cls
 
     def act(self):
         pass
 
 
-@implementer(IAuctionAction)
-class ModuleAuctionBringsAction(object):
+class ModuleAuctionBringsAction(BaseAction):
     """
         This action triggered then moudule auction brings result of auction
     """
@@ -219,10 +188,6 @@ class ModuleAuctionBringsAction(object):
         validate_auction_number_of_bids,
         validate_auction_identity_of_bids
     ]
-
-    def __init__(self, request, context):
-        self._request = request
-        self._context = context
 
     @classmethod
     def demand(cls, request, context):
@@ -236,7 +201,7 @@ class ModuleAuctionBringsAction(object):
             in bids wich didn`t do rate change status to 'invalid'
         """
         # invalidate bids after auction
-        context = self._context
+        context = self.context
         auction_value = context.value.amount
         invalid_bids = [bid for bid in context.bids if bid.value.amount == auction_value]
         for bid in invalid_bids:
@@ -244,26 +209,10 @@ class ModuleAuctionBringsAction(object):
 
         # check if there is a winner
         # if not, then switch procedure to 'unsuccessful' status
-        if any([bid.status == 'active' for bid in self._context.bids]):
+        if any([bid.status == 'active' for bid in self.context.bids]):
             # get awarding
             reg = get_current_registry()
-            awarding = reg.queryMultiAdapter((self._context, self._request), IContentConfigurator)
+            awarding = reg.queryMultiAdapter((self.context, self.request), IContentConfigurator)
             awarding.start_awarding()
         else:
-            self._context.status = 'unsuccessful'
-
-
-class AuctionActionsFactory(ActionFactory):
-    actions = (
-        AuctionPhaseCommitAction,
-        AuctionPatchDraftAction,
-        AuctionPatchActiveRectificationAction,
-        AuctionPatchAction
-    )
-
-
-class ModuleAuctionChangeActionsFactory(ActionFactory):
-    actions = (
-        ModuleAuctionBringsAction,
-        ModuleAuctionUpdateUrlsAction
-    )
+            self.context.status = 'unsuccessful'

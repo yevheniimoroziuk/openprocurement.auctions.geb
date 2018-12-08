@@ -1,11 +1,7 @@
-from zope.interface import implementer
 from openprocurement.auctions.core.utils import (
     get_now
 )
 
-from openprocurement.auctions.geb.managers.actions.main import (
-    ActionFactory
-)
 from openprocurement.auctions.geb.validation import (
     validate_bid_activation,
     validate_bid_patch_active,
@@ -15,13 +11,12 @@ from openprocurement.auctions.geb.validation import (
     validate_bid_patch_pending_make_active_status,
 )
 
-from openprocurement.auctions.geb.interfaces import (
-    IBidAction
+from openprocurement.auctions.geb.managers.changers.base import (
+    BaseAction
 )
 
 
-@implementer(IBidAction)
-class BidActivationAction(object):
+class BidActivationAction(BaseAction):
     """
     Bid Activation action
     when bid owner activate bid (patch status to 'active'):
@@ -32,11 +27,6 @@ class BidActivationAction(object):
     validators = [
         validate_bid_activation
     ]
-
-    def __init__(self, request, auction, context):
-        self._request = request
-        self._context = context
-        self._auction = auction
 
     @classmethod
     def demand(cls, request, context):
@@ -51,25 +41,19 @@ class BidActivationAction(object):
         now = get_now()
 
         # initialize qualified
-        self._context.qualified = False
+        self.context.qualified = False
 
         # initialize_date
-        self._context.date = now
+        self.context.date = now
 
 
-@implementer(IBidAction)
-class BidPendingPatchAction(object):
+class BidPendingPatchAction(BaseAction):
     """
         Bid patch in 'pending' status
     """
     validators = [
         validate_bid_patch_pending
     ]
-
-    def __init__(self, request, auction, context):
-        self._request = request
-        self._context = context
-        self._auction = auction
 
     @classmethod
     def demand(cls, request, context):
@@ -81,19 +65,13 @@ class BidPendingPatchAction(object):
         pass
 
 
-@implementer(IBidAction)
-class BidDraftPatchAction(object):
+class BidDraftPatchAction(BaseAction):
     """
         Bid patch in 'draft' status
     """
     validators = [
         validate_bid_patch_draft,
     ]
-
-    def __init__(self, request, auction, context):
-        self._request = request
-        self._context = context
-        self._auction = auction
 
     @classmethod
     def demand(cls, request, context):
@@ -105,19 +83,13 @@ class BidDraftPatchAction(object):
         pass
 
 
-@implementer(IBidAction)
-class BidActivePatchAction(object):
+class BidActivePatchAction(BaseAction):
     """
         Bid patch in 'active' status
     """
     validators = [
         validate_bid_patch_active,
     ]
-
-    def __init__(self, request, auction, context):
-        self._request = request
-        self._auction = auction
-        self._context = context
 
     @classmethod
     def demand(cls, request, context):
@@ -129,19 +101,13 @@ class BidActivePatchAction(object):
         pass
 
 
-@implementer(IBidAction)
-class BidMakeActiveStatusAction(object):
+class BidMakeActiveStatusAction(BaseAction):
     """
         Action triggered then bid owner patch bid status to 'active'
     """
     validators = [
         validate_bid_patch_pending_make_active_status,
     ]
-
-    def __init__(self, request, auction, context):
-        self._request = request
-        self._context = context
-        self._auction = auction
 
     @classmethod
     def demand(cls, request, context):
@@ -156,25 +122,19 @@ class BidMakeActiveStatusAction(object):
         now = get_now()
 
         # initialize qualified
-        self._context.qualified = False
+        self.context.qualified = False
 
         # initialize_date
-        self._context.date = now
+        self.context.date = now
 
 
-@implementer(IBidAction)
-class BidPatchAction(object):
+class BidPatchAction(BaseAction):
     """
         Action triggered then patch bid
     """
     validators = [
         validate_bid_patch_auction_period
     ]
-
-    def __init__(self, request, auction, context):
-        self._request = request
-        self._auction = auction
-        self._context = context
 
     @classmethod
     def demand(cls, request, context):
@@ -186,14 +146,3 @@ class BidPatchAction(object):
 
     def act(self):
         pass
-
-
-class BidChangeActionFactory(ActionFactory):
-    actions = (
-        BidActivationAction,
-        BidActivePatchAction,
-        BidDraftPatchAction,
-        BidMakeActiveStatusAction,
-        BidPatchAction,
-        BidPendingPatchAction
-    )

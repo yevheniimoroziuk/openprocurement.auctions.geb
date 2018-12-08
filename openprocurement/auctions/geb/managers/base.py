@@ -12,18 +12,6 @@ from openprocurement.auctions.core.adapters import (
     AuctionManagerAdapter
 )
 
-from openprocurement.auctions.geb.managers.changers import (
-    AuctionChanger,
-    BidPatchChanger,
-    BidDocumentPatchChanger,
-    CancellationPatchChanger,
-    ChronographChanger,
-    ItemPatchChanger,
-    ModuleAuctionChanger,
-    QuestionPatchChanger,
-    AuctionDocumentPatchChanger,
-    AuctionDocumentPutChanger
-)
 from openprocurement.auctions.geb.managers.representers.representers import (
     ItemRepresenter
 )
@@ -33,6 +21,14 @@ from openprocurement.auctions.geb.managers.representers.managers import (
     CancellationRepresentationManager
 )
 
+from openprocurement.auctions.geb.managers.changers.managers import (
+    AuctionChangionManager,
+    AuctionDocumentChangionManager,
+    BidChangionManager,
+    BidDocumentChangionManager,
+    ItemChangionManager,
+    QuestionChangionManager
+)
 from openprocurement.auctions.geb.managers.creators.managers import (
     AuctionCreationManager,
     BidCreationManager,
@@ -54,20 +50,13 @@ from openprocurement.auctions.geb.managers.loggers import (
 
 class AuctionManager(AuctionManager):
     creation_manager = AuctionCreationManager
+    changion_manager = AuctionChangionManager
     representation_manager = AuctionRepresentationManager
     logger = AuctionLogger
 
-    @property
-    def changer(self):
-        if self.request.authenticated_role == 'auction':
-            return ModuleAuctionChanger
-        if self.request.authenticated_role == 'chronograph':
-            return ChronographChanger
-        return AuctionChanger
-
 
 class BidManager(BidManager):
-    changer = BidPatchChanger
+    changion_manager = BidChangionManager
     creation_manager = BidCreationManager
     Deleter = BidDeleter
     representation_manager = BidRepresentationManager
@@ -75,22 +64,21 @@ class BidManager(BidManager):
 
 
 class BidDocumentManager(BidDocumentManager):
-    changer = BidDocumentPatchChanger
+    changion_manager = BidDocumentChangionManager
 
 
 class QuestionManager(QuestionManager):
-    Changer = QuestionPatchChanger
+    changion_manager = QuestionChangionManager
 
 
 class ItemManager(ItemManager):
-    changer = ItemPatchChanger
+    changion_manager = ItemChangionManager
     Representer = ItemRepresenter
     Logger = ItemLogger
 
 
 class CancellationManager(CancellationManager):
     creation_manager = CancellationCreationManager
-    changer = CancellationPatchChanger
     log = CancellationLogger
     representation_manager = CancellationRepresentationManager
 
@@ -100,12 +88,7 @@ class CancellationDocumentManager(CancellationDocumentManager):
 
 
 class AuctionDocumentManager(DocumentManager):
-
-    @property
-    def changer(self):
-        if self.request.method == 'PUT':
-            return AuctionDocumentPutChanger
-        return AuctionDocumentPatchChanger
+    changion_manager = AuctionDocumentChangionManager
 
 
 class AuctionPartialManager(AuctionManagerAdapter):

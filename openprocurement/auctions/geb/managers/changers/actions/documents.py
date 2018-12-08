@@ -1,31 +1,22 @@
 from zope.interface import implementer
 
-from openprocurement.auctions.geb.managers.actions.main import (
-    ActionFactory
-)
 from openprocurement.auctions.geb.interfaces import (
     IAuctionDocumentAction,
-    IBidDocumentAction,
 )
 from openprocurement.auctions.geb.validation import (
     validate_auction_document_patch,
     validate_auction_document_put,
 )
+from openprocurement.auctions.geb.managers.changers.base import (
+    BaseAction
+)
 
-# auction documents actions
 
-
-@implementer(IAuctionDocumentAction)
-class AuctionDocumentPatchAction(object):
+class AuctionDocumentPatchAction(BaseAction):
     """
         This action triggered then patch auction document
     """
     validators = [validate_auction_document_patch]
-
-    def __init__(self, request, auction, context):
-        self._request = request
-        self._context = context
-        self._auction = auction
 
     @classmethod
     def demand(cls, request, context):
@@ -44,11 +35,6 @@ class AuctionDocumentPutAction(object):
     """
     validators = [validate_auction_document_put]
 
-    def __init__(self, request, auction, context):
-        self._request = request
-        self._context = context
-        self._auction = auction
-
     @classmethod
     def demand(cls, request, context):
         if request.method == 'PUT':
@@ -59,17 +45,11 @@ class AuctionDocumentPutAction(object):
         pass
 
 
-@implementer(IBidDocumentAction)
-class BidDocumentPatchAction(object):
+class BidDocumentPatchAction(BaseAction):
     """
         This action triggered then patch bid document
     """
     validators = []
-
-    def __init__(self, request, auction, context):
-        self._request = request
-        self._context = context
-        self._auction = auction
 
     @classmethod
     def demand(cls, request, context):
@@ -79,27 +59,3 @@ class BidDocumentPatchAction(object):
 
     def act(self):
         pass
-
-
-# auction document actions factories
-
-
-class AuctionDocumentPatchActionsFactory(ActionFactory):
-    actions = (
-         AuctionDocumentPatchAction,
-    )
-
-
-class AuctionDocumentPutActionsFactory(ActionFactory):
-    actions = (
-         AuctionDocumentPutAction,
-    )
-
-
-# bid document actions factories
-
-
-class BidDocumentPatchActionsFactory(ActionFactory):
-    actions = (
-         BidDocumentPatchAction,
-    )
