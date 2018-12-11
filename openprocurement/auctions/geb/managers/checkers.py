@@ -6,7 +6,8 @@ from openprocurement.auctions.core.interfaces import (
 
 from openprocurement.auctions.core.utils import (
     get_now,
-    remove_bid
+    remove_bid,
+    log_auction_status_change
 )
 
 
@@ -77,6 +78,7 @@ class AuctionChecker(object):
     def _set_next_status(self):
         if self._next_status:
             self._context.status = self._next_status
+            log_auction_status_change(self._request, self._context, self._context.status)
 
     def _end_enquiry_set_unseccessful_bids(self):
         # in the end of enquiry period
