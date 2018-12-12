@@ -3,7 +3,8 @@ from datetime import timedelta
 
 from openprocurement.auctions.core.utils import (
     calculate_business_date,
-    get_now
+    get_now,
+    log_auction_status_change
 )
 from openprocurement.auctions.core.interfaces import (
     IContentConfigurator
@@ -216,3 +217,4 @@ class ModuleAuctionBringsAction(BaseAction):
             awarding.start_awarding()
         else:
             self.context.status = 'unsuccessful'
+            log_auction_status_change(self.request, self.context, self.context.status)

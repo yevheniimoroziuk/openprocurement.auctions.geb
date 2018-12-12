@@ -4,7 +4,8 @@ from openprocurement.auctions.core.interfaces import (
 )
 from openprocurement.auctions.core.utils import (
     get_now,
-    remove_bid
+    remove_bid,
+    log_auction_status_change
 )
 
 from openprocurement.auctions.geb.managers.changers.base import (
@@ -35,7 +36,7 @@ class EndActiveRectificationAction(BaseAction):
         # switch procedure to 'active.tendering'
 
         self.context.status = 'active.tendering'
-        self.context.modified = True
+        log_auction_status_change(self.request, self.context, self.context.status)
 
 
 class EndActiveTenderingAction(BaseAction):
@@ -65,7 +66,7 @@ class EndActiveTenderingAction(BaseAction):
         # switch procedure to status 'unsuccessful'
         if not active_bids:
             self.context.status = 'unsuccessful'
-            self.context.modified = True
+            log_auction_status_change(self.request, self.context, self.context.status)
             return True
 
         # if minNumberOfQualifiedBids is 2 and is only 1 bid
@@ -74,7 +75,7 @@ class EndActiveTenderingAction(BaseAction):
 
         if min_number == 2 and len(active_bids) == 1:
             self.context.status = 'unsuccessful'
-            self.context.modified = True
+            log_auction_status_change(self.request, self.context, self.context.status)
             return True
 
         # after tendering period, all bids in status 'draft' are delete
@@ -84,8 +85,7 @@ class EndActiveTenderingAction(BaseAction):
 
         # switch procedure to 'active.enquiry'
         self.context.status = 'active.enquiry'
-
-        self.context.modified = True
+        log_auction_status_change(self.request, self.context, self.context.status)
 
 
 class EndActiveEnquiryAction(BaseAction):
@@ -116,23 +116,23 @@ class EndActiveEnquiryAction(BaseAction):
 
         if min_number == 1:
             if len(active_bids) == 0:
-                self.context.status = 'unsuccessful'
+                status = 'unsuccessful'
             elif len(active_bids) == 1:
-                self.context.status = 'active.qualification'
+                status = 'active.qualification'
                 # start awarding
                 reg = get_current_registry()
                 awarding = reg.queryMultiAdapter((self.context, self.request), IContentConfigurator)
                 awarding.start_awarding()
 
             elif len(active_bids) >= 2:
-                self.context.status = 'active.auction'
+                status = 'active.auction'
         elif min_number == 2:
             if len(active_bids) == 0:
-                self.context.status = 'unsuccessful'
+                status = 'unsuccessful'
             elif len(active_bids) == 1:
-                self.context.status = 'unsuccessful'
+                status = 'unsuccessful'
             elif len(active_bids) >= 2:
-                self.context.status = 'active.auction'
+                status = 'active.auction'
 
         # in the end of enquiry period
         # all bids that are in status 'draft/pending'
@@ -141,7 +141,8 @@ class EndActiveEnquiryAction(BaseAction):
             if bid.status in ['draft', 'pending']:
                 bid.status = 'unsuccessful'
 
-        self.context.modified = True
+        self.context.status = status
+        log_auction_status_change(self.request, self.context, self.context.status)
 
 
 class SetAuctionPeriodStartDateAction(BaseAction):

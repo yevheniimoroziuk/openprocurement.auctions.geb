@@ -96,5 +96,7 @@ class IRepresentationManager(Interface):
     """Interface for resource creator"""
 
 
+# logger interfaces
+
 class IResourceLogger(Interface):
     """Interface for resource creator"""

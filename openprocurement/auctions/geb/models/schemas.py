@@ -234,7 +234,6 @@ class Bid(Model):
     date = IsoDateTimeType()
     documents = ListType(ModelType(BidDocument), default=list())
     id = MD5Type(required=True, default=lambda: uuid4().hex)
-    changed = False
     owner = StringType()
     owner_token = StringType()
     participationUrl = URLType()

@@ -282,18 +282,10 @@ def validate_auction_patch_draft(request, **kwargs):
     """
 
     new_status = request.validated['json_data'].get('status')
-    new_items = request.validated['json_data'].get('items')
 
     # can switch only to 'active.rectification'
     if new_status and new_status != 'active.rectification':
         err_msg = "Can\'t switch to ({}) only to status 'active.rectification'".format(new_status)
-        request.errors.add('body', 'data', err_msg)
-        request.errors.status = 403
-        return False
-
-    # in status 'draft' can patch items
-    if not new_status and new_items is None:
-        err_msg = "In status 'draft' can`t change fields except ['status', 'items']".format(new_status)
         request.errors.add('body', 'data', err_msg)
         request.errors.status = 403
         return False

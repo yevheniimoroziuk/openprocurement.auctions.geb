@@ -1,3 +1,6 @@
+from openprocurement.auctions.core.utils import (
+    log_auction_status_change
+)
 from openprocurement.auctions.geb.constants import (
     AUCTION_STATUSES_FOR_CLEAN_BIDS_IN_CANCELLATION
 )
@@ -35,6 +38,7 @@ class CancellationActivationAction(BaseAction):
         # pendify auction status
         status = 'cancelled'
         auction.status = status
+        log_auction_status_change(self.request, self.context, status)
 
         # clean bids after cancellation procedure
         auction_status = self.request.validated['auction_src']['status']
