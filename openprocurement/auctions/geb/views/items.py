@@ -19,6 +19,7 @@ from openprocurement.auctions.core.interfaces import (
 @opresource(name='geb:Auction Items',
             collection_path='/auctions/{auction_id}/items',
             path='/auctions/{auction_id}/items/{item_id}',
+            auctionsprocurementMethodType="geb",
             description="Auction items")
 class AuctionItemResource(APIResource):
 
