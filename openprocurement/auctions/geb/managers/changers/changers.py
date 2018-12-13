@@ -78,8 +78,6 @@ class ModuleAuctionChanger(BaseResourceChanger):
         self.context.auctionPeriod['endDate'] = get_now()
 
         modified = apply_patch(self.request, save=False, src=self.context.serialize())
-        if modified:
-            self.context.modified = modified
         return modified
 
 

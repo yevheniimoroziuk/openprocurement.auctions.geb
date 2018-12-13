@@ -36,8 +36,6 @@ class BaseResourceChanger(object):
 
     def _change(self):
         modified = apply_patch(self.request, save=False, src=self.context.serialize())
-        if modified:
-            self.context.modified = modified
         return modified
 
     def change(self):

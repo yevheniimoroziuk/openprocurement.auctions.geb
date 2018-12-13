@@ -28,15 +28,13 @@ class AuctionCancellationResource(APIResource):
         """
         Auction Cancellations
         """
-        save = None
 
         manager = self.request.registry.queryMultiAdapter((self.request, self.context), IManager)
 
         applicant = self.request.validated['cancellation']
         cancellation = manager.create(applicant)
-        save = manager.save()
 
-        if save:
+        if manager.save():
             msg = 'Create auction cancellation {}'.format(cancellation['id'])
             manager.log('auction_cancellation_create', msg)
             representation_manager = manager.get_representation_manager()
@@ -70,9 +68,8 @@ class AuctionCancellationResource(APIResource):
         manager = self.request.registry.queryMultiAdapter((self.request, self.context), IManager)
 
         manager.change()
-        save = manager.save()
 
-        if save:
+        if manager.save():
             msg = 'Updated auction cancellation {}'.format(manager.context.id)
             manager.log('auction_cancellation_patch', msg)
             representation_manager = manager.get_representation_manager()
