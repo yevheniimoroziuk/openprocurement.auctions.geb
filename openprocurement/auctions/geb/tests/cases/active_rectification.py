@@ -13,6 +13,7 @@ from openprocurement.auctions.geb.tests.states import (
 
 from openprocurement.auctions.geb.tests.fixtures.active_rectification import (
     AUCTION_WITH_QUESTIONS,
+    AUCTION_WITH_DOCUMENTS,
     AUCTION_WITHOUT_ITEMS,
     AUCTION_WITH_CANCELLATION,
     AUCTION_WITH_CANCELLATION_WITH_DOCUMENTS
@@ -28,8 +29,13 @@ from openprocurement.auctions.geb.tests.blanks.mixins import (
 )
 
 from openprocurement.auctions.geb.tests.blanks.active_rectification import (
-    add_document,
-    add_offline_document,
+    auction_document_post,
+    auction_document_post_offline,
+    auction_document_post_without_ds,
+    auction_document_put_without_ds,
+    auction_document_patch,
+    auction_document_put,
+    auction_document_download,
     add_question,
     answer_question,
     change_bankAccount,
@@ -54,16 +60,16 @@ from openprocurement.auctions.geb.tests.blanks.active_rectification import (
     items_get_listing,
     items_patch_collections,
     items_patch_collections_blank_items,
-    patch_document,
-    put_document,
-    download_document
 )
 
 
 class ActiveRectificationTest(BaseWebTest):
+    docservice = True
 
     test_add_question = snitch(add_question)
     test_cancellation_post = snitch(cancellation_post)
+    test_auction_document_post = snitch(auction_document_post)
+    test_auction_document_post_offline = snitch(auction_document_post_offline)
     test_change_title = snitch(change_title)
     test_change_description = snitch(change_desctiption)
     test_change_tenderAttempts = snitch(change_tenderAttempts)
@@ -92,14 +98,45 @@ class ActiveRectificationTest(BaseWebTest):
 
         entrypoints = {}
 
-        entrypoints['patch_auction'] = '/auctions/{}?acc_token={}'.format(auction['data']['id'],
-                                                                          auction['access']['token'])
-        entrypoints['post_question'] = '/auctions/{}/questions'.format(auction['data']['id'])
+        entrypoint_pattern = '/auctions/{}?acc_token={}'
+        entrypoints['patch_auction'] = entrypoint_pattern.format(auction['data']['id'], auction['access']['token'])
+
+        entrypoint_pattern = '/auctions/{}/questions'
+        entrypoints['post_question'] = entrypoint_pattern.format(auction['data']['id'])
+
         entrypoints['get_auction'] = '/auctions/{}'.format(auction['data']['id'])
-        entrypoints['post_cancellation'] = '/auctions/{}/cancellations?acc_token={}'.format(auction['data']['id'],
-                                                                                            auction['access']['token'])
+
+        entrypoint_pattern = '/auctions/{}/cancellations?acc_token={}'
+        entrypoints['post_cancellation'] = entrypoint_pattern.format(auction['data']['id'], auction['access']['token'])
+
+        entrypoint_pattern = '/auctions/{}/documents?acc_token={}'
+        entrypoints['documents'] = entrypoint_pattern.format(auction['data']['id'], auction['access']['token'])
+
         self.auction = auction
         self.items = items
+        self.ENTRYPOINTS = entrypoints
+
+
+class ActiveRectificationWithoutDSTest(BaseWebTest):
+    docservice = False
+
+    test_auction_document_post_without_ds = snitch(auction_document_post_without_ds)
+
+    def setUp(self):
+        super(ActiveRectificationWithoutDSTest, self).setUp()
+
+        procedure = ProcedureMachine()
+        procedure.set_db_connector(self.db)
+        procedure.toggle('active.rectification')
+        context = procedure.snapshot()
+        auction = context['auction']
+
+        entrypoints = {}
+
+        entrypoint_pattern = '/auctions/{}/documents?acc_token={}'
+        entrypoints['documents'] = entrypoint_pattern.format(auction['data']['id'], auction['access']['token'])
+
+        self.auction = auction
         self.ENTRYPOINTS = entrypoints
 
 
@@ -192,22 +229,64 @@ class ActiveRectificationWithoutItemsTest(BaseWebTest):
         self.ENTRYPOINTS = entrypoints
 
 
-class ActiveRectificationDocumentTest(BaseWebTest):
+class ActiveRectificationDocumentsTest(BaseWebTest):
     docservice = True
 
-    test_add_online_document = snitch(add_document)
-    test_add_offline_document = snitch(add_offline_document)
-    test_patch_document = snitch(patch_document)
-    test_put_document = snitch(put_document)
-    test_download_document = snitch(download_document)
+    test_auction_document_patch = snitch(auction_document_patch)
+    test_auction_document_put = snitch(auction_document_put)
+    test_auction_document_download = snitch(auction_document_download)
 
     def setUp(self):
-        super(ActiveRectificationDocumentTest, self).setUp()
+        super(ActiveRectificationDocumentsTest, self).setUp()
 
         procedure = ProcedureMachine()
         procedure.set_db_connector(self.db)
         procedure.toggle('active.rectification')
-        self.procedure = procedure
+        context = procedure.snapshot(fixture=AUCTION_WITH_DOCUMENTS)
+
+        auction = context['auction']
+        document = context['documents'][0]
+
+        entrypoints = {}
+        entrypoint_pattern = '/auctions/{}/documents/{}?acc_token={}'
+        entrypoints['document_patch'] = entrypoint_pattern.format(auction['data']['id'], document['data']['id'], auction['access']['token'])
+
+        entrypoint_pattern = '/auctions/{}/documents/{}'
+        entrypoints['document_get'] = entrypoint_pattern.format(auction['data']['id'], document['data']['id'])
+
+        entrypoints['document_put'] = entrypoints['document_patch']
+
+        self.document = document
+        self.auction = auction
+        self.ENTRYPOINTS = entrypoints
+
+
+class ActiveRectificationDocumentsWithoutDSTest(BaseWebTest):
+    docservice = False
+
+    test_auction_document_put_without_ds = snitch(auction_document_put_without_ds)
+
+    def setUp(self):
+        super(ActiveRectificationDocumentsWithoutDSTest, self).setUp()
+
+        procedure = ProcedureMachine()
+        procedure.set_db_connector(self.db)
+        procedure.toggle('active.rectification')
+        context = procedure.snapshot(fixture=AUCTION_WITH_DOCUMENTS)
+
+        auction = context['auction']
+        document = context['documents'][0]
+
+        entrypoints = {}
+        entrypoint_pattern = '/auctions/{}/documents/{}?acc_token={}'
+        entrypoints['document_put'] = entrypoint_pattern.format(auction['data']['id'], document['data']['id'], auction['access']['token'])
+
+        entrypoint_pattern = '/auctions/{}/documents/{}'
+        entrypoints['document_get'] = entrypoint_pattern.format(auction['data']['id'], document['data']['id'])
+
+        self.document = document
+        self.auction = auction
+        self.ENTRYPOINTS = entrypoints
 
 
 class ActiveRectificationCancellationsTest(BaseWebTest, CancellationWorkFlowMixin):
@@ -300,11 +379,13 @@ def suite():
     suite = unittest.TestSuite()
     suite.addTest(unittest.makeSuite(ActiveRectificationAdministratorTest))
     suite.addTest(unittest.makeSuite(ActiveRectificationCancellationsDocumentsTest))
-    suite.addTest(unittest.makeSuite(ActiveRectificationDocumentTest))
     suite.addTest(unittest.makeSuite(ActiveRectificationItemsTest))
     suite.addTest(unittest.makeSuite(ActiveRectificationQuestionsTest))
     suite.addTest(unittest.makeSuite(ActiveRectificationTest))
     suite.addTest(unittest.makeSuite(ActiveRectificationWithoutItemsTest))
+    # documents tests
+    suite.addTest(unittest.makeSuite(ActiveRectificationDocumentsTest))
+    suite.addTest(unittest.makeSuite(ActiveRectificationDocumentsWithoutDSTest))
     return suite
 
 

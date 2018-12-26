@@ -1,6 +1,5 @@
 # -*- coding: utf-8 -*-
 from copy import deepcopy
-from email.header import Header
 
 from openprocurement.auctions.core.tests.base import (
     test_document_data
@@ -113,25 +112,25 @@ def cancellation_document_post(test_case):
 
 
 def cancellation_document_post_without_ds(test_case):
-    response = test_case.app.post(
-        test_case.ENTRYPOINTS['cancellation_document_post'],
-        upload_files=[('file', str(Header(u'укр.doc', 'utf-8')), 'content')]
-    )
+    file_title = 'name.doc'
+    file_info = ('file', file_title, 'content')
+
+    response = test_case.app.post(test_case.ENTRYPOINTS['cancellation_document_post'], upload_files=[file_info])
     test_case.assertEqual(response.status, '201 Created')
     test_case.assertEqual(response.content_type, 'application/json')
     doc_id = response.json["data"]['id']
     test_case.assertIn(doc_id, response.headers['Location'])
-    test_case.assertEqual(u'укр.doc', response.json["data"]["title"])
+    test_case.assertEqual(file_title, response.json["data"]["title"])
 
 
 def cancellation_document_put_without_ds(test_case):
-    response = test_case.app.put(
-        test_case.ENTRYPOINTS['cancellation_document'],
-        upload_files=[('file', str(Header(u'eng.doc', 'utf-8')), 'content')]
-    )
+    file_title = 'name.doc'
+    file_info = ('file', file_title, 'content')
+
+    response = test_case.app.put(test_case.ENTRYPOINTS['cancellation_document'], upload_files=[file_info])
     test_case.assertEqual(response.status, '200 OK')
     test_case.assertEqual(response.content_type, 'application/json')
-    test_case.assertEqual(u'eng.doc', response.json["data"]["title"])
+    test_case.assertEqual(file_title, response.json["data"]["title"])
 
 
 def cancellation_document_listing(test_case):

@@ -26,6 +26,11 @@ class CancellationWorkFlowMixin(object):
     test_cancellation_patch = snitch(cancellation_patch)
     test_cancellation_make_active = snitch(cancellation_make_active)
     test_cancellation_document_post = snitch(cancellation_document_post)
+
+
+class CancellationWorkFlowWithoutDSMixin(object):
+    docservice = False
+
     test_cancellation_document_post_without_ds = snitch(cancellation_document_post_without_ds)
 
 
@@ -34,6 +39,11 @@ class CancellationDocumentsWorkFlowMixin(object):
     test_cancellation_document_get = snitch(cancellation_document_get)
     test_cancellation_document_patch = snitch(cancellation_document_patch)
     test_cancellation_document_put = snitch(cancellation_document_put)
+
+
+class CancellationDocumentsWorkFlowWithoutDSMixin(object):
+    docservice = False
+
     test_cancellation_document_put_without_ds = snitch(cancellation_document_put_without_ds)
 
 

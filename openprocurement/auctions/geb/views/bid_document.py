@@ -2,8 +2,7 @@
 from openprocurement.auctions.core.utils import (
     opresource,
     json_view,
-    context_unpack,
-    dgf_upload_file
+    context_unpack
 )
 from openprocurement.auctions.core.views.mixins import AuctionBidDocumentResource
 from openprocurement.auctions.core.validation import (
@@ -30,22 +29,13 @@ class AuctionBidDocumentResource(AuctionBidDocumentResource):
     def collection_post(self):
         """Auction Bid Document Upload
         """
-        save = None
 
         manager = self.request.registry.queryMultiAdapter((self.request, self.context), IBidManager)
 
-        applicant = self.request.validated['document'] if 'data' in self.request.validated else None
+        applicant = self.request.validated.get('document', self.request.validated.get('file'))
+        document = manager.create(applicant)
 
-        if applicant:
-            document = manager.create(applicant)
-        else:
-            document = dgf_upload_file(self.request)
-            self.context.documents.append(document)
-            manager._is_changed = True
-
-        save = manager.save()
-
-        if save:
+        if manager.save():
             msg = 'Created auction bid document {}'.format(document.id)
             extra = context_unpack(self.request, {'MESSAGE_ID': 'auction_bid_document_create'}, {'document_id': document['id']})
             self.LOGGER.info(msg, extra=extra)
