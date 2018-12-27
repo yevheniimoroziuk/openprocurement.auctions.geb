@@ -28,14 +28,13 @@ class AuctionBidDocumentResource(AuctionBidDocumentResource):
     def collection_post(self):
         """Auction Bid Document Upload
         """
-        save = None
 
-        applicant = self.request.validated['document']
         manager = self.request.registry.queryMultiAdapter((self.request, self.context), IManager)
-        document = manager.create(applicant)
-        save = manager.save()
 
-        if save:
+        applicant = self.request.validated.get('document', self.request.validated.get('file'))
+        document = manager.create(applicant)
+
+        if manager.save():
             msg = 'Created auction bid document {}'.format(document.id)
             extra = context_unpack(self.request, {'MESSAGE_ID': 'auction_bid_document_create'}, {'document_id': document['id']})
             self.LOGGER.info(msg, extra=extra)

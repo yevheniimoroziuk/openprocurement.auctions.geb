@@ -32,8 +32,8 @@ class AuctionAuctionResource(APIResource):
             return {'data': self.request.validated['auction'].serialize("auction_view")}
 
     @json_view(permission='auction')
-    def get(self):                                                              # TODO refactoring
-        if self.request.validated['auction_status'] != 'active.auction':
+    def get(self):
+        if self.request.validated['auction_status'] not in ('active.auction', 'active.qualification'):
             self.request.errors.add('body', 'data', 'Can\'t get auction info in current ({}) auction status'.format(
                 self.request.validated['auction_status']))
             self.request.errors.status = 403

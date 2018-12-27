@@ -11,10 +11,15 @@ class CreatorsFactory(object):
     """
         Creators Factory
     """
-    def __init__(self, creators):
+    def __init__(self, request, context, creators):
+        self.request = request
+        self.context = context
         self.creators = creators
 
     def __call__(self, applicant):
+        if 'file' in self.request.validated:
+            applicant = type(self.context).documents.model_class()
+
         for creator in self.creators:
             if creator.resource_interface.providedBy(applicant):
                 return creator
@@ -36,7 +41,7 @@ class BaseCreationManager(object):
         self.context = context
 
     def manage(self, applicant):
-        factory = self.factory(self.creators)
+        factory = self.factory(self.request, self.context, self.creators)
         creator_type = factory(applicant)
         creator = creator_type(self.request, self.context)
         return creator.create(applicant)

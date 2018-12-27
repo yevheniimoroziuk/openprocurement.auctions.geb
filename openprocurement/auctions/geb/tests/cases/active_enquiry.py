@@ -11,15 +11,16 @@ from openprocurement.auctions.geb.tests.states import (
     ProcedureMachine
 )
 from openprocurement.auctions.geb.tests.blanks.mixins import (
-    BaseAdministratorTestMixin,
+    CancellationWorkFlowMixin,
+    CancellationWorkFlowWithoutDSMixin,
     CancellationDocumentsWorkFlowMixin,
-    CancellationWorkFlowMixin
+    CancellationDocumentsWorkFlowWithoutDSMixin,
+    BaseAdministratorTestMixin
 )
 from openprocurement.auctions.geb.tests.fixtures.active_enquiry import (
     AUCTION_WITH_BIDS_WITH_CANCELLATION,
     AUCTION_WITH_BID_ACTIVE,
     AUCTION_WITH_BID_ACTIVE_WITH_DOCUMENT,
-    AUCTION_WITH_BID_DRAFT_WITH_DOCUMENT,
     AUCTION_WITH_BID_PENDING,
     AUCTION_WITH_BID_PENDING_WITH_DOCUMENT,
     AUCTION_WITH_CANCELLATION,
@@ -30,32 +31,33 @@ from openprocurement.auctions.geb.tests.fixtures.active_enquiry import (
 
 from openprocurement.auctions.geb.tests.blanks.active_enquiry import (
     auction_auction_get,
-    auction_document_patch,
+    auction_bid_post,
     auction_document_download,
-    auction_document_put,
+    auction_document_patch,
     auction_document_post,
     auction_document_post_offline,
-    add_question,
-    add_question_to_item,
-    answer_question,
-    auction_change_fields,
-    get_question,
-    bid_add,
-    bid_add_document_in_active_status,
-    bid_add_document_in_pending_status,
+    auction_document_post_without_ds,
+    auction_document_put,
+    auction_document_put_without_ds,
+    auction_patch,
+    auction_question_post,
+    bid_active_get_document,
+    bid_active_patch_document,
     bid_delete_in_active_status,
     bid_delete_in_pending_status,
+    bid_document_post,
+    bid_document_post_without_ds,
+    bid_document_put_without_ds,
     bid_get_in_active_status,
     bid_get_in_pending_status,
     bid_make_activate,
     bid_patch_in_active_status,
     bid_patch_in_pending_status,
-    bid_draft_get_document,
-    bid_draft_patch_document,
-    bid_pending_patch_document,
     bid_pending_get_document,
-    bid_active_patch_document,
-    bid_active_get_document,
+    bid_pending_patch_document,
+    item_question_post,
+    question_get,
+    question_patch
 )
 from openprocurement.auctions.geb.tests.blanks.cancellations import (
     cancellation_make_clean_bids
@@ -65,13 +67,13 @@ from openprocurement.auctions.geb.tests.blanks.cancellations import (
 class ActiveEnquiryTest(BaseWebTest):
     docservice = True
 
-    test_bid_add = snitch(bid_add)
-    test_add_question = snitch(add_question)
+    test_auction_bid_post = snitch(auction_bid_post)
+    test_auction_question_post = snitch(auction_question_post)
     test_auction_auction_get = snitch(auction_auction_get)
     test_auction_document_post = snitch(auction_document_post)
     test_auction_document_post_offline = snitch(auction_document_post_offline)
-    test_add_question_to_item = snitch(add_question_to_item)
-    test_auction_change_fields = snitch(auction_change_fields)
+    test_item_question_post = snitch(item_question_post)
+    test_auction_patch = snitch(auction_patch)
 
     def setUp(self):
         super(ActiveEnquiryTest, self).setUp()
@@ -94,10 +96,33 @@ class ActiveEnquiryTest(BaseWebTest):
         self.ENTRYPOINTS = entrypoints
 
 
+class ActiveEnquiryWithoutDSTest(BaseWebTest):
+    docservice = False
+
+    test_auction_document_post_without_ds = snitch(auction_document_post_without_ds)
+
+    def setUp(self):
+        super(ActiveEnquiryWithoutDSTest, self).setUp()
+
+        procedure = ProcedureMachine()
+        procedure.set_db_connector(self.db)
+        procedure.toggle('active.enquiry')
+        context = procedure.snapshot()
+
+        self.auction = context['auction']
+
+        entrypoints = {}
+
+        entrypoint_pattern = '/auctions/{}/documents?acc_token={}'
+        entrypoints['documents'] = entrypoint_pattern.format(self.auction['data']['id'], self.auction['access']['token'])
+
+        self.ENTRYPOINTS = entrypoints
+
+
 class ActiveEnquiryQuestionsTest(BaseWebTest):
 
-    test_answer_question = snitch(answer_question)
-    test_get_question = snitch(get_question)
+    test_question_patch = snitch(question_patch)
+    test_question_get = snitch(question_get)
 
     def setUp(self):
         super(ActiveEnquiryQuestionsTest, self).setUp()
@@ -121,18 +146,18 @@ class ActiveEnquiryQuestionsTest(BaseWebTest):
         self.ENTRYPOINTS = entrypoints
 
 
-class ActiveEnquiryPendingBidsTest(BaseWebTest):
+class ActiveEnquiryBidsPendingTest(BaseWebTest):
     docservice = True
 
     test_bid_patch_in_pending_status = snitch(bid_patch_in_pending_status)
     test_bid_make_activate = snitch(bid_make_activate)
-    test_bid_add_document_in_pending_status = snitch(bid_add_document_in_pending_status)
+    test_bid_document_post = snitch(bid_document_post)
     test_bid_delete_in_pending_status = snitch(bid_delete_in_pending_status)
     test_bid_get_in_pending_status = snitch(bid_get_in_pending_status)
     test_bid_patch_in_pending_status = snitch(bid_patch_in_pending_status)
 
     def setUp(self):
-        super(ActiveEnquiryPendingBidsTest, self).setUp()
+        super(ActiveEnquiryBidsPendingTest, self).setUp()
 
         procedure = ProcedureMachine()
         procedure.set_db_connector(self.db)
@@ -158,17 +183,44 @@ class ActiveEnquiryPendingBidsTest(BaseWebTest):
         self.auction = auction
 
 
-class ActiveEnquiryActiveBidsTest(BaseWebTest):
+class ActiveEnquiryBidsPendingWithoutDSTest(BaseWebTest):
+    docservice = False
+
+    test_bid_document_post_without_ds = snitch(bid_document_post_without_ds)
+
+    def setUp(self):
+        super(ActiveEnquiryBidsPendingWithoutDSTest, self).setUp()
+
+        procedure = ProcedureMachine()
+        procedure.set_db_connector(self.db)
+        procedure.toggle('active.enquiry')
+        context = procedure.snapshot(fixture=AUCTION_WITH_BID_PENDING)
+
+        auction = context['auction']
+        bid = context['bids'][0]
+
+        entrypoints = {}
+
+        pattern = '/auctions/{auction}/bids/{bid}/documents?acc_token={token}'
+        entrypoints['add_bid_document'] = pattern.format(auction=auction['data']['id'],
+                                                         bid=bid['data']['id'],
+                                                         token=bid['access']['token'])
+        self.ENTRYPOINTS = entrypoints
+        self.bid = bid
+        self.auction = auction
+
+
+class ActiveEnquiryBidsActiveTest(BaseWebTest):
     docservice = True
 
     test_bid_patch_in_active_status = snitch(bid_patch_in_active_status)
-    test_bid_add_document_in_active_status = snitch(bid_add_document_in_active_status)
+    test_bid_document_post = snitch(bid_document_post)
     test_bid_delete_in_active_status = snitch(bid_delete_in_active_status)
     test_bid_get_in_active_status = snitch(bid_get_in_active_status)
     test_bid_patch_in_active_status = snitch(bid_patch_in_active_status)
 
     def setUp(self):
-        super(ActiveEnquiryActiveBidsTest, self).setUp()
+        super(ActiveEnquiryBidsActiveTest, self).setUp()
 
         procedure = ProcedureMachine()
         procedure.set_db_connector(self.db)
@@ -184,6 +236,33 @@ class ActiveEnquiryActiveBidsTest(BaseWebTest):
         entrypoints['bid'] = pattern.format(auction=auction['data']['id'],
                                             bid=bid['data']['id'],
                                             token=bid['access']['token'])
+
+        pattern = '/auctions/{auction}/bids/{bid}/documents?acc_token={token}'
+        entrypoints['add_bid_document'] = pattern.format(auction=auction['data']['id'],
+                                                         bid=bid['data']['id'],
+                                                         token=bid['access']['token'])
+        self.ENTRYPOINTS = entrypoints
+        self.bid = bid
+        self.auction = auction
+
+
+class ActiveEnquiryBidsActiveWithoutDSTest(BaseWebTest):
+    docservice = False
+
+    test_bid_document_post_without_ds = snitch(bid_document_post_without_ds)
+
+    def setUp(self):
+        super(ActiveEnquiryBidsActiveWithoutDSTest, self).setUp()
+
+        procedure = ProcedureMachine()
+        procedure.set_db_connector(self.db)
+        procedure.toggle('active.enquiry')
+        context = procedure.snapshot(fixture=AUCTION_WITH_BID_ACTIVE)
+
+        auction = context['auction']
+        bid = context['bids'][0]
+
+        entrypoints = {}
 
         pattern = '/auctions/{auction}/bids/{bid}/documents?acc_token={token}'
         entrypoints['add_bid_document'] = pattern.format(auction=auction['data']['id'],
@@ -226,6 +305,37 @@ class ActiveEnquiryDocumentsTest(BaseWebTest):
         self.ENTRYPOINTS = entrypoints
 
 
+class ActiveEnquiryDocumentWithoutDSTest(BaseWebTest):
+    docservice = False
+
+    test_auction_document_put_without_ds = snitch(auction_document_put_without_ds)
+
+    def setUp(self):
+        super(ActiveEnquiryDocumentWithoutDSTest, self).setUp()
+
+        procedure = ProcedureMachine()
+        procedure.set_db_connector(self.db)
+        procedure.toggle('active.enqiry')
+        context = procedure.snapshot(fixture=AUCTION_WITH_DOCUMENTS)
+
+        auction = context['auction']
+        document = context['documents'][0]
+
+        entrypoints = {}
+
+        entrypoint_pattern = '/auctions/{}/documents/{}?acc_token={}'
+        entrypoints['document_patch'] = entrypoint_pattern.format(auction['data']['id'], document['data']['id'], auction['access']['token'])
+
+        entrypoint_pattern = '/auctions/{}/documents/{}'
+        entrypoints['document_get'] = entrypoint_pattern.format(auction['data']['id'], document['data']['id'])
+
+        entrypoints['document_put'] = entrypoints['document_patch']
+
+        self.document = document
+        self.auction = auction
+        self.ENTRYPOINTS = entrypoints
+
+
 class ActiveEnquiryCancellationsTest(BaseWebTest, CancellationWorkFlowMixin):
     docservice = True
 
@@ -261,11 +371,35 @@ class ActiveEnquiryCancellationsTest(BaseWebTest, CancellationWorkFlowMixin):
         self.ENTRYPOINTS = entrypoints
 
 
-class ActiveEnquiryWithBidsCancellationsTest(BaseWebTest):
+class ActiveEnquiryCancellationsWithoutDSTest(BaseWebTest, CancellationWorkFlowWithoutDSMixin):
+
+    def setUp(self):
+        super(ActiveEnquiryCancellationsWithoutDSTest, self).setUp()
+
+        procedure = ProcedureMachine()
+        procedure.set_db_connector(self.db)
+        procedure.toggle('active.tendering')
+        context = procedure.snapshot(fixture=AUCTION_WITH_CANCELLATION)
+
+        auction = context['auction']
+        cancellation = context['cancellations'][0]
+
+        entrypoints = {}
+        entrypoint_pattern = '/auctions/{}/cancellations/{}/documents?acc_token={}'
+        entrypoints['cancellation_document_post'] = entrypoint_pattern.format(auction['data']['id'],
+                                                                              cancellation['data']['id'],
+                                                                              auction['access']['token'])
+
+        self.auction = auction
+        self.cancellation = cancellation
+        self.ENTRYPOINTS = entrypoints
+
+
+class ActiveEnquiryCancellationsWithBidsTest(BaseWebTest):
     test_cancellation_make_clean_bids = snitch(cancellation_make_clean_bids)
 
     def setUp(self):
-        super(ActiveEnquiryWithBidsCancellationsTest, self).setUp()
+        super(ActiveEnquiryCancellationsWithBidsTest, self).setUp()
 
         procedure = ProcedureMachine()
         procedure.set_db_connector(self.db)
@@ -289,40 +423,13 @@ class ActiveEnquiryWithBidsCancellationsTest(BaseWebTest):
         self.ENTRYPOINTS = entrypoints
 
 
-class ActiveEnquiryDraftBidsWithDocumentTest(BaseWebTest):
-
-    test_bid_draft_get_document = snitch(bid_draft_get_document)
-    test_bid_draft_patch_document = snitch(bid_draft_patch_document)
-
-    def setUp(self):
-        super(ActiveEnquiryDraftBidsWithDocumentTest, self).setUp()
-
-        procedure = ProcedureMachine()
-        procedure.set_db_connector(self.db)
-        procedure.toggle('active.tendering')
-        context = procedure.snapshot(fixture=AUCTION_WITH_BID_DRAFT_WITH_DOCUMENT)
-        auction = context['auction']
-        bid = context['bids'][0]
-        bid_document = bid['data']['documents'][0]
-        entrypoints = {}
-        pattern = '/auctions/{}/bids/{}/documents/{}?acc_token={}'
-        entrypoints['bid_document'] = pattern.format(auction['data']['id'],
-                                                     bid['data']['id'],
-                                                     bid_document['data']['id'],
-                                                     bid['access']['token'])
-
-        self.ENTRYPOINTS = entrypoints
-        self.bid = bid
-        self.auction = auction
-
-
-class ActiveEnquiryPendingBidsWithDocumentTest(BaseWebTest):
+class ActiveEnquiryBidsPendingWithDocumentTest(BaseWebTest):
 
     test_bid_pending_get_document = snitch(bid_pending_get_document)
     test_bid_pending_patch_document = snitch(bid_pending_patch_document)
 
     def setUp(self):
-        super(ActiveEnquiryPendingBidsWithDocumentTest, self).setUp()
+        super(ActiveEnquiryBidsPendingWithDocumentTest, self).setUp()
 
         procedure = ProcedureMachine()
         procedure.set_db_connector(self.db)
@@ -343,17 +450,72 @@ class ActiveEnquiryPendingBidsWithDocumentTest(BaseWebTest):
         self.auction = auction
 
 
-class ActiveEnquiryActiveBidsWithDocumentTest(BaseWebTest):
+class ActiveEnquiryBidsPendingWithDocumentWithoutDSTest(BaseWebTest):
+    docservice = False
+
+    test_bid_document_put_without_ds = snitch(bid_document_put_without_ds)
+
+    def setUp(self):
+        super(ActiveEnquiryBidsPendingWithDocumentWithoutDSTest, self).setUp()
+
+        procedure = ProcedureMachine()
+        procedure.set_db_connector(self.db)
+        procedure.toggle('active.enquiry')
+        context = procedure.snapshot(fixture=AUCTION_WITH_BID_PENDING_WITH_DOCUMENT)
+        auction = context['auction']
+        bid = context['bids'][0]
+        bid_document = bid['data']['documents'][0]
+        entrypoints = {}
+        pattern = '/auctions/{}/bids/{}/documents/{}?acc_token={}'
+        entrypoints['bid_document'] = pattern.format(auction['data']['id'],
+                                                     bid['data']['id'],
+                                                     bid_document['data']['id'],
+                                                     bid['access']['token'])
+
+        self.ENTRYPOINTS = entrypoints
+        self.bid = bid
+        self.auction = auction
+
+
+class ActiveEnquiryBidsActiveWithDocumentTest(BaseWebTest):
 
     test_bid_active_get_document = snitch(bid_active_get_document)
     test_bid_active_patch_document = snitch(bid_active_patch_document)
 
     def setUp(self):
-        super(ActiveEnquiryActiveBidsWithDocumentTest, self).setUp()
+        super(ActiveEnquiryBidsActiveWithDocumentTest, self).setUp()
 
         procedure = ProcedureMachine()
         procedure.set_db_connector(self.db)
         procedure.toggle('active.tendering')
+        context = procedure.snapshot(fixture=AUCTION_WITH_BID_ACTIVE_WITH_DOCUMENT)
+        auction = context['auction']
+        bid = context['bids'][0]
+        bid_document = bid['data']['documents'][0]
+        entrypoints = {}
+        pattern = '/auctions/{}/bids/{}/documents/{}?acc_token={}'
+        entrypoints['bid_document'] = pattern.format(auction['data']['id'],
+                                                     bid['data']['id'],
+                                                     bid_document['data']['id'],
+                                                     bid['access']['token'])
+
+        self.ENTRYPOINTS = entrypoints
+        self.bid = bid
+        self.auction = auction
+
+
+class ActiveEnquiryBidsActiveWithDocumentWithoutDSTest(BaseWebTest):
+
+    docservice = False
+
+    test_bid_document_put_without_ds = snitch(bid_document_put_without_ds)
+
+    def setUp(self):
+        super(ActiveEnquiryBidsActiveWithDocumentWithoutDSTest, self).setUp()
+
+        procedure = ProcedureMachine()
+        procedure.set_db_connector(self.db)
+        procedure.toggle('active.enquiry')
         context = procedure.snapshot(fixture=AUCTION_WITH_BID_ACTIVE_WITH_DOCUMENT)
         auction = context['auction']
         bid = context['bids'][0]
@@ -402,6 +564,32 @@ class ActiveEnquiryCancellationsDocumentsTest(BaseWebTest, CancellationDocuments
         self.ENTRYPOINTS = entrypoints
 
 
+class ActiveEnquiryCancellationsDocumentsWithoutDSTest(BaseWebTest, CancellationDocumentsWorkFlowWithoutDSMixin):
+
+    def setUp(self):
+        super(ActiveEnquiryCancellationsDocumentsWithoutDSTest, self).setUp()
+
+        procedure = ProcedureMachine()
+        procedure.set_db_connector(self.db)
+        procedure.toggle('active.enquiry')
+        context = procedure.snapshot(fixture=AUCTION_WITH_CANCELLATION_WITH_DOCUMENTS)
+
+        auction = context['auction']
+        cancellation = context['cancellations'][0]
+        document = cancellation['data']['documents'][0]
+
+        entrypoints = {}
+        entrypoint_pattern = '/auctions/{}/cancellations/{}/documents/{}?acc_token={}'
+        entrypoints['cancellation_document'] = entrypoint_pattern.format(auction['data']['id'],
+                                                                         cancellation['data']['id'],
+                                                                         document['id'],
+                                                                         auction['access']['token'])
+
+        self.auction = auction
+        self.document = document
+        self.ENTRYPOINTS = entrypoints
+
+
 class ActiveEnquiryAdministratorTest(BaseWebTest, BaseAdministratorTestMixin):
 
     def setUp(self):
@@ -423,18 +611,35 @@ class ActiveEnquiryAdministratorTest(BaseWebTest, BaseAdministratorTestMixin):
 
 def suite():
     suite = unittest.TestSuite()
-    suite.addTest(unittest.makeSuite(ActiveEnquiryActiveBidsTest))
-    suite.addTest(unittest.makeSuite(ActiveEnquiryActiveBidsWithDocumentTest))
-    suite.addTest(unittest.makeSuite(ActiveEnquiryCancellationsDocumentsTest))
-    suite.addTest(unittest.makeSuite(ActiveEnquiryCancellationsTest))
-    suite.addTest(unittest.makeSuite(ActiveEnquiryDocumentsTest))
-    suite.addTest(unittest.makeSuite(ActiveEnquiryDraftBidsWithDocumentTest))
-    suite.addTest(unittest.makeSuite(ActiveEnquiryPendingBidsTest))
-    suite.addTest(unittest.makeSuite(ActiveEnquiryPendingBidsWithDocumentTest))
-    suite.addTest(unittest.makeSuite(ActiveEnquiryQuestionsTest))
-    suite.addTest(unittest.makeSuite(ActiveEnquiryTest))
-    suite.addTest(unittest.makeSuite(ActiveEnquiryWithBidsCancellationsTest))
+    # auction tests
     suite.addTest(unittest.makeSuite(ActiveEnquiryAdministratorTest))
+    suite.addTest(unittest.makeSuite(ActiveEnquiryTest))
+    suite.addTest(unittest.makeSuite(ActiveEnquiryWithoutDSTest))
+    # questions test
+    suite.addTest(unittest.makeSuite(ActiveEnquiryQuestionsTest))
+    # auction with documents tests
+    suite.addTest(unittest.makeSuite(ActiveEnquiryDocumentsTest))
+    suite.addTest(unittest.makeSuite(ActiveEnquiryDocumentWithoutDSTest))
+    # cancellations tests
+    suite.addTest(unittest.makeSuite(ActiveEnquiryCancellationsTest))
+    suite.addTest(unittest.makeSuite(ActiveEnquiryCancellationsWithoutDSTest))
+    suite.addTest(unittest.makeSuite(ActiveEnquiryCancellationsWithBidsTest))
+
+    # cancellations with documents tests
+    suite.addTest(unittest.makeSuite(ActiveEnquiryCancellationsDocumentsTest))
+    suite.addTest(unittest.makeSuite(ActiveEnquiryCancellationsDocumentsWithoutDSTest))
+    # bids tests
+    suite.addTest(unittest.makeSuite(ActiveEnquiryBidsPendingTest))
+    suite.addTest(unittest.makeSuite(ActiveEnquiryBidsActiveTest))
+
+    suite.addTest(unittest.makeSuite(ActiveEnquiryBidsPendingWithoutDSTest))
+    suite.addTest(unittest.makeSuite(ActiveEnquiryBidsActiveWithoutDSTest))
+    # bids with documents tests
+    suite.addTest(unittest.makeSuite(ActiveEnquiryBidsPendingWithDocumentTest))
+    suite.addTest(unittest.makeSuite(ActiveEnquiryBidsActiveWithDocumentTest))
+
+    suite.addTest(unittest.makeSuite(ActiveEnquiryBidsPendingWithDocumentWithoutDSTest))
+    suite.addTest(unittest.makeSuite(ActiveEnquiryBidsActiveWithDocumentWithoutDSTest))
     return suite
 
 

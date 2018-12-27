@@ -39,7 +39,9 @@ class AuctionCancellationDocumentResource(AuctionCancellationDocumentResource):
         """
 
         manager = self.request.registry.queryMultiAdapter((self.request, self.context), IManager)
-        document = manager.create(self.request.validated['document'])
+
+        applicant = self.request.validated.get('document', self.request.validated.get('file'))
+        document = manager.create(applicant)
 
         if manager.save():
             msg = 'Create auction cancellation document {}'.format(document['id'])

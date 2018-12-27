@@ -61,10 +61,10 @@ class AuctionDocumentCreator(BaseCreator):
     resource_interface = IAuctionDocument
     validators = [validate_auction_document_post]
 
-    def _create(self, document):
-        uploaded_document = upload_file(self.request, document)
+    def _create(self, applicant):
+        uploaded_document = upload_file(self.request, applicant)
         self.context.documents.append(uploaded_document)
-        return document
+        return uploaded_document
 
 
 class BidDocumentCreator(BaseCreator):
@@ -75,10 +75,10 @@ class BidDocumentCreator(BaseCreator):
     resource_interface = IBidDocument
     validators = [validate_bid_document_post]
 
-    def _create(self, document):
-        uploaded_document = upload_file(self.request, document)
+    def _create(self, applicant):
+        uploaded_document = upload_file(self.request, applicant)
         self.context.documents.append(uploaded_document)
-        return document
+        return uploaded_document
 
 
 class CancellationDocumentCreator(BaseCreator):
@@ -88,10 +88,10 @@ class CancellationDocumentCreator(BaseCreator):
 
     resource_interface = ICancellationDocument
 
-    def _create(self, document):
-        uploaded_document = upload_file(self.request, document)
+    def _create(self, applicant):
+        uploaded_document = upload_file(self.request, applicant)
         self.context.documents.append(uploaded_document)
-        return document
+        return uploaded_document
 
 
 class ItemCreator(BaseCreator):

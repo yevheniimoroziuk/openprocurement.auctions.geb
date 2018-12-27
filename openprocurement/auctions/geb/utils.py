@@ -15,7 +15,7 @@ from openprocurement.auctions.geb.constants import (
 
 def upload_file(request, document, blacklisted_fields=DOCUMENT_BLACKLISTED_FIELDS):
     # offline document upload
-    if document.documentType in DOCUMENT_TYPE_OFFLINE:
+    if hasattr(document, 'documentType') and document.documentType in DOCUMENT_TYPE_OFFLINE:
         document.format = 'offline/on-site-examination'
         return document
     return base_upload_file(request, blacklisted_fields)

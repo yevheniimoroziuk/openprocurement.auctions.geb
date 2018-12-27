@@ -2,11 +2,11 @@
 from openprocurement.auctions.core.utils import (
     json_view,
     context_unpack,
-    opresource,
+    opresource
 )
 from openprocurement.auctions.core.validation import (
-    validate_file_upload,
     validate_file_update,
+    validate_file_upload,
     validate_patch_document_data
 )
 from openprocurement.auctions.core.views.mixins import AuctionDocumentResource
@@ -34,7 +34,7 @@ class AuctionDocumentResource(AuctionDocumentResource):
 
         manager = self.request.registry.queryMultiAdapter((self.request, self.context), IManager)
 
-        applicant = self.request.validated['document']
+        applicant = self.request.validated.get('document', self.request.validated.get('file'))
         document = manager.create(applicant)
 
         if document:
