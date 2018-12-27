@@ -107,6 +107,18 @@ def dump_bid_owner_upload_auction_protocol(test_case):
     test_case.app.authorization = auth
 
 
+def module_auction_get_auction_auction(test_case):
+    auth = test_case.app.authorization
+    expected_http_status = '200 OK'
+    auction_url = '/auctions/{}/auction'.format(test_case.auction['data']['id'])
+
+    test_case.app.authorization = ('Basic', ('auction', ''))
+    response = test_case.app.get(auction_url)
+
+    test_case.assertEqual(response.status, expected_http_status)
+    test_case.app.authorization = auth
+
+
 def organizer_activate_award(test_case):
     expected_http_status = '200 OK'
 

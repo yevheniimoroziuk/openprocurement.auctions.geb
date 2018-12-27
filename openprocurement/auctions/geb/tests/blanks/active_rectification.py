@@ -13,8 +13,7 @@ from openprocurement.auctions.geb.tests.fixtures.common import (
     test_question_data
 )
 from openprocurement.auctions.geb.tests.fixtures.active_rectification import (
-    AUCTION,
-    AUCTION_WITH_DOCUMENTS
+    AUCTION
 )
 from openprocurement.auctions.geb.tests.fixtures.items import (
     TEST_ITEM
@@ -316,28 +315,23 @@ def change_contractTerms(test_case):
     test_case.assertEqual(new, response.json['data'][field])
 
 
-def add_offline_document(test_case):
-    context = test_case.procedure.snapshot()
-    auction = context['auction']
+# document tests
+
+
+def auction_document_post_offline(test_case):
     expected_http_status = '201 Created'
-    entrypoint_pattern = '/auctions/{}/documents?acc_token={}'
-    entrypoint = entrypoint_pattern.format(auction['data']['id'], auction['access']['token'])
     document = deepcopy(test_document_data)
     document.pop('hash')
     document['accessDetails'] = 'test accessDetails'
     document['documentType'] = 'x_dgfAssetFamiliarization'
 
     request_data = {'data': document}
-    response = test_case.app.post_json(entrypoint, request_data)
+    response = test_case.app.post_json(test_case.ENTRYPOINTS['documents'], request_data)
     test_case.assertEqual(expected_http_status, response.status)
 
 
-def add_document(test_case):
-    context = test_case.procedure.snapshot()
-    auction = context['auction']
-    expected_http_status = '201 Created'
-    entrypoint_pattern = '/auctions/{}/documents?acc_token={}'
-    entrypoint = entrypoint_pattern.format(auction['data']['id'], auction['access']['token'])
+def auction_document_post(test_case):
+
     auction_documents_type = [
         'technicalSpecifications',
         'evaluationCriteria',
@@ -358,48 +352,61 @@ def add_document(test_case):
         'contractProforma'
     ]
     init_document = deepcopy(test_document_data)
-    url = test_case.generate_docservice_url(),
-    init_document['url'] = url[0]
+    init_document['url'] = test_case.generate_docservice_url()
+
+    expected_http_status = '201 Created'
     for doc_type in auction_documents_type:
         document = deepcopy(init_document)
         document['documentType'] = doc_type
 
         request_data = {'data': document}
-        response = test_case.app.post_json(entrypoint, request_data)
+        response = test_case.app.post_json(test_case.ENTRYPOINTS['documents'], request_data)
         test_case.assertEqual(expected_http_status, response.status)
 
 
-def patch_document(test_case):
-    context = test_case.procedure.snapshot(fixture=AUCTION_WITH_DOCUMENTS)
-    auction = context['auction']
-    document = context['documents'][0]
+def auction_document_post_without_ds(test_case):
+
+    file_title = 'name.doc'
+    file_info = ('file', file_title, 'content')
+    response = test_case.app.post(test_case.ENTRYPOINTS['documents'], upload_files=[file_info])
+
+    test_case.assertEqual(response.status, '201 Created')
+    test_case.assertEqual(response.content_type, 'application/json')
+    doc_id = response.json["data"]['id']
+    test_case.assertIn(doc_id, response.headers['Location'])
+    test_case.assertEqual(file_title, response.json["data"]["title"])
+
+
+def auction_document_put_without_ds(test_case):
+    file_title = 'name.doc'
+    file_info = ('file', file_title, 'content')
+    response = test_case.app.put(test_case.ENTRYPOINTS['document_put'], upload_files=[file_info])
+
+    test_case.assertEqual(response.status, '200 OK')
+    test_case.assertEqual(response.content_type, 'application/json')
+    test_case.assertEqual(file_title, response.json["data"]["title"])
+
+
+def auction_document_patch(test_case):
     field = 'documentType'
     new = 'technicalSpecifications'
 
-    entrypoint_pattern = '/auctions/{}/documents/{}?acc_token={}'
-    entrypoint = entrypoint_pattern.format(auction['data']['id'], document['data']['id'], auction['access']['token'])
     request_data = {'data': {field: new}}
 
-    response = test_case.app.patch_json(entrypoint, request_data)
+    response = test_case.app.patch_json(test_case.ENTRYPOINTS['document_patch'], request_data)
     document = response.json['data']
 
     test_case.assertEqual(response.status, '200 OK')
     test_case.assertEqual(document[field], new)
 
-    response = test_case.app.get(entrypoint)
+    response = test_case.app.get(test_case.ENTRYPOINTS['document_get'])
     document = response.json['data']
     test_case.assertEqual(document[field], new)
 
 
-def download_document(test_case):
-    context = test_case.procedure.snapshot(fixture=AUCTION_WITH_DOCUMENTS)
-    auction = context['auction']
-    document = context['documents'][0]
-
+def auction_document_download(test_case):
     # get document data
-    entrypoint_pattern = '/auctions/{}/documents/{}'
-    entrypoint = entrypoint_pattern.format(auction['data']['id'], document['data']['id'])
-    response = test_case.app.get(entrypoint)
+    response = test_case.app.get(test_case.ENTRYPOINTS['document_get'])
     document_data = response.json['data']
 
     # get document key
@@ -407,29 +414,30 @@ def download_document(test_case):
 
     # download document
     entrypoint_pattern = '/auctions/{}/documents/{}?download={}'
-    entrypoint = entrypoint_pattern.format(auction['data']['id'], document['data']['id'], key)
+    entrypoint = entrypoint_pattern.format(test_case.auction['data']['id'],
+                                           test_case.document['data']['id'],
+                                           key)
     response = test_case.app.get(entrypoint)
 
     test_case.assertEqual(response.content_type, 'application/msword')
 
 
-def put_document(test_case):
+def auction_document_put(test_case):
     new_document = deepcopy(test_document_data)
+    new_title = 'Title for new Document'
     url = test_case.generate_docservice_url(),
     new_document['url'] = url[0]
+    new_document['title'] = new_title
 
-    context = test_case.procedure.snapshot(fixture=AUCTION_WITH_DOCUMENTS)
-    auction = context['auction']
-    document = context['documents'][0]
-
-    entrypoint_pattern = '/auctions/{}/documents/{}?acc_token={}'
-    entrypoint = entrypoint_pattern.format(auction['data']['id'], document['data']['id'], auction['access']['token'])
     request_data = {'data': new_document}
 
-    response = test_case.app.put_json(entrypoint, request_data)
-    document = response.json['data']
+    response = test_case.app.put_json(test_case.ENTRYPOINTS['document_put'], request_data)
 
     test_case.assertEqual(response.status, '200 OK')
+
+    response = test_case.app.get(test_case.ENTRYPOINTS['document_get'])
+    document = response.json['data']
+    test_case.assertEqual(document['title'], new_title)
 
 
 def add_document_dump(test_case):

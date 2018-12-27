@@ -16,6 +16,7 @@ from openprocurement.auctions.geb.tests.blanks.active_qualification import (
     organizer_uploads_the_auction_protocol,
     winner_activate_award,
     winner_rejection_award,
+    module_auction_get_auction_auction,
     winner_upload_rejection_protocol
 )
 from openprocurement.auctions.geb.tests.fixtures.active_qualification import (
@@ -29,6 +30,7 @@ class StatusActiveQualificationTest(BaseWebTest):
     test_organizer_downloads_the_auction_protocol = snitch(organizer_uploads_the_auction_protocol)
     test_organizer_rejection_award = snitch(organizer_rejection_award)
     test_winner_rejection_award = snitch(winner_rejection_award)
+    test_module_auction_get_auction_auction = snitch(module_auction_get_auction_auction)
     test_winner_upload_rejection_protocol = snitch(winner_upload_rejection_protocol)
     test_auction_put_auction_document_audit = snitch(auction_put_auction_document_audit)
     test_bid_owner_downloads_the_auction_protocol = snitch(bid_owner_uploads_the_auction_protocol)

@@ -246,7 +246,7 @@ def bid_patch(test_case):
     test_case.app.authorization = auth
 
 
-def post_auction_document_audit(test_case):
+def module_auction_post_audit(test_case):
     context = test_case.procedure.snapshot(fixture=AUCTION)
     auction = context['auction']
 
@@ -269,7 +269,20 @@ def post_auction_document_audit(test_case):
     test_case.assertEqual(response.status, '200 OK')
 
 
-def get_auction_auction(test_case):
+def module_auction_post_audit_without_ds(test_case):
+
+    file_title = 'name.doc'
+    file_info = ('file', file_title, 'content')
+    response = test_case.app.post(test_case.ENTRYPOINTS['documents'], upload_files=[file_info])
+
+    test_case.assertEqual(response.status, '201 Created')
+    test_case.assertEqual(response.content_type, 'application/json')
+    doc_id = response.json["data"]['id']
+    test_case.assertIn(doc_id, response.headers['Location'])
+    test_case.assertEqual(file_title, response.json["data"]["title"])
+
+
+def module_auction_get_auction_auction(test_case):
     expected_http_status = '200 OK'
     context = test_case.procedure.snapshot(fixture=AUCTION)
     auction = context['auction']
@@ -303,7 +316,7 @@ def get_auction_urls_dump(test_case):
 
 
 @unittest.skipIf(SANDBOX_MODE, 'If sandbox mode is it enabled generating correct periods')
-def switch_to_qualification(test_case):
+def module_auction_switch_to_qualification(test_case):
     context = test_case.procedure.snapshot(fixture=AUCTION_WITH_URLS)
     auction = context['auction']
     bids = context['bids']
@@ -382,7 +395,7 @@ def switch_to_qualification(test_case):
 
 
 @unittest.skipIf(SANDBOX_MODE, 'If sandbox mode is it enabled generating correct periods')
-def switch_to_qualification_outstanding(test_case):
+def module_auction_switch_to_qualification_outstanding(test_case):
     context = test_case.procedure.snapshot(fixture=AUCTION_WITH_URLS)
     auction = context['auction']
     bids = context['bids']
@@ -434,7 +447,7 @@ def switch_to_qualification_outstanding(test_case):
     test_case.assertEqual(signing_start_date, expected_start_date)
 
 
-def switch_to_unsuccessful(test_case):
+def module_auction_switch_to_unsuccessful(test_case):
     expected_http_status = '200 OK'
     context = test_case.procedure.snapshot(fixture=AUCTION_WITH_URLS)
     auction = context['auction']
@@ -480,7 +493,7 @@ def switch_to_unsuccessful(test_case):
     test_case.assertEqual(response.json['data']['status'], 'unsuccessful')
 
 
-def post_result_invalid_number_of_bids(test_case):
+def module_auction_post_result_invalid_number_of_bids(test_case):
     expected_http_status = '422 Unprocessable Entity'
     context = test_case.procedure.snapshot(fixture=AUCTION_WITH_URLS)
     auction = context['auction']
@@ -514,7 +527,7 @@ def post_result_invalid_number_of_bids(test_case):
     test_case.assertEqual(response.status, expected_http_status)
 
 
-def update_auction_urls(test_case):
+def module_auction_update_auction_urls(test_case):
     context = test_case.procedure.snapshot(fixture=AUCTION)
     expected_http_status = '200 OK'
     request_data = {}
@@ -536,7 +549,7 @@ def update_auction_urls(test_case):
     test_case.assertEqual(response.status, expected_http_status)
 
 
-def get_participation_urls(test_case):
+def bid_get_participation_urls(test_case):
     context = test_case.procedure.snapshot(fixture=AUCTION_WITH_URLS)
     auction = context['auction']
     bids = context['bids']

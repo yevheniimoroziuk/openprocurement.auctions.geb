@@ -55,9 +55,9 @@ class AuctionDocumentCreator(object):
                 return False
         return True
 
-    def create(self, document):
+    def create(self, applicant):
         if self.validate():
-            document = upload_file(self._request, document)
+            document = upload_file(self._request, applicant)
             self._context.documents.append(document)
             self._context.changed = True
             return document
@@ -236,7 +236,14 @@ class AuctionCreatorsFactory(object):
         CancellationDocumentCreator
     )
 
+    def __init__(self, request, context):
+        self.request = request
+        self.context = context
+
     def __call__(self, applicant):
+        if 'file' in self.request.validated:
+            applicant = type(self.context).documents.model_class()
+
         for creator in self.creators:
             if creator.resource_interface.providedBy(applicant):
                 return creator
@@ -250,11 +257,11 @@ class Creator(object):
     factory = AuctionCreatorsFactory
 
     def __init__(self, request, context):
-        self._request = request
-        self._context = context
+        self.request = request
+        self.context = context
 
     def create(self, applicant):
-        factory = self.factory()
+        factory = self.factory(self.request, self.context)
         creator_type = factory(applicant)
-        creator = creator_type(self._request, self._context)
+        creator = creator_type(self.request, self.context)
         return creator.create(applicant)

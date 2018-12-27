@@ -35,7 +35,7 @@ class AuctionAuctionResource(APIResource):
 
     @json_view(permission='auction')
     def get(self):
-        if self.request.validated['auction_status'] != 'active.auction':
+        if self.request.validated['auction_status'] not in ('active.auction', 'active.qualification'):
             self.request.errors.add('body', 'data', 'Can\'t get auction info in current ({}) auction status'.format(
                 self.request.validated['auction_status']))
             self.request.errors.status = 403
