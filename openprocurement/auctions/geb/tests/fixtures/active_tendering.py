@@ -21,7 +21,8 @@ from openprocurement.auctions.geb.tests.fixtures.bids import (
     BID_PENDING_FIRST_WITH_DOCUMENT
 )
 from openprocurement.auctions.geb.tests.fixtures.documents import (
-    DOCUMENT
+    DOCUMENT,
+    OFFLINE_DOCUMENT
 )
 from openprocurement.auctions.geb.tests.fixtures.cancellations import (
     CANCELLATION,
@@ -74,6 +75,11 @@ AUCTION_WITH_QUESTIONS = auction
 auction = deepcopy(AUCTION)
 auction['documents'] = [DOCUMENT]
 AUCTION_WITH_DOCUMENTS = auction
+
+# auction with offline_documents
+auction = deepcopy(AUCTION)
+auction['documents'] = [OFFLINE_DOCUMENT]
+AUCTION_WITH_OFFLINE_DOCUMENTS = auction
 
 # auction with cancellation
 auction = deepcopy(AUCTION)

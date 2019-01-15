@@ -15,6 +15,17 @@ DOCUMENT = {
     "id": uuid4().hex,
     "dateModified": now.isoformat()
 }
+OFFLINE_DOCUMENT = {
+    "format": "offline/on-site-examination",
+    "title": "offline_document_title.doc",
+    "accessDetails": "offline document access Details",
+    "documentOf": "auction",
+    "datePublished": now.isoformat(),
+    "documentType": "x_dgfAssetFamiliarization",
+    "id": uuid4().hex,
+    "dateModified": now.isoformat()
+}
+
 document = deepcopy(DOCUMENT)
 document['documentOf'] = 'cancellation'
 CANCELLATION_DOCUMENT = document

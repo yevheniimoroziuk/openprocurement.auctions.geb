@@ -14,6 +14,7 @@ from openprocurement.auctions.geb.tests.states import (
 from openprocurement.auctions.geb.tests.fixtures.active_rectification import (
     AUCTION_WITH_QUESTIONS,
     AUCTION_WITH_DOCUMENTS,
+    AUCTION_WITH_OFFLINE_DOCUMENTS,
     AUCTION_WITHOUT_ITEMS,
     AUCTION_WITH_CANCELLATION,
     AUCTION_WITH_CANCELLATION_WITH_DOCUMENTS
@@ -35,6 +36,7 @@ from openprocurement.auctions.geb.tests.blanks.active_rectification import (
     auction_document_put_without_ds,
     auction_document_patch,
     auction_document_put,
+    auction_document_put_offline,
     auction_document_download,
     add_question,
     answer_question,
@@ -261,6 +263,36 @@ class ActiveRectificationDocumentsTest(BaseWebTest):
         self.ENTRYPOINTS = entrypoints
 
 
+class ActiveRectificationOfflineDocumentsTest(BaseWebTest):
+    docservice = True
+
+    test_auction_document_put_offline = snitch(auction_document_put_offline)
+
+    def setUp(self):
+        super(ActiveRectificationOfflineDocumentsTest, self).setUp()
+
+        procedure = ProcedureMachine()
+        procedure.set_db_connector(self.db)
+        procedure.toggle('active.rectification')
+        context = procedure.snapshot(fixture=AUCTION_WITH_OFFLINE_DOCUMENTS)
+
+        auction = context['auction']
+        document = context['documents'][0]
+
+        entrypoints = {}
+        entrypoint_pattern = '/auctions/{}/documents/{}?acc_token={}'
+        entrypoints['document_patch'] = entrypoint_pattern.format(auction['data']['id'], document['data']['id'], auction['access']['token'])
+
+        entrypoint_pattern = '/auctions/{}/documents/{}'
+        entrypoints['document_get'] = entrypoint_pattern.format(auction['data']['id'], document['data']['id'])
+
+        entrypoints['document_put'] = entrypoints['document_patch']
+
+        self.document = document
+        self.auction = auction
+        self.ENTRYPOINTS = entrypoints
+
+
 class ActiveRectificationDocumentsWithoutDSTest(BaseWebTest):
     docservice = False
 
@@ -385,6 +417,7 @@ def suite():
     suite.addTest(unittest.makeSuite(ActiveRectificationWithoutItemsTest))
     # documents tests
     suite.addTest(unittest.makeSuite(ActiveRectificationDocumentsTest))
+    suite.addTest(unittest.makeSuite(ActiveRectificationOfflineDocumentsTest))
     suite.addTest(unittest.makeSuite(ActiveRectificationDocumentsWithoutDSTest))
     return suite
 

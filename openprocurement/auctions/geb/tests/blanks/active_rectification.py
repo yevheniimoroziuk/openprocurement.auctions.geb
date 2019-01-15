@@ -324,6 +324,7 @@ def auction_document_post_offline(test_case):
     document.pop('hash')
     document['accessDetails'] = 'test accessDetails'
     document['documentType'] = 'x_dgfAssetFamiliarization'
+    document['format'] = 'offline/on-site-examination'
 
     request_data = {'data': document}
     response = test_case.app.post_json(test_case.ENTRYPOINTS['documents'], request_data)
@@ -438,6 +439,29 @@ def auction_document_put(test_case):
     response = test_case.app.get(test_case.ENTRYPOINTS['document_get'])
     document = response.json['data']
     test_case.assertEqual(document['title'], new_title)
+
+
+def auction_document_put_offline(test_case):
+    new_document = deepcopy(test_document_data)
+    new_title = 'Title for new Offline Document'
+    new_access_details = 'New Access details'
+
+    new_document.pop('hash')
+    new_document['title'] = new_title
+    new_document['accessDetails'] = new_access_details
+    new_document['format'] = 'offline/on-site-examination'
+    new_document['documentType'] = 'x_dgfAssetFamiliarization'
+
+    request_data = {'data': new_document}
+
+    response = test_case.app.put_json(test_case.ENTRYPOINTS['document_put'], request_data)
+
+    test_case.assertEqual(response.status, '200 OK')
+
+    response = test_case.app.get(test_case.ENTRYPOINTS['document_get'])
+    document = response.json['data']
+    test_case.assertEqual(document['title'], new_title)
+    test_case.assertEqual(document['accessDetails'], new_access_details)
 
 
 def add_document_dump(test_case):
