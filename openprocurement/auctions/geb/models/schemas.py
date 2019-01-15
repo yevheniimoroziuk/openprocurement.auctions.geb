@@ -54,7 +54,7 @@ from openprocurement.auctions.geb.interfaces import (
     IBid,
     ICancellation,
     ICancellationDocument,
-    IAuctionDocument,
+    IDocument,
     IBidDocument,
     IItem,
     IContract,
@@ -110,7 +110,7 @@ from openprocurement.auctions.geb.utils import (
 )
 
 
-@implementer(IAuctionDocument)
+@implementer(IDocument)
 class AuctionDocument(BaseDocument):
 
     documentOf = StringType(required=True, choices=['auction'], default='auction')
@@ -200,7 +200,7 @@ class AuctionAuctionPeriod(Period):
             expected_end_time_of_auction = calc_expected_auction_end_time(auctionPeriod.startDate)
             now = get_now()
             # check if auction not happen
-            if now > expected_end_time_of_auction:
+            if now > expected_end_time_of_auction:  # TODO test replaning
                 should_start_after = expected_end_time_of_auction
         return rounding_shouldStartAfter(should_start_after, auction).isoformat()
 
@@ -234,6 +234,7 @@ class Bid(Model):
     date = IsoDateTimeType()
     documents = ListType(ModelType(BidDocument), default=list())
     id = MD5Type(required=True, default=lambda: uuid4().hex)
+    changed = False
     owner = StringType()
     owner_token = StringType()
     participationUrl = URLType()
