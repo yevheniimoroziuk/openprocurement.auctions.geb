@@ -10,7 +10,8 @@ from openprocurement.auctions.core.validation import (
 )
 
 from openprocurement.auctions.core.interfaces import (
-    IManager
+    IAuctionManager,
+    IQuestionManager
 )
 
 from openprocurement.auctions.core.views.mixins import (
@@ -32,7 +33,7 @@ class AuctionQuestionResource(AuctionQuestionResource):
         """
         save = None
 
-        manager = self.request.registry.queryMultiAdapter((self.request, self.context), IManager)
+        manager = self.request.registry.queryMultiAdapter((self.request, self.context), IAuctionManager)
 
         applicant = self.request.validated['question']
         question = manager.create(applicant)
@@ -58,7 +59,7 @@ class AuctionQuestionResource(AuctionQuestionResource):
         """
         question = self.request.context
 
-        manager = self.request.registry.queryMultiAdapter((self.request, self.context), IManager)
+        manager = self.request.registry.queryMultiAdapter((self.request, self.context), IQuestionManager)
 
         manager.change()
         save = manager.save()

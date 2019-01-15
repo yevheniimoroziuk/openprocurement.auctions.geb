@@ -11,7 +11,8 @@ from openprocurement.auctions.core.validation import (
 )
 
 from openprocurement.auctions.core.interfaces import (
-    IManager
+    IAuctionManager,
+    IItemManager
 )
 
 
@@ -26,11 +27,9 @@ class AuctionItemResource(APIResource):
     def collection_get(self):
         """Auction Item List"""
 
-        manager = self.request.registry.queryMultiAdapter((self.request, self.context), IManager)
-
-        representation_manager = manager.get_representation_manager()
+        manager = self.request.registry.queryMultiAdapter((self.request, self.context), IAuctionManager)
         item_type = type(manager.context).items.model_class
-        return representation_manager.represent_listing(implementedBy(item_type))
+        return manager.represent_subresources_listing(implementedBy(item_type))
 
     @json_view(content_type="application/json", permission='create_item', validators=(validate_item_data))
     def collection_post(self):
@@ -40,37 +39,34 @@ class AuctionItemResource(APIResource):
         save = None
 
         applicant = self.request.validated['item']
-        manager = self.request.registry.queryMultiAdapter((self.request, self.context), IManager)
+        manager = self.request.registry.queryMultiAdapter((self.request, self.context), IAuctionManager)
         item = manager.create(applicant)
         save = manager.save()
 
         if save:
             msg = 'Create auction item {}'.format(item['id'])
-            manager.log('auction_item_create', msg)
-            representation_manager = manager.get_representation_manager()
-            return representation_manager.represent_created(item)
+            manager.log_action('auction_item_create', msg)
+            return manager.represent_subresource_created(item)
 
     @json_view(permission='view_auction')
     def get(self):
         """
         Auction Item Read
         """
-        manager = self.request.registry.queryMultiAdapter((self.request, self.context), IManager)
-        representation_manager = manager.get_representation_manager()
-        return representation_manager.represent()
+        manager = self.request.registry.queryMultiAdapter((self.request, self.context), IItemManager)
+        return manager.represent(self.request.method)
 
     @json_view(content_type="application/json", permission='edit_auction', validators=(validate_patch_item_data))
     def patch(self):
         """
         Auction Item Change
         """
-        manager = self.request.registry.queryMultiAdapter((self.request, self.context), IManager)
+        manager = self.request.registry.queryMultiAdapter((self.request, self.context), IItemManager)
 
         manager.change()
         save = manager.save()
 
         if save:
             msg = 'Updated auction item {}'.format(manager.context.id)
-            manager.log('auction_item_patch', msg)
-            representation_manager = manager.get_representation_manager()
-            return representation_manager.represent()
+            manager.log_action('auction_item_patch', msg)
+            return manager.represent(self.request.method)

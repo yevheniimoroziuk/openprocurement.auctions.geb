@@ -8,7 +8,7 @@ from openprocurement.auctions.core.views.mixins import (
     AuctionResource
 )
 from openprocurement.auctions.core.interfaces import (
-    IManager
+    IAuctionManager
 )
 from openprocurement.auctions.geb.validation import (
     validate_patch_resource_data
@@ -22,9 +22,14 @@ class AuctionResource(AuctionResource):
                validators=(validate_patch_resource_data,),
                permission='edit_auction')
     def patch(self):
-        manager = self.request.registry.queryMultiAdapter((self.request, self.context), IManager)
-
+        save = False
+        manager = self.request.registry.queryMultiAdapter((self.request, self.context), IAuctionManager)
         manager.change()
+        if self.request.authenticated_role == 'chronograph':
+            manager.check()
+        else:
+            manager.initialize(manager.context.status)
+
         save = manager.save()
 
         if save:
