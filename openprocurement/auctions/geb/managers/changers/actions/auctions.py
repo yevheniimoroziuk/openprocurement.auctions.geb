@@ -180,7 +180,7 @@ class AuctionPatchAction(BaseAction):
         pass
 
 
-class ModuleAuctionBringsAction(BaseAction):
+class ModuleAuctionBringsResultAction(BaseAction):
     """
         This action triggered then moudule auction brings result of auction
     """
@@ -203,6 +203,8 @@ class ModuleAuctionBringsAction(BaseAction):
         """
         # invalidate bids after auction
         context = self.context
+
+        context.auctionPeriod['endDate'] = get_now()
         auction_value = context.value.amount
         invalid_bids = [bid for bid in context.bids if bid.value.amount == auction_value]
         for bid in invalid_bids:

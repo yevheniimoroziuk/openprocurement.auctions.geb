@@ -119,13 +119,7 @@ class BidMakeActiveStatusAction(BaseAction):
         return False
 
     def act(self):
-        now = get_now()
-
-        # initialize qualified
-        self.context.qualified = False
-
-        # initialize_date
-        self.context.date = now
+        pass
 
 
 class BidPatchAction(BaseAction):

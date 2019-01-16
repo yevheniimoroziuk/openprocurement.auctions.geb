@@ -1,7 +1,5 @@
 from openprocurement.auctions.core.utils import (
-    apply_patch,
-    upload_file,
-    get_now
+    upload_file
 )
 from openprocurement.auctions.geb.managers.changers.base import (
     BaseResourceChanger
@@ -11,7 +9,7 @@ from openprocurement.auctions.geb.managers.changers.actions.auctions import (
     AuctionPatchActiveRectificationAction,
     AuctionPatchDraftAction,
     AuctionPhaseCommitAction,
-    ModuleAuctionBringsAction,
+    ModuleAuctionBringsResultAction,
     ModuleAuctionUpdateUrlsAction,
 )
 from openprocurement.auctions.geb.managers.changers.actions.chronograph import (
@@ -67,18 +65,9 @@ class ModuleAuctionChanger(BaseResourceChanger):
         trigger when module auction change auction
     """
     actions = (
-        ModuleAuctionBringsAction,
+        ModuleAuctionBringsResultAction,
         ModuleAuctionUpdateUrlsAction
     )
-
-    def _change(self):
-        """
-            When results come, it is end of auctionPerion
-        """
-        self.context.auctionPeriod['endDate'] = get_now()
-
-        modified = apply_patch(self.request, save=False, src=self.context.serialize())
-        return modified
 
 
 class ChronographChanger(BaseResourceChanger):
