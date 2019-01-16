@@ -165,19 +165,28 @@ def auction_patch_items(test_case):
 
 @unittest.skipIf(SANDBOX_MODE, 'If sandbox mode is it enabled generating correct periods')
 def phase_commit_invalid_auctionPeriod(test_case):
-
-    expected_http_status = '422 Unprocessable Entity'
-    request_data = {"data": {'status': 'active.rectification'}}
+    """
+        If during the creation of the procedure
+        was not specified the correct auctionPeriod.startDate,
+        then when there will be a phase commit, will give an error
+    """
 
     auth = test_case.app.authorization
     test_case.app.authorization = ('Basic', ('{}'.format(test_case.auction['access']['owner']), ''))
-    response = test_case.app.patch_json(test_case.ENTRYPOINTS['patch_auction'], request_data, status=422)
-    test_case.app.authorization = auth
 
+    request_data = {"data": {'status': 'active.rectification'}}
+    response = test_case.app.patch_json(test_case.ENTRYPOINTS['patch_auction'], request_data, status=403)
+
+    expected_http_status = '403 Forbidden'
     test_case.assertEqual(expected_http_status, response.status)
+
+    test_case.app.authorization = auth
 
 
 def invalid_phase_commit(test_case):
+    """
+        In procedure status 'draft' can`t patch status to any except 'active.rectification'
+    """
 
     next_status = 'active.tendering'
     request_data = {"data": {'status': next_status}}
@@ -186,6 +195,7 @@ def invalid_phase_commit(test_case):
     test_case.app.authorization = ('Basic', ('{}'.format(test_case.auction['access']['owner']), ''))
 
     test_case.app.patch_json(test_case.ENTRYPOINTS['patch_auction'], request_data, status=403)
+
     test_case.app.authorization = auth
 
 

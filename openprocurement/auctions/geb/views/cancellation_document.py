@@ -7,7 +7,7 @@ from openprocurement.auctions.core.validation import (
     validate_file_upload
 )
 from openprocurement.auctions.core.interfaces import (
-    ICancellationManager
+    IManager
 )
 from openprocurement.auctions.core.utils import opresource
 from openprocurement.auctions.core.views.mixins import (
@@ -26,22 +26,25 @@ class AuctionCancellationDocumentResource(AuctionCancellationDocumentResource):
     def collection_get(self):
         """Auction Cancellation Documents List"""
 
-        manager = self.request.registry.queryMultiAdapter((self.request, self.context), ICancellationManager)
+        manager = self.request.registry.queryMultiAdapter((self.request, self.context), IManager)
+        representation_manager = manager.get_representation_manager()
+
         document_type = type(manager.context).documents.model_class
-        return manager.represent_subresources_listing(implementedBy(document_type))
+        return representation_manager.represent_listing(implementedBy(document_type))
 
     @json_view(validators=(validate_file_upload,), permission='edit_auction')
     def collection_post(self):
         """
-        Auction Cancellation Document Upload
+        Auction Cancellation Document Post
         """
 
-        manager = self.request.registry.queryMultiAdapter((self.request, self.context), ICancellationManager)
+        manager = self.request.registry.queryMultiAdapter((self.request, self.context), IManager)
 
         applicant = self.request.validated.get('document', self.request.validated.get('file'))
         document = manager.create(applicant)
 
         if manager.save():
             msg = 'Create auction cancellation document {}'.format(document['id'])
-            manager.log_action('auction_cancellation_document_create', msg)
-            return manager.represent_subresource_created(document)
+            manager.log('auction_cancellation_document_create', msg)
+            representation_manager = manager.get_representation_manager()
+            return representation_manager.represent_created(document)
