@@ -8,7 +8,8 @@ from openprocurement.auctions.core.adapters import (
 )
 from openprocurement.auctions.core.utils import (
     set_specific_hour,
-    get_now
+    get_now,
+    log_auction_status_change
 )
 from openprocurement.auctions.geb.models.schemas import (
     Auction
@@ -93,6 +94,7 @@ class Awarding(AuctionConfigurator, BaseAwarding):
         # organizer reject award, auction switch to status 'unsuccessful'
 
         self.context.status = 'unsuccessful'
+        log_auction_status_change(self.request, self.context, self.context.status)
 
     def back_to_awarding(self):
         self._reject_award()
