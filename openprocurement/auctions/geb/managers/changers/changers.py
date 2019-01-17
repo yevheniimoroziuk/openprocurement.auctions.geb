@@ -1,4 +1,4 @@
-from openprocurement.auctions.core.utils import (
+from openprocurement.auctions.geb.utils import (
     upload_file
 )
 from openprocurement.auctions.geb.managers.changers.base import (
@@ -130,7 +130,7 @@ class AuctionDocumentPutChanger(BaseResourceChanger):
     )
 
     def _change(self):
-        document = upload_file(self.request)
+        document = upload_file(self.request, self.request.validated['document'],)
         auction = self.request.auction
 
         auction.documents.append(document)
