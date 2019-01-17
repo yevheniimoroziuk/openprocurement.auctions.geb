@@ -3,8 +3,11 @@ from datetime import timedelta
 from openprocurement.auctions.core.plugins.awarding.v3_1.adapters import (
     AwardingV3_1ConfiguratorMixin as BaseAwarding
 )
+from openprocurement.auctions.core.plugins.contracting.v3_1.adapters import (
+    ContractingV3_1ConfiguratorMixin as BaseContracting
+)
 from openprocurement.auctions.core.adapters import (
-    AuctionConfigurator
+    AuctionConfigurator as BaseAuctionConfigurator
 )
 from openprocurement.auctions.core.utils import (
     set_specific_hour,
@@ -19,7 +22,7 @@ from openprocurement.auctions.core.utils import (
 )
 
 
-class Awarding(AuctionConfigurator, BaseAwarding):
+class AuctionConfigurator(BaseAuctionConfigurator, BaseAwarding, BaseContracting):
     model = Auction
     pending_admission_for_one_bid = False
     NUMBER_OF_BIDS_TO_BE_QUALIFIED = 1
