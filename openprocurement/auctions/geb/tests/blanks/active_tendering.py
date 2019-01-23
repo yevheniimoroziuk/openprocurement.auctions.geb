@@ -509,19 +509,18 @@ def bid_delete_in_active_status(test_case):
 
 
 def bid_patch_in_draft_status(test_case):
-    expected_http_status = '403 Forbidden'
     request_data = {"data": {"status": "active"}}
     auth = test_case.app.authorization
 
     test_case.app.authorization = ('Basic', ('{}'.format(test_case.bid['access']['owner']), ''))
 
-    response = test_case.app.patch_json(test_case.ENTRYPOINTS['bid'], request_data, status=403)
-    test_case.assertEqual(expected_http_status, response.status)
-
     request_data = {"data": {'qualified': True}}
-    response = test_case.app.patch_json(test_case.ENTRYPOINTS['bid'], request_data, status=403)
-    test_case.assertEqual(expected_http_status, response.status)
+    response = test_case.app.patch_json(test_case.ENTRYPOINTS['bid'], request_data)
 
+    response = test_case.app.get(test_case.ENTRYPOINTS['bid'])
+    bid = response.json['data']
+    test_case.assertEqual(bid['status'], 'draft')
+    test_case.assertEqual(bid['qualified'], False)
     test_case.app.authorization = auth
 
 
@@ -634,6 +633,25 @@ def bid_make_pending(test_case):
     expected_data = ['date', 'owner', 'id', 'qualified', 'value', 'status', 'tenderers']
 
     request_data = {"data": {"status": "pending"}}
+
+    auth = test_case.app.authorization
+    test_case.app.authorization = ('Basic', ('{}'.format(test_case.bid['access']['owner']), ''))
+    response = test_case.app.patch_json(test_case.ENTRYPOINTS['bid'], request_data)
+    test_case.app.authorization = auth
+
+    test_case.assertEqual(expected_http_status, response.status)
+    test_case.assertSetEqual(set(expected_data), set(response.json['data'].keys()))
+
+
+def bid_make_pending_include_all_data(test_case):
+    response = test_case.app.get(test_case.ENTRYPOINTS['bid'])
+    bid = deepcopy(response.json['data'])
+
+    expected_http_status = '200 OK'
+    expected_data = ['date', 'owner', 'id', 'qualified', 'value', 'status', 'tenderers']
+
+    bid['status'] = 'pending'
+    request_data = {"data": bid}
 
     auth = test_case.app.authorization
     test_case.app.authorization = ('Basic', ('{}'.format(test_case.bid['access']['owner']), ''))

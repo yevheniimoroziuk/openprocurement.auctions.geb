@@ -209,27 +209,6 @@ def validate_bid_patch_pending(request, **kwargs):
     return True
 
 
-def validate_bid_patch_draft(request, **kwargs):
-    """
-        validate bid patch in 'draft' status
-    """
-
-    # check if it administrator bacause he can do everything
-    if request.authenticated_role == 'Administrator':
-        return True
-
-    # in bid status 'draft' can`t patch bid
-    # only can change status to 'pending'
-    patch_data = request.validated['json_data']
-    if patch_data.keys() != ['status']:
-        err_msg = 'Can\'t update bid status, in bid active status'
-        request.errors.add('body', 'data', err_msg)
-        request.errors.status = 403
-        return False
-
-    return True
-
-
 def validate_bid_patch_active(request, **kwargs):
     """
         validate bid patch in 'active' status

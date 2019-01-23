@@ -60,6 +60,7 @@ from openprocurement.auctions.geb.tests.blanks.active_tendering import (
     bid_get_in_pending_status,
     bid_make_activate,
     bid_make_pending,
+    bid_make_pending_include_all_data,
     bid_patch_bid_number_invalid,
     bid_patch_in_active_status,
     bid_patch_in_draft_status,
@@ -196,6 +197,7 @@ class ActiveTenderingBidsDraftTest(BaseWebTest):
 
     test_bid_patch_in_draft_status = snitch(bid_patch_in_draft_status)
     test_bid_make_pending = snitch(bid_make_pending)
+    test_bid_make_pending_include_all_data = snitch(bid_make_pending_include_all_data)
     test_bid_document_post = snitch(bid_document_post)
     test_bid_delete_in_draft_status = snitch(bid_delete_in_draft_status)
     test_bid_get_in_draft_status = snitch(bid_get_in_draft_status)

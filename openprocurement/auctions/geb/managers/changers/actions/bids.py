@@ -5,7 +5,6 @@ from openprocurement.auctions.core.utils import (
 from openprocurement.auctions.geb.validation import (
     validate_bid_activation,
     validate_bid_patch_active,
-    validate_bid_patch_draft,
     validate_bid_patch_auction_period,
     validate_bid_patch_pending,
     validate_bid_patch_pending_make_active_status,
@@ -19,7 +18,7 @@ from openprocurement.auctions.geb.managers.changers.base import (
 class BidActivationAction(BaseAction):
     """
     Bid Activation action
-    when bid owner activate bid (patch status to 'active'):
+    when bid owner activate bid (patch status to 'pending'):
 
     bid.qualified will set to False
     bid.date will set to now
@@ -69,9 +68,7 @@ class BidDraftPatchAction(BaseAction):
     """
         Bid patch in 'draft' status
     """
-    validators = [
-        validate_bid_patch_draft,
-    ]
+    validators = []
 
     @classmethod
     def demand(cls, request, context):
