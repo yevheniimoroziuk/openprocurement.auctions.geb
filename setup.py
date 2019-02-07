@@ -1,6 +1,6 @@
 from setuptools import setup, find_packages
 
-version = '1.0.3'
+VERSION = '1.0.4'
 
 entry_points = {
     'openprocurement.auctions.core.plugins': [
@@ -20,7 +20,7 @@ test_requires = [
 ]
 
 setup(name='openprocurement.auctions.geb',
-      version=version,
+      version=VERSION,
       description="",
       long_description=open("README.md").read(),
       # Get more strings from
