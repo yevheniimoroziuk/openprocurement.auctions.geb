@@ -4,6 +4,9 @@ from openprocurement.auctions.core.models import (
     Administrator_role
 )
 
+
+chronograph_role = whitelist('lots', 'next_check')
+
 auction_administrator_role = Administrator_role + whitelist(
     'tenderPeriod',
     'awards',
