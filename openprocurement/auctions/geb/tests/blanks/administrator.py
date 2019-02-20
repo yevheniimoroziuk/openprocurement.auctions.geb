@@ -1,7 +1,9 @@
 from datetime import timedelta
+from iso8601 import parse_date
 
 from openprocurement.auctions.core.utils import (
-    get_now
+    get_now,
+    TZ
 )
 
 
@@ -31,7 +33,7 @@ def auction_patch_field_auction_period(test_case):
 
     # change auctionPeriod to new date
     new_auction_period_start_date = get_now() + timedelta(days=42)
-    new_auction_period_start_date = new_auction_period_start_date.isoformat()
+    new_auction_period_start_date = new_auction_period_start_date.astimezone(TZ).isoformat()
     request_data = {"data": {'auctionPeriod': {'startDate': new_auction_period_start_date}}}
     response = test_case.app.patch_json(test_case.ENTRYPOINTS['patch_auction'], request_data)
     response = test_case.app.get(test_case.ENTRYPOINTS['get_auction'], request_data)
