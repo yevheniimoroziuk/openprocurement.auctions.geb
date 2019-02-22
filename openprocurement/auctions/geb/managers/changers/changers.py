@@ -88,7 +88,8 @@ class ChronographChanger(BaseResourceChanger):
         if actions:
             if all([self._validate(action.validators) for action in actions]):
                 change = self._change()
-                _ = [action.act() for action in actions]
+                for action in actions:
+                    action.act()
                 return change
 
 
