@@ -44,7 +44,7 @@ class BaseResourceChanger(object):
             if all([self._validate(action.validators) for action in actions]):
                 change = self._change()
                 if change:
-                    [action.act() for action in actions]
+                    _ = [action.act() for action in actions]
                 return change
 
 
