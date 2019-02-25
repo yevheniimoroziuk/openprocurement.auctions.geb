@@ -83,6 +83,15 @@ class ChronographChanger(BaseResourceChanger):
         SetAuctionPeriodStartDateAction
     )
 
+    def change(self):
+        actions = self.get_actions()
+        if actions:
+            if all([self._validate(action.validators) for action in actions]):
+                change = self._change()
+                for action in actions:
+                    action.act()
+                return change
+
 
 class BidChanger(BaseResourceChanger):
     """
