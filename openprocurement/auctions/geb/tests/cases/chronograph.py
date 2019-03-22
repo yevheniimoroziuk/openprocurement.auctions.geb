@@ -14,6 +14,7 @@ from openprocurement.auctions.geb.tests.blanks.chronograph import (
     enquiry_switch_to_active_auction,
     enquiry_switch_to_active_qualification,
     enquiry_switch_to_active_qualification_sandbox,
+    enquiry_switch_to_active_qualification_with_first_unsuccessful,
     enquiry_set_unsuccessful_bids,
     enquiry_switch_to_unsuccessful_bids_min_number_1_no_bids,
     enquiry_switch_to_unsuccessful_bids_min_number_2_no_bids,
@@ -127,6 +128,7 @@ class ChronographEndEnquiryTest(BaseWebTest):
     test_enquiry_switch_to_active_auction = snitch(enquiry_switch_to_active_auction)
     test_enquiry_switch_to_active_qualification = snitch(enquiry_switch_to_active_qualification)
     test_enquiry_switch_to_active_qualification_sandbox = snitch(enquiry_switch_to_active_qualification_sandbox)
+    test_enquiry_switch_to_active_qualification_with_first_unsuccessful = snitch(enquiry_switch_to_active_qualification_with_first_unsuccessful)
     test_enquiry_set_unsuccessful_bids = snitch(enquiry_set_unsuccessful_bids)
 
     def setUp(self):

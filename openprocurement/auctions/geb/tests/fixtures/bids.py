@@ -81,3 +81,12 @@ bid = deepcopy(BID_ACTIVE_FIRST)
 bid['id'] = uuid4().hex
 bid['documents'] = [BID_DOCUMENT]
 BID_ACTIVE_FIRST_WITH_DOCUMENT = bid
+
+# unsuccessful bids
+
+# bid in 'unsuccessful' status
+auction = deepcopy(BID_ACTIVE_FIRST)
+auction['id'] = uuid4().hex
+auction['status'] = 'unsuccessful'
+auction['qualified'] = False
+BID_UNSUCCESSFUL_FIRST = auction
