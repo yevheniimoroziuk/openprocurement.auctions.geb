@@ -19,7 +19,9 @@ from openprocurement.auctions.geb.tests.fixtures.active_enquiry import (
     END_ACTIVE_ENQUIRY_UNSUCCESSFUL_NO_BIDS_ACTIVE,
     END_ACTIVE_ENQUIRY_WITH_MIN_NUMBER_BID_1_WITH_2_ACTIVE_BIDS,
     END_ACTIVE_ENQUIRY_WITH_MIN_NUMBER_BID_1_WITH_NO_ACTIVE_BIDS,
-    END_ACTIVE_ENQUIRY_WITH_MIN_NUMBER_BID_2_WITH_1_ACTIVE_BID
+    END_ACTIVE_ENQUIRY_WITH_MIN_NUMBER_BID_2_WITH_1_ACTIVE_BID,
+    END_ACTIVE_ENQUIRY_AUCTION_QUALIFICATION_WITH_1_ACTIVE_AND_UNSUCCESSFUL
+
 )
 from openprocurement.auctions.geb.utils import (
     calculate_certainly_business_date as ccbd
@@ -342,6 +344,48 @@ def enquiry_switch_to_active_qualification(test_case):
     signing_end_date = parse_date(award['signingPeriod']['endDate'])
     expected_end_date = ccbd(verification_end_date, timedelta(days=0), specific_hour=23) + timedelta(minutes=59)
     test_case.assertEqual(signing_end_date, expected_end_date)
+
+
+def enquiry_switch_to_active_qualification_with_first_unsuccessful(test_case):
+    # end active.enquiry Period
+    # chronograph check
+    # minNumberOfQualifiedBids = 1
+    # if first bid is unsuccessful and second bid is in status 'active'
+    # switch procedure to 'active.qualification'
+
+    context = test_case.procedure.snapshot(fixture=END_ACTIVE_ENQUIRY_AUCTION_QUALIFICATION_WITH_1_ACTIVE_AND_UNSUCCESSFUL)
+    active_bid = context['bids'][1]
+    auction = context['auction']
+    entrypoint = '/auctions/{}'.format(auction['data']['id'])
+
+    # get auctionPeriod.enquiryPeriod.EndDate
+    response = test_case.app.get(entrypoint)
+    data = response.json['data']
+    enquiry_end = parse_date(data['enquiryPeriod']['endDate'])
+
+    # simulate enquiryPeriod.endDate
+    with freeze_time(enquiry_end):
+        request_data = {'data': {'id': auction['data']['id']}}
+        response = test_case.app.patch_json(entrypoint, request_data)
+
+    test_case.assertEqual(response.status, '200 OK')
+    test_case.assertEqual(response.json['data']["status"], 'active.qualification')
+
+    response = test_case.app.get('/auctions/{}/awards'.format(auction['data']['id']))
+
+    # check generated award
+    awards = response.json['data']
+    award = awards[0]
+    test_case.assertEqual(len(awards), 1)
+    test_case.assertIsNotNone(award.get('verificationPeriod'))
+    test_case.assertIsNotNone(award.get('signingPeriod'))
+    test_case.assertEqual(award['status'], 'pending')
+    test_case.assertEqual(award['bid_id'], active_bid['data']['id'])
+
+    # check bid of award
+    response = test_case.app.get('/auctions/{}/bids/{}'.format(auction['data']['id'], award['bid_id']))
+    bid = response.json['data']
+    test_case.assertEqual(bid['status'], 'active')
 
 
 def enquiry_switch_to_active_auction(test_case):

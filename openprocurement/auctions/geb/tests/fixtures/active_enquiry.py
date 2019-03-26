@@ -27,7 +27,8 @@ from openprocurement.auctions.geb.tests.fixtures.bids import (
     BID_DRAFT_WITH_DOCUMENT,
     BID_PENDING_FIRST,
     BID_PENDING_FIRST_WITH_DOCUMENT,
-    BID_PENDING_SECOND
+    BID_PENDING_SECOND,
+    BID_UNSUCCESSFUL_FIRST
 )
 from openprocurement.auctions.geb.tests.fixtures.calculator import (
     Calculator
@@ -168,6 +169,14 @@ auction = deepcopy(END_ACTIVE_ENQUIRY_AUCTION)
 auction['bids'] = [BID_ACTIVE_FIRST]
 auction['minNumberOfQualifiedBids'] = 1
 END_ACTIVE_ENQUIRY_AUCTION_QUALIFICATION = auction
+
+# auction in end 'active.enquiry' with first bid in status 'unsuccessful' and second bid in 'active'
+# and minNumberOfQualifiedBids = 1
+# which will lead to the status 'active.qualification' auction
+auction = deepcopy(END_ACTIVE_ENQUIRY_AUCTION)
+auction['bids'] = [BID_UNSUCCESSFUL_FIRST, BID_ACTIVE_SECOND]
+auction['minNumberOfQualifiedBids'] = 1
+END_ACTIVE_ENQUIRY_AUCTION_QUALIFICATION_WITH_1_ACTIVE_AND_UNSUCCESSFUL = auction
 
 # auction with cancellations fixture
 auction = deepcopy(AUCTION)

@@ -101,3 +101,6 @@ class AuctionConfigurator(BaseAuctionConfigurator, BaseAwarding, BaseContracting
 
     def back_to_awarding(self):
         self._reject_award()
+
+    def is_bid_valid(self, bid):
+        return bid['value'] is not None and bid['status'] not in ['unsuccessful']
