@@ -354,7 +354,7 @@ def enquiry_switch_to_active_qualification_with_first_unsuccessful(test_case):
     # switch procedure to 'active.qualification'
 
     context = test_case.procedure.snapshot(fixture=END_ACTIVE_ENQUIRY_AUCTION_QUALIFICATION_WITH_1_ACTIVE_AND_UNSUCCESSFUL)
-    bid = context['bids'][0]
+    active_bid = context['bids'][1]
     auction = context['auction']
     entrypoint = '/auctions/{}'.format(auction['data']['id'])
 
@@ -380,7 +380,7 @@ def enquiry_switch_to_active_qualification_with_first_unsuccessful(test_case):
     test_case.assertIsNotNone(award.get('verificationPeriod'))
     test_case.assertIsNotNone(award.get('signingPeriod'))
     test_case.assertEqual(award['status'], 'pending')
-    test_case.assertEqual(award['bid_id'], bid['data']['id'])
+    test_case.assertEqual(award['bid_id'], active_bid['data']['id'])
 
     # check bid of award
     response = test_case.app.get('/auctions/{}/bids/{}'.format(auction['data']['id'], award['bid_id']))
