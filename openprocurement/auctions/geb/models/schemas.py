@@ -72,6 +72,7 @@ from openprocurement.auctions.geb.constants import (
 )
 
 from openprocurement.auctions.geb.models.roles import (
+    chronograph_role,
     auction_administrator_role,
     auction_contractTerms_create_role,
     auction_create_role,
@@ -344,6 +345,8 @@ class Auction(BaseAuction):
             'edit_active.enquiry': auction_edit_enquiry_role,
 
             'Administrator': auction_administrator_role,
+
+            'chronograph': chronograph_role
         }
 
     def __local_roles__(self):                                                  # TODO rm black box
