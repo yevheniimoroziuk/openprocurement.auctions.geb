@@ -48,20 +48,6 @@ class ChronographEndRectificationTest(BaseWebTest):
         self.app.authorization = ('Basic', ('chronograph', ''))
 
 
-class ChronographTenderingTest(BaseWebTest):
-
-
-    def setUp(self):
-        super(ChronographTenderingTest, self).setUp()
-
-        procedure = ProcedureMachine()
-        procedure.set_db_connector(self.db)
-        procedure.toggle('active.tendering')
-
-        self.procedure = procedure
-        self.app.authorization = ('Basic', ('chronograph', ''))
-
-
 class ChronographEndTenderingTest(BaseWebTest):
 
     test_tendering_switch_to_unsuccessful_only_draft_bids = snitch(tendering_switch_to_unsuccessful_only_draft_bids)
@@ -131,7 +117,6 @@ class ChronographReplaningAuctionTest(BaseWebTest):
 
 def suite():
     suite = unittest.TestSuite()
-    suite.addTest(unittest.makeSuite(ChronographTenderingTest))
     suite.addTest(unittest.makeSuite(ChronographReplaningAuctionTest))
     return suite
 
