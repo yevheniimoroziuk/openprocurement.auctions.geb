@@ -220,3 +220,24 @@ class ModuleAuctionBringsResultAction(BaseAction):
         else:
             self.context.status = 'unsuccessful'
             log_auction_status_change(self.request, self.context, self.context.status)
+
+
+class SetAuctionPeriodStartDateAction(BaseAction):
+    """
+        Chronograph action
+        trigger when chronograph come in end of 'active.enquiry'
+    """
+    validators = []
+
+    @classmethod
+    def demand(cls, request, context):
+        """
+            Check if request patch auctionPeriod.startDate
+        """
+        auction_period = request.validated['json_data'].get('auctionPeriod')
+        if auction_period and auction_period.get('startDate'):
+            return cls
+        return False
+
+    def act(self):
+        pass

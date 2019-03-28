@@ -11,13 +11,13 @@ from openprocurement.auctions.geb.managers.changers.actions.auctions import (
     AuctionPhaseCommitAction,
     ModuleAuctionBringsResultAction,
     ModuleAuctionUpdateUrlsAction,
+    SetAuctionPeriodStartDateAction
 )
 from openprocurement.auctions.geb.managers.changers.actions.chronograph import (
     ChronographPatchAction,
     EndActiveEnquiryAction,
     EndActiveRectificationAction,
     EndActiveTenderingAction,
-    SetAuctionPeriodStartDateAction
 )
 from openprocurement.auctions.geb.managers.changers.actions.bids import (
     BidActivationAction,
@@ -66,7 +66,8 @@ class ModuleAuctionChanger(BaseResourceChanger):
     """
     actions = (
         ModuleAuctionBringsResultAction,
-        ModuleAuctionUpdateUrlsAction
+        ModuleAuctionUpdateUrlsAction,
+        SetAuctionPeriodStartDateAction
     )
 
 
@@ -80,7 +81,6 @@ class ChronographChanger(BaseResourceChanger):
         EndActiveEnquiryAction,
         EndActiveRectificationAction,
         EndActiveTenderingAction,
-        SetAuctionPeriodStartDateAction
     )
 
     def change(self):
