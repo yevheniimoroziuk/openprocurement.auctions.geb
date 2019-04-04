@@ -9,7 +9,7 @@ from openprocurement.auctions.geb.tests.base import (
 from openprocurement.auctions.geb.tests.states import (
     ProcedureMachine
 )
-from openprocurement.auctions.geb.tests.blanks.auction_bridge import (
+from openprocurement.auctions.geb.tests.blanks.auction_period_patch import (
     set_auctionPeriod_startDate_enquiring,
     set_auctionPeriod_startDate_rectification,
     set_auctionPeriod_startDate_tendering
