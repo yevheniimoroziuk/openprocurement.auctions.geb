@@ -6,6 +6,11 @@ from openprocurement.auctions.geb.tests.base import (
     BaseWebTest,
 )
 
+from openprocurement.auctions.geb.tests.blanks.auction_period_patch import (
+    set_auctionPeriod_startDate_enquiring,
+    set_auctionPeriod_startDate_rectification,
+    set_auctionPeriod_startDate_tendering
+)
 from openprocurement.auctions.geb.tests.states import (
     ProcedureMachine
 )
@@ -45,20 +50,6 @@ class ChronographEndRectificationTest(BaseWebTest):
         entrypoints['auction'] = '/auctions/{}'.format(self.auction['data']['id'])
         self.ENTRYPOINTS = entrypoints
 
-        self.app.authorization = ('Basic', ('chronograph', ''))
-
-
-class ChronographTenderingTest(BaseWebTest):
-
-
-    def setUp(self):
-        super(ChronographTenderingTest, self).setUp()
-
-        procedure = ProcedureMachine()
-        procedure.set_db_connector(self.db)
-        procedure.toggle('active.tendering')
-
-        self.procedure = procedure
         self.app.authorization = ('Basic', ('chronograph', ''))
 
 
@@ -129,10 +120,62 @@ class ChronographReplaningAuctionTest(BaseWebTest):
         self.app.authorization = ('Basic', ('chronograph', ''))
 
 
+class ChronographTenderingTest(BaseWebTest):
+    test_set_auctionPeriod_startDate_tendering = snitch(set_auctionPeriod_startDate_tendering)
+
+    def setUp(self):
+        super(ChronographTenderingTest, self).setUp()
+
+        procedure = ProcedureMachine()
+        procedure.set_db_connector(self.db)
+        procedure.toggle('active.tendering')
+
+        self.procedure = procedure
+        self.app.authorization = ('Basic', ('chronograph', ''))
+
+
+class ChronographRectificationTest(BaseWebTest):
+    test_set_auctionPeriod_startDate_rectification = snitch(set_auctionPeriod_startDate_rectification)
+
+    def setUp(self):
+        super(ChronographRectificationTest, self).setUp()
+
+        procedure = ProcedureMachine()
+        procedure.set_db_connector(self.db)
+        procedure.toggle('active.rectification')
+        context = procedure.snapshot()
+
+        self.auction = context['auction']
+
+        entrypoints = {}
+        entrypoints['auction'] = '/auctions/{}'.format(self.auction['data']['id'])
+        self.ENTRYPOINTS = entrypoints
+
+        self.app.authorization = ('Basic', ('chronograph', ''))
+
+
+class ChronographEnquiryTest(BaseWebTest):
+
+    test_set_auctionPeriod_startDate_enquiring = snitch(set_auctionPeriod_startDate_enquiring)
+
+    def setUp(self):
+        super(ChronographEnquiryTest, self).setUp()
+
+        procedure = ProcedureMachine()
+        procedure.set_db_connector(self.db)
+        procedure.toggle('active.enquiry')
+
+        self.procedure = procedure
+        self.app.authorization = ('Basic', ('chronograph', ''))
+
+
 def suite():
     suite = unittest.TestSuite()
-    suite.addTest(unittest.makeSuite(ChronographTenderingTest))
     suite.addTest(unittest.makeSuite(ChronographReplaningAuctionTest))
+    suite.addTest(unittest.makeSuite(ChronographTenderingTest))
+    suite.addTest(unittest.makeSuite(ChronographEnquiryTest))
+    suite.addTest(unittest.makeSuite(ChronographRectificationTest))
+
     return suite
 
 
