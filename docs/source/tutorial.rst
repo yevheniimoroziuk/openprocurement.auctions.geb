@@ -286,4 +286,3 @@ Auction after award activation:
 
 .. include:: tutorial/active_awarded_auction_after_contract_activation.http
     :code:
-

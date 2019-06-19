@@ -28,8 +28,7 @@ Status Workflow
             "active.enquiry" -> "active.qualification" [color="0.7777 1.0000 0.5020"];
             edge[dir="forward"];
             "active.qualification" -> "active.awarded" [color="0.7777 1.0000 0.5020"];
-            edge[dir="forward"];
-            "active.awarded" -> "complete" [color="0.7777 1.0000 0.5020"];         
+  
         color=white;
         }
             edge[style=solid]
@@ -38,6 +37,17 @@ Status Workflow
             "active.qualification" -> "unsuccessful" [color="0.0000 0.0000 0.3882"];
             edge[style=solid];
             "active.awarded" -> "unsuccessful" [color="0.0000 0.0000 0.3882"];
+
+            edge[style=dashed]
+            "active.enquiry" -> "cancelled" [color="0.0000 0.0000 0.3882"];
+            edge[style=dashed];
+            "active.qualification" -> "cancelled" [color="0.0000 0.0000 0.3882"];
+            edge[style=dashed];
+            "active.awarded" -> "cancelled" [color="0.0000 0.0000 0.3882"];
+        
+        node [style=filled, fillcolor=seashell2];
+        edge[dir="forward"];
+        "active.awarded" -> "complete" [color="0.7777 1.0000 0.5020"];       
     }
 
 Roles
@@ -73,8 +83,6 @@ Status Workflow
             "active.auction" -> "active.qualification" [color="0.7777 1.0000 0.5020"];
             edge[dir="forward"];
             "active.qualification" -> "active.awarded" [color="0.7777 1.0000 0.5020"];
-            edge[dir="forward"];
-            "active.awarded" -> "complete" [color="0.7777 1.0000 0.5020"];         
         color=white;
         }
         edge[style=solid]
@@ -87,6 +95,21 @@ Status Workflow
         "active.qualification" -> "unsuccessful" [color="0.0000 0.0000 0.3882"];
         edge[style=solid];
         "active.awarded" -> "unsuccessful" [color="0.0000 0.0000 0.3882"];
+
+        edge[style=dashed]
+        "active.tendering" -> "cancelled" [color="0.0000 0.0000 0.3882"];
+        edge[style=dashed]
+        "active.enquiry" -> "cancelled" [color="0.0000 0.0000 0.3882"];
+        edge[style=dashed]
+        "active.auction" -> "cancelled" [color="0.0000 0.0000 0.3882"];
+        edge[style=dashed]
+        "active.qualification" -> "cancelled" [color="0.0000 0.0000 0.3882"];
+        edge[style=dashed];
+        "active.awarded" -> "cancelled" [color="0.0000 0.0000 0.3882"];
+
+        node [style=filled, fillcolor=seashell2];
+        edge[dir="forward"];
+        "active.awarded" -> "complete" [color="0.7777 1.0000 0.5020"];      
     }
 
 Roles
